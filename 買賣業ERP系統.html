@@ -1147,7 +1147,8 @@ function renderTrialBalance() {
 function renderIncomeStatement() {
   const now = new Date();
   const mode = document.getElementById('isMode')?.value || 'year';
-  let html = `<div class="card"><div class="card-header"><h2>財務報表—損益表</h2>
+  const company = (STATE.license && STATE.license.company) || '';
+  let html = `<div class="card"><div class="card-header"><h2>${company?company+' — ':''}損益表</h2>
     <div style="display:flex;gap:8px;align-items:center;">
       <select id="isMode" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">
         <option value="year"${mode==='year'?' selected':''}>年度比較</option>
@@ -1266,7 +1267,8 @@ function renderIncomeStatement() {
 function renderBalanceSheet() {
   const asOf = document.getElementById('bsDate')?.value || new Date().toISOString().split('T')[0];
   const balances = getBalancesAsOf(asOf);
-  let html = `<div class="card"><div class="card-header"><h2>財務報表—資產負債表</h2><span style="font-size:12px;color:var(--text-muted);"><input type="date" id="bsDate" value="${asOf}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()"></span></div><div class="card-body">`;
+  const company = (STATE.license && STATE.license.company) || '';
+  let html = `<div class="card"><div class="card-header"><h2>${company?company+' — ':''}資產負債表</h2><span style="font-size:12px;color:var(--text-muted);"><input type="date" id="bsDate" value="${asOf}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()"></span></div><div class="card-body">`;
 
   // Assets
   html += `<div class="report-section"><h3>資產</h3><table class="data-table"><tbody>`;
