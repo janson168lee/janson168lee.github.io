@@ -108,7 +108,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
     <h1>你的企業，值得一套<span>真正用得起的</span><br>管理系統</h1>
     <p>買賣業 ERP ＋ 人力資源薪資管理　｜　免安裝、免月費、雙擊就開<br>Excel 自由匯出匯入，資料永遠不被綁架</p>
     <div class="hero-btns">
-      <a href="#download" class="btn btn-gold">📥 免費下載</a>
+      <a href="erp-free-業務推展包.zip" class="btn btn-gold" download>📥 免費下載</a>
       <a href="#contact" class="btn btn-outline">📞 預約導覽</a>
     </div>
   </div>
@@ -200,15 +200,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
         <div class="feats">✓ 完整功能無刪減<br>✓ 單機單人使用<br>✓ Excel 匯出匯入<br>✓ 手動備份<br>✓ 線上教學影片</div>
       </div>
       <div class="price-card popular">
-        <h3>⭐ 專業版</h3><div class="amt">9,800</div><div class="period">元 / 年</div>
+        <h3>⭐ 專業版</h3><div class="amt" data-price="pro">9,800</div><div class="period">元 / 年</div>
         <div class="feats">✓ 免費版全部功能<br>✓ 多使用者權限<br>✓ 大容量儲存<br>✓ 自動雲端備份<br>✓ 稅法級距自動更新<br>✓ Email 客服支援</div>
       </div>
       <div class="price-card">
-        <h3>🏢 企業版</h3><div class="amt">39,800</div><div class="period">元 / 年起</div>
+        <h3>🏢 企業版</h3><div class="amt" data-price="enterprise">39,800</div><div class="period">元 / 年起</div>
         <div class="feats">✓ 專業版全部功能<br>✓ 多公司帳本<br>✓ 跨據點同步<br>✓ API 介接<br>✓ 專屬客服窗口<br>✓ 到場導入服務</div>
       </div>
       <div class="price-card">
-        <h3>🏛️ 事務所版</h3><div class="amt">29,800</div><div class="period">元 / 年起</div>
+        <h3>🏛️ 事務所版</h3><div class="amt" data-price="firm">29,800</div><div class="period">元 / 年起</div>
         <div class="feats">✓ 專業版全部功能<br>✓ 多客戶集中管理<br>✓ 客戶資料隔離<br>✓ 批次匯出匯入<br>✓ 白牌授權<br>✓ 優先功能建議</div>
       </div>
     </div>
@@ -233,5 +233,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
   買賣業 ERP 系統 ＋ 人力資源薪資管理系統　｜　專為台灣中小企業打造　｜　© 2026
 </footer>
 
+<script>
+// ── Admin Panel (access via ?admin) ──
+const DEFAULT_PRICES = {pro:9800, enterprise:39800, firm:29800};
+function pr(k){return JSON.parse(localStorage.getItem('erpfree_prices')||'{}')[k]||DEFAULT_PRICES[k];}
+function loadPrices(){document.querySelectorAll('[data-price]').forEach(el=>{el.textContent=Number(pr(el.dataset.price)).toLocaleString();});}
+(function(){
+  if(location.search.includes('admin')){
+    let p=JSON.parse(localStorage.getItem('erpfree_prices')||'{}');
+    document.body.insertAdjacentHTML('afterbegin','<div id="adminBar" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#1b2a4a;color:#fff;padding:12px 24px;display:flex;gap:12px;align-items:center;font-size:14px;flex-wrap:wrap;"><strong>🔧 價格管理</strong> 專業版 <input id="apPro" type="number" value="'+(p.pro||DEFAULT_PRICES.pro)+'" style="width:80px;padding:4px;border-radius:4px;border:none;"> 元/年　企業版 <input id="apEnt" type="number" value="'+(p.enterprise||DEFAULT_PRICES.enterprise)+'" style="width:80px;padding:4px;border-radius:4px;border:none;"> 元/年　事務所版 <input id="apFirm" type="number" value="'+(p.firm||DEFAULT_PRICES.firm)+'" style="width:80px;padding:4px;border-radius:4px;border:none;"> 元/年 <button onclick="saveAdminPrices()" style="padding:6px 16px;background:#d4820a;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700;">儲存</button> <button onclick="location.href=location.pathname" style="padding:6px 16px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:4px;cursor:pointer;">關閉</button></div>');
+    document.body.style.paddingTop='60px';
+  }
+})();
+function saveAdminPrices(){
+  const p={pro:Number(document.getElementById('apPro').value)||9800,enterprise:Number(document.getElementById('apEnt').value)||39800,firm:Number(document.getElementById('apFirm').value)||29800};
+  localStorage.setItem('erpfree_prices',JSON.stringify(p));loadPrices();
+}
+loadPrices();
+</script>
 </body>
 </html>
