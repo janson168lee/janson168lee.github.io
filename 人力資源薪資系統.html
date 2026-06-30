@@ -147,7 +147,7 @@ select.filter-select { padding:7px 10px; border:1px solid var(--border); border-
       <div class="nav-item" data-page="annual-summary"><span class="nav-icon">📊</span>年度薪資彙總</div>
     </div>
   </nav>
-  <div class="sidebar-footer"><div style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px;">專業版 V2.0</div><div id="sidebarLicense" style="font-size:9px;color:var(--text-sidebar);margin-top:2px;">授權：未啟用</div><span>台灣中小企業適用</span><span id="sidebarClock">--</span></div>
+  <div class="sidebar-footer"><div id="sidebarVer" style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px;">專業版 V2.0</div><div id="sidebarLicense" style="font-size:9px;color:var(--text-sidebar);margin-top:2px;">授權：未啟用</div><span>台灣中小企業適用</span><span id="sidebarClock">--</span></div>
 </aside>
 
 <!-- ═══════════════ MAIN ═══════════════ -->
@@ -167,6 +167,14 @@ select.filter-select { padding:7px 10px; border:1px solid var(--border); border-
    ═══════════════════════════════════════════════════════ */
 
 const STATE = { currentPage:'employees', editingId:null, currentUser:null };
+
+// ═══════════════════════════════════════════════
+//  VERSION CHECK — Free vs Pro
+// ═══════════════════════════════════════════════
+function isFree(){ return STATE.license && STATE.license.tier === 1; }
+function isPro(){ return STATE.license && STATE.license.tier === 2; }
+function getLimits(){ return isFree() ? {employees:20,attendances:500,payroll:12} : null; }
+function checkLimit(type){ const l=getLimits(); if(!l) return false; const m={'employees':employees,'attendances':attendances,'payroll':payrollRecords.length}; const d=m[type]; return d&&d>=l[type]; }
 
 // ═══════════════════════════════════════════════
 //  LICENSE SYSTEM — Offline Key Verification
@@ -242,10 +250,12 @@ async function activateLicense(){
 }
 
 function updateSidebarLicense(){
-  const el=document.getElementById('sidebarLicense');
+  const el = document.getElementById('sidebarLicense');
   if(!el) return;
-  if(STATE.license){
-    el.innerHTML=`授權：<span style="color:var(--accent-light);">${STATE.license.company}</span> | ${STATE.license.tierName}`;
+  if(STATE.license && STATE.license.valid){
+    const badge = isPro() ? '<span style="background:#1b7d46;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">專業版</span>' : '<span style="background:#d4820a;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">免費版</span>';
+    el.innerHTML = badge + ' ' + STATE.license.company;
+    el.style.display = '';
   } else {
     el.textContent='授權：未啟用';
   }
@@ -354,6 +364,8 @@ let employees, salaryStructures, attendances, leaves, overtimes, payrollRecords;
     STATE.license = result;
   }
   updateSidebarLicense();
+  const ver = document.getElementById('sidebarVer');
+  if(ver && STATE.license){ ver.textContent = isPro() ? '專業版 V2.0' : '免費版 V2.0'; ver.style.color = isPro() ? '#1b7d46' : '#d4820a'; }
   employees = await load('employees', DEFAULT_EMPLOYEES);
   salaryStructures = await load('salaryStructures', DEFAULT_SALARIES);
   attendances = await load('attendances', []);
@@ -404,6 +416,16 @@ const pageTitles={
 
 function renderPage(){
   const page=STATE.currentPage;
+  if(isFree()){
+    const limits=getLimits();
+    const names={employees:'員工',attendances:'出勤記錄',payroll:'薪資月份'};
+    for(const[k,v] of Object.entries(limits)){
+      if(checkLimit(k)){
+        const mc=document.getElementById('mainContent');
+        if(mc) mc.insertAdjacentHTML('afterbegin','<div style="background:#fef3e0;color:#b87008;padding:8px 16px;font-size:12px;border-radius:4px;margin-bottom:12px;">⚠️ 免費版'+names[k]+'已達上限（'+v+'），請升級專業版。聯絡：02-26293721</div>');
+      }
+    }
+  }
   document.getElementById('pageTitle').textContent=pageTitles[page]||page;
   updateToolbar();
   const c=document.getElementById('mainContent');
@@ -444,7 +466,7 @@ function renderEmployees(){
 
   h+=`<table class="data-table"><thead><tr><th>編號</th><th>姓名</th><th>部門</th><th>職稱</th><th>身分證</th><th>電話</th><th>到職日</th><th>狀態</th><th></th></tr></thead><tbody>`;
   for(const e of filtered){
-    h+=`<tr><td style="font-family:var(--font-mono);font-size:12px;">${e.code}</td><td><strong>${e.name}</strong></td><td>${e.dept}</td><td>${e.title}</td><td style="font-family:var(--font-mono);font-size:12px;">${e.idNumber.slice(0,1)}*****${e.idNumber.slice(-3)}</td><td>${e.phone}</td><td>${fmtDate(e.hireDate)}</td><td><span class="badge ${e.status==='在職'?'badge-success':'badge-danger'}">${e.status}</span></td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="showEmployeeModal('${e.id}')">編輯</button><button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteEmployee('${e.id}')">刪除</button></td></tr>`;
+    h+=`<tr><td style="font-family:var(--font-mono);font-size:12px;">${e.code}</td><td><strong>${e.name}</strong></td><td>${e.dept}</td><td>${e.title}</td><td style="font-family:var(--font-mono);font-size:12px;">${e.idNumber.slice(0,1)}*****${e.idNumber.slice(-3)}</td><td>${e.phone}</td><td>${fmtDate(e.hireDate)}</td><td><span class="badge ${e.status==='在職'?'badge-success':'badge-danger'}">${e.status}</span></td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="showEmployeeModal('${e.id}')">編輯</button><button class="btn btn-danger btn-xs" style="margin-left:4px;${isFree()?'display:none;':''}" onclick="deleteEmployee('${e.id}')">刪除</button></td></tr>`;
   }
   h+=`</tbody></table></div></div>`;
   return h;
@@ -544,7 +566,7 @@ function renderAttendance(){
     h+=`<table class="data-table"><thead><tr><th>日期</th><th>員工</th><th>上班</th><th>下班</th><th>狀態</th><th>備註</th><th></th></tr></thead><tbody>`;
     for(const a of filtered){
       const statusClass=a.status==='正常'?'badge-success':(a.status==='遲到'?'badge-warning':(a.status==='早退'?'badge-warning':'badge-danger'));
-      h+=`<tr><td>${fmtDate(a.date)}</td><td>${empName(a.employeeId)}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td><span class="badge ${statusClass}">${a.status}</span></td><td>${a.note||''}</td><td style="text-align:right;"><button class="btn btn-danger btn-xs" onclick="deleteAttendance('${a.id}')">刪除</button></td></tr>`;
+      h+=`<tr><td>${fmtDate(a.date)}</td><td>${empName(a.employeeId)}</td><td>${a.checkIn||'—'}</td><td>${a.checkOut||'—'}</td><td><span class="badge ${statusClass}">${a.status}</span></td><td>${a.note||''}</td><td style="text-align:right;"><button class="btn btn-danger btn-xs" style="${isFree()?'display:none;':''}" onclick="deleteAttendance('${a.id}')">刪除</button></td></tr>`;
     }
     h+=`</tbody></table>`;
   }
@@ -588,7 +610,7 @@ function renderLeave(){
     h+=`<table class="data-table"><thead><tr><th>員工</th><th>類型</th><th>起日</th><th>迄日</th><th>時數</th><th>狀態</th><th>原因</th><th></th></tr></thead><tbody>`;
     for(const l of [...leaves].reverse()){
       const sc=l.status==='核准'?'badge-success':(l.status==='待審'?'badge-warning':'badge-danger');
-      h+=`<tr><td>${empName(l.employeeId)}</td><td>${l.type}</td><td>${fmtDate(l.startDate)}</td><td>${fmtDate(l.endDate)}</td><td class="num">${l.hours}h</td><td><span class="badge ${sc}">${l.status}</span></td><td>${l.reason||''}</td><td style="text-align:right;"><button class="btn btn-outline btn-xs" onclick="approveLeave('${l.id}')">核准</button><button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteLeave('${l.id}')">刪除</button></td></tr>`;
+      h+=`<tr><td>${empName(l.employeeId)}</td><td>${l.type}</td><td>${fmtDate(l.startDate)}</td><td>${fmtDate(l.endDate)}</td><td class="num">${l.hours}h</td><td><span class="badge ${sc}">${l.status}</span></td><td>${l.reason||''}</td><td style="text-align:right;"><button class="btn btn-outline btn-xs" onclick="approveLeave('${l.id}')">核准</button><button class="btn btn-danger btn-xs" style="margin-left:4px;${isFree()?'display:none;':''}" onclick="deleteLeave('${l.id}')">刪除</button></td></tr>`;
     }
     h+=`</tbody></table>`;
   }
@@ -636,7 +658,7 @@ function renderOvertime(){
       const hourRate=sal?Math.round(sal.baseSalary/30/8):0;
       // Taiwan overtime rate: first 2hr x1.34, 2-4hr x1.67
       const otPay=o.hours<=2?Math.round(o.hours*hourRate*1.34):Math.round(2*hourRate*1.34+(o.hours-2)*hourRate*1.67);
-      h+=`<tr><td>${fmtDate(o.date)}</td><td>${empName(o.employeeId)}</td><td><span class="badge badge-warning">${o.type}</span></td><td class="num">${o.hours}h</td><td class="num">${fmtMoney(otPay)}</td><td>${o.note||''}</td><td style="text-align:right;"><button class="btn btn-danger btn-xs" onclick="deleteOvertime('${o.id}')">刪除</button></td></tr>`;
+      h+=`<tr><td>${fmtDate(o.date)}</td><td>${empName(o.employeeId)}</td><td><span class="badge badge-warning">${o.type}</span></td><td class="num">${o.hours}h</td><td class="num">${fmtMoney(otPay)}</td><td>${o.note||''}</td><td style="text-align:right;"><button class="btn btn-danger btn-xs" style="${isFree()?'display:none;':''}" onclick="deleteOvertime('${o.id}')">刪除</button></td></tr>`;
     }
     h+=`</tbody></table>`;
   }
@@ -807,7 +829,7 @@ function renderPayslip(){
     h+=`<div style="text-align:center;padding:30px;color:var(--text-muted);">${emp.name} ${ym.replace('-','/')} 尚無薪資記錄，請先至「每月薪資計算」產生</div>`;
   } else {
     h+=`<div class="pay-slip">
-      <h2>員工薪資明細單</h2>
+      <h2>${STATE.license&&STATE.license.company?STATE.license.company+' — ':''}員工薪資明細單</h2>
       <table><tr><td><strong>員工：</strong>${emp.code} ${emp.name}</td><td style="text-align:right;"><strong>薪資月份：</strong>${ymKey.slice(0,4)}年${ymKey.slice(4)}月</td></tr>
       <tr><td><strong>部門：</strong>${emp.dept}</td><td style="text-align:right;"><strong>職稱：</strong>${emp.title}</td></tr></table>
       <hr style="margin:16px 0;border-color:var(--border);">
