@@ -1143,12 +1143,22 @@ function renderTrialBalance() {
 //  5. INCOME STATEMENT
 // ═══════════════════════════════════════════════
 function renderIncomeStatement() {
-  const balances = getBalances();
+  const now = new Date();
+  const from = document.getElementById('isFrom')?.value || '';
+  const to = document.getElementById('isTo')?.value || '';
+  const balances = from || to ? getBalancesForPeriod(from, to) : getBalances();
   const revenue = sumByType('revenue', balances);
   const expenses = sumByType('expense', balances);
   const netIncome = revenue - expenses;
 
-  let html = `<div class="card"><div class="card-header"><h2>財務報表—損益表</h2><span style="font-size:12px;color:var(--text-muted);">期間累計</span></div><div class="card-body">`;
+  let html = `<div class="card"><div class="card-header"><h2>財務報表—損益表</h2>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="date" id="isFrom" value="${from}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">
+      <span style="font-size:12px;color:var(--text-muted);">～</span>
+      <input type="date" id="isTo" value="${to}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">
+      <button class="btn btn-outline btn-xs" onclick="renderIncomeStatement(true)">查詢</button>
+      <span style="font-size:12px;color:var(--text-muted);">${from||to?(from||'起始')+'～'+(to||'今日'):'全部期間'}</span>
+    </div></div><div class="card-body">`;
 
   html += `<div class="report-section"><h3>營業收入</h3><table class="data-table"><tbody>`;
   for (const a of accounts.filter(x=>x.type==='revenue')) {
@@ -1224,6 +1234,18 @@ function getBalances() {
   const balances = {};
   for (const a of accounts) balances[a.id] = 0;
   for (const je of journalEntries) {
+    for (const l of je.lines) {
+      balances[l.acc] = (balances[l.acc] || 0) + l.debit - l.credit;
+    }
+  }
+  return balances;
+}
+function getBalancesForPeriod(from, to) {
+  const balances = {};
+  for (const a of accounts) balances[a.id] = 0;
+  for (const je of journalEntries) {
+    if (from && je.date < from) continue;
+    if (to && je.date > to) continue;
     for (const l of je.lines) {
       balances[l.acc] = (balances[l.acc] || 0) + l.debit - l.credit;
     }
@@ -1751,7 +1773,7 @@ function updateToolbar(){
   const ib=(fn,lb)=>`<button class="btn btn-outline btn-sm" onclick="${fn}">📤 ${lb}</button>`;
   switch(p){
     case 'chart-of-accounts': h=eb("exportAccounts()","匯出科目")+ib("importAccounts()","匯入科目"); break;
-    case 'journal': h=eb("exportJournal()","匯出傳票"); break;
+    case 'journal': h=eb("exportJournal()","匯出傳票")+ib("importJournal()","匯入傳票"); break;
     case 'general-ledger': case 'trial-balance': h=eb("exportTrialBalance()","匯出試算表"); break;
     case 'income-statement': h=eb("exportIncomeStatement()","匯出損益表"); break;
     case 'balance-sheet': h=eb("exportBalanceSheet()","匯出資產負債表"); break;
@@ -1783,6 +1805,9 @@ function importAccounts(){ impXLSX(data=>{ data.forEach(r=>{ if(r.代碼&&r.科�
 function importProducts(){ impXLSX(data=>{ data.forEach(r=>{ if(r.代碼&&r.名稱){ const ex=products.find(p=>p.code===String(r.代碼)); const nd={code:String(r.代碼),name:r.名稱,unit:r.單位||'個',cost:Number(r.成本單價)||0,sale:Number(r.售價)||0,stock:Number(r.庫存數量)||0,minStock:Number(r.安全存量)||0}; if(ex){Object.assign(ex,nd);} else{products.push({id:genId(),...nd});} } }); save('products',products); renderPage(); }); }
 function importSuppliers(){ impXLSX(data=>{ data.forEach(r=>{ if(r.代碼&&r.名稱){ const ex=suppliers.find(s=>s.code===String(r.代碼)); const nd={code:String(r.代碼),name:r.名稱,contact:r.聯絡人||'',phone:r.電話||'',addr:r.地址||''}; if(ex){Object.assign(ex,nd);} else{suppliers.push({id:genId(),...nd});} } }); save('suppliers',suppliers); renderPage(); }); }
 function importCustomers(){ impXLSX(data=>{ data.forEach(r=>{ if(r.代碼&&r.名稱){ const ex=customers.find(c=>c.code===String(r.代碼)); const nd={code:String(r.代碼),name:r.名稱,contact:r.聯絡人||'',phone:r.電話||'',addr:r.地址||''}; if(ex){Object.assign(ex,nd);} else{customers.push({id:genId(),...nd});} } }); save('customers',customers); renderPage(); }); }
+
+// Import journal entries from Excel
+function importJournal(){ impXLSX(data=>{ const entries={}; data.forEach(r=>{ if(!r.日期||!r.傳票編號) return; const v=r.傳票編號.toString().trim(); if(!entries[v]){ entries[v]={id:genId(),date:r.日期.toString().substring(0,10),voucher:v,desc:r.摘要||'',lines:[]}; } const dr=Number(r.借方金額)||0; const cr=Number(r.貸方金額)||0; if(dr>0||cr>0){ const accId=accounts.find(a=>r.科目&&(a.code+' '+a.name===r.科目||a.name===r.科目||a.code===r.科目)); entries[v].lines.push({acc:accId?accId.id:'',debit:dr,credit:cr}); } }); Object.values(entries).forEach(e=>{ if(e.lines.length>=2){ const idx=journalEntries.findIndex(j=>j.voucher===e.voucher); if(idx>=0) journalEntries[idx]=e; else journalEntries.push(e); } }); save('journalEntries',journalEntries); renderPage(); }); }
 
 // ═══════════════════════════════════════════════
 //  COMMON
