@@ -346,8 +346,10 @@ const DB_VERSION = 2;
 const STORES = ['accounts','journalEntries','products','suppliers','customers','purchaseOrders','salesOrders','users','license','openingBalances','openingDate'];
 
 let _db = null;
+const IS_FILE = location.protocol === 'file:';
 
 function openDB() {
+  if (IS_FILE) return Promise.reject(new Error('file protocol, using localStorage'));
   return new Promise((resolve, reject) => {
     if (_db) return resolve(_db);
     try { var req = indexedDB.open(DB_NAME, DB_VERSION); } catch(e) { return reject(e); }
