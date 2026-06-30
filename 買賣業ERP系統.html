@@ -275,7 +275,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
       <div class="nav-item" data-page="inventory"><span class="nav-icon">🏗️</span>庫存管理</div>
     </div>
   </nav>
-  <div class="sidebar-version"><span>專業版 V2.0</span>
+  <div class="sidebar-version"><span><span id="sidebarVer">專業版 V2.0</span></span>
   <div id="sidebarLicense" style="font-size:9px;color:var(--text-sidebar);margin-top:2px;display:none;"></div>
 </div>
   <div class="sidebar-footer">
@@ -515,15 +515,24 @@ async function verifyLicenseAsync(key, company) {
   return { valid: false, reason: '金鑰無效，請確認金鑰與公司名稱正確' };
 }
 
+function isFree(){ return STATE.license && STATE.license.tier === 1; }
+function isPro(){ return STATE.license && STATE.license.tier === 2; }
+function getLimits(){ return isFree() ? {journal:100,products:50,customers:50,suppliers:20} : null; }
+function checkLimit(type){ const l=getLimits(); if(!l) return false; const m={'journal':journalEntries,'products':products,'customers':customers,'suppliers':suppliers}; const d=m[type]; return d&&d.length>=l[type]; }
+
 function updateLicenseDisplay() {
   const el = document.getElementById('sidebarLicense');
   if (!el) return;
   if (STATE.license && STATE.license.valid) {
-    el.innerHTML = '授權：<span style="color:var(--accent-light);">' + STATE.license.company + '</span> | ' + STATE.license.tierName;
+    const tierBadge = isPro() ? '<span style="background:#1b7d46;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">專業版</span>' : '<span style="background:#d4820a;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">免費版</span>';
+    el.innerHTML = tierBadge+' '+STATE.license.company;
     el.style.display = '';
   } else {
     el.style.display = 'none';
   }
+  // Update version badge
+  const ver = document.getElementById('sidebarVer');
+  if(ver&&STATE.license){ ver.textContent = isPro()?'專業版 V2.0':'免費版 V2.0'; }
 }
 
 function showLicenseModal(errorMsg) {
