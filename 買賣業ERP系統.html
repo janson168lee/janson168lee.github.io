@@ -623,21 +623,7 @@ async function initData() {
   users = await load('users', DEFAULT_USERS);
   await loadOpeningBalances();
 
-  // Generate sample journal entries if empty
-  if (journalEntries.length === 0) {
-    const now = new Date();
-    const fmt = d => d.toISOString().split('T')[0];
-    journalEntries = [
-      {id:'j1',date:fmt(new Date(now.getFullYear(),0,15)),voucher:'1130115-001',desc:'業主現金投資',lines:[{acc:'a1',debit:2000000,credit:0},{acc:'e1',debit:0,credit:2000000}]},
-      {id:'j2',date:fmt(new Date(now.getFullYear(),1,20)),voucher:'1130220-001',desc:'進貨-筆記型電腦 10台',lines:[{acc:'x1',debit:220000,credit:0},{acc:'a2',debit:0,credit:220000}]},
-      {id:'j3',date:fmt(new Date(now.getFullYear(),2,10)),voucher:'1130310-001',desc:'銷貨-機械鍵盤 20個',lines:[{acc:'a1',debit:36000,credit:0},{acc:'r1',debit:0,credit:36000},{acc:'x1',debit:24000,credit:0},{acc:'a4',debit:0,credit:24000}]},
-      {id:'j4',date:fmt(new Date(now.getFullYear(),2,28)),voucher:'1130328-001',desc:'支付薪資',lines:[{acc:'x3',debit:80000,credit:0},{acc:'a2',debit:0,credit:80000}]},
-      {id:'j5',date:fmt(new Date(now.getFullYear(),3,5)),voucher:'1130405-001',desc:'支付辦公室租金',lines:[{acc:'x4',debit:45000,credit:0},{acc:'a2',debit:0,credit:45000}]},
-      {id:'j6',date:fmt(new Date(now.getFullYear(),3,15)),voucher:'1130415-001',desc:'銷貨-筆記型電腦 5台',lines:[{acc:'a1',debit:140000,credit:0},{acc:'r1',debit:0,credit:140000},{acc:'x1',debit:110000,credit:0},{acc:'a4',debit:0,credit:110000}]},
-      {id:'j7',date:fmt(new Date(now.getFullYear(),4,10)),voucher:'1130510-001',desc:'支付水電費',lines:[{acc:'x5',debit:12500,credit:0},{acc:'a2',debit:0,credit:12500}]},
-    ];
-    await save('journalEntries', journalEntries);
-  }
+  // (Sample journal entries removed for clean start)
 }
 
 // ── Helpers ──
@@ -1145,16 +1131,48 @@ function renderTrialBalance() {
 // ═══════════════════════════════════════════════
 function renderIncomeStatement() {
   const now=new Date();
+  const mode=document.getElementById('isMode')?.value||'year';
   const yr=parseInt(document.getElementById('isYear')?.value)||now.getFullYear();
-  // Build comparative monthly view
-  let html = `<div class="card"><div class="card-header"><h2>財務報表—損益表（比較）</h2>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <select id="isYear" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">`;
-  for(let y=now.getFullYear();y>=now.getFullYear()-3;y--){ html+=`<option value="${y}" ${y===yr?'selected':''}>${y-1911} 年</option>`; }
-  html+=`</select><span style="font-size:12px;color:var(--text-muted);">${openingDate?'期初:'+openingDate+' | ':''}各月比較</span></div></div><div class="card-body">`;
+  const from=document.getElementById('isFrom')?.value||'';
+  const to=document.getElementById('isTo')?.value||'';
 
-  const months=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  // Collect revenue per month
+  let html=`<div class="card"><div class="card-header"><h2>財務報表—損益表</h2>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <select id="isMode" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">
+        <option value="year" ${mode==='year'?'selected':''}>年度各月比較</option>
+        <option value="period" ${mode==='period'?'selected':''}>期間損益表</option>
+      </select>`;
+
+  if(mode==='period'){
+    html+=`<input type="date" id="isFrom" value="${from||yr+'-01-01'}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">
+      <span style="font-size:12px">～</span>
+      <input type="date" id="isTo" value="${to||yr+'-12-31'}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">`;
+  }else{
+    html+=`<select id="isYear" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">`;
+    for(let y=now.getFullYear();y>=now.getFullYear()-3;y--){ html+=`<option value="${y}" ${y===yr?'selected':''}>${y-1911} 年</option>`; }
+    html+=`</select>`;
+  }
+  html+=`<span style="font-size:12px;color:var(--text-muted);">${openingDate?'期初:'+openingDate+' | ':''}${mode==='period'?'區間損益':'各月比較'}</span></div></div><div class="card-body">`;
+
+  if(mode==='period'){
+    // Period-based income statement (simple)
+    const balances=getBalancesForPeriod(from||yr+'-01-01',to||yr+'-12-31');
+    let rev=0,exp=0;
+    html+=`<div class="report-section"><h3>營業收入（${from||yr+'-01-01'}～${to||yr+'-12-31'}）</h3><table class="data-table"><tbody>`;
+    for(const a of accounts.filter(x=>x.type==='revenue')){
+      const bal=Math.abs(balances[a.id]||0); if(bal===0)continue;
+      rev+=bal; html+=`<tr><td>${a.name}</td><td class="num">${fmtMoney(bal)}</td></tr>`;
+    }
+    html+=`<tr class="total-row"><td>收入合計</td><td class="num">${fmtMoney(rev)}</td></tr></tbody></table></div>`;
+    html+=`<div class="report-section"><h3>營業成本與費用</h3><table class="data-table"><tbody>`;
+    for(const a of accounts.filter(x=>x.type==='expense')){
+      const bal=Math.abs(balances[a.id]||0); if(bal===0)continue;
+      exp+=bal; html+=`<tr><td>${a.name}</td><td class="num credit">${fmtMoney(bal)}</td></tr>`;
+    }
+    html+=`<tr class="total-row"><td>費用合計</td><td class="num credit">${fmtMoney(exp)}</td></tr></tbody></table></div>`;
+    const ni=rev-exp;
+    html+=`<div class="kpi-card" style="margin-top:12px;"><div class="kpi-label">本期淨利（損）</div><div class="kpi-value ${ni>=0?'positive':'negative'}">${fmtMoney(ni)}</div></div>`;
+  }else{
   const revAccts=accounts.filter(a=>a.type==='revenue');
   const expAccts=accounts.filter(a=>a.type==='expense');
   const startDate=openingDate||'0000-01-01';
@@ -1221,6 +1239,7 @@ function renderIncomeStatement() {
   html+=`<td class="num" style="font-weight:900;font-size:15px;color:${yrNet>=0?'var(--positive)':'var(--negative)'};">${fmtMoney(yrNet)}</td></tr></tbody></table></div>`;
 
   html+=`</div></div>`;
+  }
   return html;
 }
 
@@ -1856,7 +1875,13 @@ function exportIncomeStatement(){ const bal={}; accounts.forEach(a=>bal[a.id]=0)
 function exportBalanceSheet(){ const bal=getBalancesAsOf(document.getElementById('bsDate')?.value||new Date().toISOString().split('T')[0]); const d=[]; let tA=0; d.push({項目:'【資產】',金額:''}); accounts.filter(a=>a.type==='asset').forEach(a=>{ const b=bal[a.id]||0; if(b===0)return; tA+=b; d.push({項目:'  '+a.name,金額:b}); }); d.push({項目:'資產合計',金額:tA}); let tL=0; d.push({項目:'【負債】',金額:''}); accounts.filter(a=>a.type==='liability').forEach(a=>{ const b=-(bal[a.id]||0); if(b===0)return; tL+=b; d.push({項目:'  '+a.name,金額:b}); }); d.push({項目:'負債合計',金額:tL}); let tE=0; d.push({項目:'【權益】',金額:''}); accounts.filter(a=>a.type==='equity').forEach(a=>{ const b=-(bal[a.id]||0); if(b===0)return; tE+=b; d.push({項目:'  '+a.name,金額:b}); }); d.push({項目:'權益合計',金額:tE}); expXLSX(d,'資產負債表'); }
 
 // Import opening balances from Excel
-function importOpeningBalances(){ impXLSX(data=>{ const obs=[]; let obDate=''; data.forEach(r=>{ if(r.日期&&!obDate) obDate=r.日期.toString().substring(0,10); if(r.科目){ const accId=accounts.find(a=>r.科目&&(a.code+' '+a.name===r.科目||a.name===r.科目||a.code===r.科目)); if(accId){ const dr=Number(r.借方金額)||0; const cr=Number(r.貸方金額)||0; obs.push({acc:accId.id,debit:dr,credit:cr}); } } }); if(obs.length>0){ openingBalances=obs; openingDate=obDate||new Date().toISOString().split('T')[0]; save('openingBalances',openingBalances); save('openingDate',[{date:openingDate}]); alert('已匯入 '+obs.length+' 筆期初餘額，期初日期：'+openingDate); renderPage(); } else { alert('未找到有效科目，請確認 Excel 欄位：日期、科目、借方金額、貸方金額'); } }); }
+function importOpeningBalances(){ impXLSX(data=>{ const obs=[]; let obDate=''; data.forEach(r=>{ if(r.日期&&!obDate) obDate=r.日期.toString().substring(0,10); if(r.科目){ const accId=accounts.find(a=>r.科目&&(a.code+' '+a.name===r.科目||a.name===r.科目||a.code===r.科目)); if(accId){ const dr=Number(r.借方金額)||0; const cr=Number(r.貸方金額)||0; obs.push({acc:accId.id,debit:dr,credit:cr}); } } }); if(obs.length>0){ openingBalances=obs; openingDate=obDate||new Date().toISOString().split('T')[0]; save('openingBalances',openingBalances); save('openingDate',[{date:openingDate}]);
+      const oDr=obs.reduce((s,o)=>s+o.debit,0); const oCr=obs.reduce((s,o)=>s+o.credit,0);
+      const exEntry=journalEntries.find(j=>j.voucher===openingDate+'-OPEN');
+      const jeLines=obs.filter(o=>o.debit>0||o.credit>0).map(o=>({acc:o.acc,debit:o.debit,credit:o.credit}));
+      if(exEntry){ exEntry.lines=jeLines; } else { journalEntries.push({id:genId(),date:openingDate,voucher:openingDate+'-OPEN',desc:'開帳分錄（期初餘額匯入）',lines:jeLines}); }
+      await save('journalEntries',journalEntries);
+      alert('已匯入 '+obs.length+' 筆期初餘額\n期初日期：'+openingDate+'\n已自動產生開帳傳票：'+openingDate+'-OPEN'); renderPage(); } else { alert('未找到有效科目，請確認 Excel 欄位：日期、科目、借方金額、貸方金額'); } }); }
 
 // Import functions
 function importAccounts(){ impXLSX(data=>{ data.forEach(r=>{ if(r.代碼&&r.科目名稱){ const tMap={'資產':'asset','負債':'liability','權益':'equity','收入':'revenue','費用':'expense'}; const ty=tMap[r.類別]||'asset'; const ex=accounts.find(a=>a.code===r.代碼); if(ex){ex.name=r.科目名稱;ex.type=ty;} else{accounts.push({id:genId(),code:String(r.代碼),name:r.科目名稱,type:ty,parent:''});} } }); save('accounts',accounts); renderPage(); }); }
