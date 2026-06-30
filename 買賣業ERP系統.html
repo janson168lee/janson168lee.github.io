@@ -1954,11 +1954,10 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Async init with IndexedDB fallback to localStorage
-(async function init() {
-  try { await initData(); } catch(e) { console.warn('IndexedDB failed, using localStorage fallback'); DB=null; }
-  // Fallback: load from localStorage if IndexedDB didn't work
-  if(!DB){
+// Init: localStorage-only for file://, IndexedDB for http://
+(function init() {
+  if (IS_FILE) {
+    // File protocol: pure localStorage, no IndexedDB at all
     accounts = JSON.parse(localStorage.getItem('erp_accounts')||'null')||DEFAULT_ACCOUNTS;
     journalEntries = JSON.parse(localStorage.getItem('erp_journalEntries')||'null')||[];
     products = JSON.parse(localStorage.getItem('erp_products')||'null')||DEFAULT_PRODUCTS;
@@ -1967,46 +1966,68 @@ document.addEventListener('keydown', (e) => {
     purchaseOrders = JSON.parse(localStorage.getItem('erp_purchaseOrders')||'null')||[];
     salesOrders = JSON.parse(localStorage.getItem('erp_salesOrders')||'null')||[];
     users = JSON.parse(localStorage.getItem('erp_users')||'null')||DEFAULT_USERS;
-    // Override save to use localStorage
-    const origSave=save; save=async function(k,d){ localStorage.setItem('erp_'+k,JSON.stringify(d)); };
-  }
-
-  // Check license (IndexedDB or localStorage)
-  const savedLicense = DB ? await dbLoad('license') : JSON.parse(localStorage.getItem('erp_license')||'null');
-  if (!savedLicense || savedLicense.length === 0) {
-    showLicenseModal(); return;
-  }
-  const lic = savedLicense[0];
-  // Free tier: skip crypto verification, use stored data directly
-  if (lic.tier === 1 || (lic.key && lic.key.startsWith('FREE'))) {
-    STATE.license = { valid:true, tier:1, tierName:'免費版', company:lic.company||'免費試用', key:lic.key||'FREE', expiry:'永久' };
-  } else {
-    const result = await verifyLicenseAsync(lic.key, lic.company);
-    if (!result.valid) {
-      showLicenseModal('授權已失效：' + result.reason); return;
+    // Override save
+    save = async function(k,d){ localStorage.setItem('erp_'+k,JSON.stringify(d)); };
+    // Sample data if fresh
+    if (journalEntries.length === 0) {
+      const td = new Date().toISOString().split('T')[0];
+      journalEntries = [
+        {id:'j1',date:td,voucher:'TMPL-001',desc:'【範本】業主現金投資',lines:[{acc:'a1',debit:0,credit:0},{acc:'e1',debit:0,credit:0}]},
+        {id:'j2',date:td,voucher:'TMPL-002',desc:'【範本】進貨',lines:[{acc:'x1',debit:0,credit:0},{acc:'a2',debit:0,credit:0}]},
+        {id:'j3',date:td,voucher:'TMPL-003',desc:'【範本】銷貨收入',lines:[{acc:'a1',debit:0,credit:0},{acc:'r1',debit:0,credit:0}]},
+        {id:'j4',date:td,voucher:'TMPL-004',desc:'【範本】支付薪資',lines:[{acc:'x3',debit:0,credit:0},{acc:'a2',debit:0,credit:0}]},
+        {id:'j5',date:td,voucher:'TMPL-005',desc:'【範本】支付租金',lines:[{acc:'x4',debit:0,credit:0},{acc:'a2',debit:0,credit:0}]},
+      ];
+      save('journalEntries', journalEntries);
     }
-    STATE.license = result;
-  }
-  updateLicenseDisplay();
-
-  // Free version: auto-login, skip login screen
-  if (STATE.license && STATE.license.tier === 1) {
+    // Check license
+    const savedLicense = JSON.parse(localStorage.getItem('erp_license')||'null');
+    if (!savedLicense || savedLicense.length === 0) { showLicenseModal(); return; }
+    const lic = savedLicense[0];
+    STATE.license = { valid:true, tier:lic.tier||1, tierName:lic.tierName||'免費版', company:lic.company||'免費試用', key:lic.key||'FREE', expiry:lic.expiry||'永久' };
+    updateLicenseDisplay();
     currentUser = { id:'free', username:'訪客', role:'免費版' };
     sessionStorage.setItem('erp_session', JSON.stringify({id:'free', username:'訪客', role:'免費版'}));
     updateUserDisplay();
     document.getElementById('loginOverlay').classList.add('hidden');
     renderPage();
-    return;
-  }
-
-  if (checkLogin()) {
-    updateUserDisplay();
-    document.getElementById('loginOverlay').classList.add('hidden');
   } else {
-    document.getElementById('loginOverlay').classList.remove('hidden');
-    document.getElementById('loginUsername').focus();
+    // HTTP protocol: use IndexedDB
+    (async function() {
+      await initData();
+
+      // Check license
+      const savedLicense = await dbLoad('license');
+      if (!savedLicense || savedLicense.length === 0) { showLicenseModal(); return; }
+      const lic = savedLicense[0];
+      if (lic.tier === 1 || (lic.key && lic.key.startsWith('FREE'))) {
+        STATE.license = { valid:true, tier:1, tierName:'免費版', company:lic.company||'免費試用', key:lic.key||'FREE', expiry:'永久' };
+      } else {
+        const result = await verifyLicenseAsync(lic.key, lic.company);
+        if (!result.valid) { showLicenseModal('授權已失效：' + result.reason); return; }
+        STATE.license = result;
+      }
+      updateLicenseDisplay();
+
+      if (STATE.license && STATE.license.tier === 1) {
+        currentUser = { id:'free', username:'訪客', role:'免費版' };
+        sessionStorage.setItem('erp_session', JSON.stringify({id:'free', username:'訪客', role:'免費版'}));
+        updateUserDisplay();
+        document.getElementById('loginOverlay').classList.add('hidden');
+        renderPage();
+        return;
+      }
+
+      if (checkLogin()) {
+        updateUserDisplay();
+        document.getElementById('loginOverlay').classList.add('hidden');
+      } else {
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        document.getElementById('loginUsername').focus();
+      }
+      renderPage();
+    })();
   }
-  renderPage();
 })();
 </script>
 </body>
