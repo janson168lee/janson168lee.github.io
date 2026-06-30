@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="專為台灣中小企業打造的買賣業 ERP 系統與人力資源薪資管理系統。免安裝、免月費、雙擊就開，Excel 自由匯出匯入。">
+<meta name="keywords" content="ERP,進銷存,會計系統,薪資管理,人資系統,買賣業,中小企業,台灣">
+<title>erp-free.com — 中小企業免費管理系統 | 買賣業 ERP × 人力資源薪資</title>
+<style>
+:root{--bg:#0d1b2a;--bg2:#111d2e;--gold:#d4820a;--gold-light:#f5a623;--text:#e6edf3;--text2:#8b949e;--white:#fff;--card-bg:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.section{padding:80px 0}
+
+/* Hero */
+.hero{background:linear-gradient(160deg,#0d1b2a 0%,#1b2a4a 50%,#2d1a0a 100%);padding:100px 0 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-30%;right:-15%;width:500px;height:500px;background:radial-gradient(circle,rgba(212,130,10,0.12) 0%,transparent 70%)}
+.hero-badge{display:inline-block;border:1px solid rgba(212,130,10,0.5);color:var(--gold-light);padding:6px 18px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:2px;margin-bottom:20px}
+.hero h1{font-size:clamp(28px,5vw,44px);font-weight:900;line-height:1.2;color:var(--white);margin-bottom:16px;position:relative;z-index:1}
+.hero h1 span{color:var(--gold-light)}
+.hero p{font-size:18px;color:var(--text2);max-width:650px;margin:0 auto 32px;position:relative;z-index:1}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.btn{padding:14px 32px;border-radius:8px;font-size:15px;font-weight:700;text-decoration:none;transition:all .2s;cursor:pointer;border:none;display:inline-block}
+.btn-gold{background:var(--gold);color:#fff}.btn-gold:hover{background:#b87008}
+.btn-outline{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,0.3)}.btn-outline:hover{background:rgba(255,255,255,0.06)}
+
+/* Section titles */
+.section-title{text-align:center;margin-bottom:48px}
+.section-title h2{font-size:30px;font-weight:800;color:var(--white);margin-bottom:8px}
+.section-title h2 span{color:var(--gold-light)}
+.section-title p{font-size:15px;color:var(--text2)}
+
+/* Pain grid */
+.pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.pain-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:28px 24px;text-align:center}
+.pain-card .icon{font-size:36px;margin-bottom:12px}
+.pain-card h3{font-size:16px;color:var(--gold-light);margin-bottom:8px}
+.pain-card p{font-size:14px;color:var(--text2);line-height:1.6}
+
+/* Products */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:24px}
+.product-card{background:var(--card-bg);border:2px solid var(--border);border-radius:12px;overflow:hidden}
+.product-card.featured{border-color:var(--gold)}
+.product-head{padding:20px 24px;display:flex;align-items:center;gap:12px}
+.product-head.erp{background:#1b2a4a}
+.product-head.hr{background:#2d1a0a}
+.product-head .picon{font-size:32px}
+.product-head h3{font-size:18px;font-weight:800;color:var(--white)}
+.product-body{padding:24px}
+.product-body ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.product-body li{font-size:13px;color:var(--text);padding:6px 0;border-bottom:1px solid var(--border)}
+.product-body li::before{content:'✓ ';color:#1b7d46;font-weight:700}
+
+/* Advantages */
+.adv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px}
+.adv-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px 20px;text-align:center}
+.adv-card .icon{font-size:32px;margin-bottom:8px}
+.adv-card h3{font-size:15px;color:var(--gold-light);margin-bottom:6px}
+.adv-card p{font-size:13px;color:var(--text2);line-height:1.5}
+
+/* Pricing */
+.price-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.price-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:28px 20px;text-align:center;position:relative}
+.price-card.popular{border:2px solid var(--gold)}
+.price-card.popular::before{content:'最受歡迎';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;padding:3px 16px;border-radius:10px;font-size:10px;font-weight:700}
+.price-card h3{font-size:17px;color:var(--white);margin-bottom:4px}
+.price-card .amt{font-size:28px;font-weight:900;color:var(--gold-light);margin:8px 0}
+.price-card .period{font-size:12px;color:var(--text2);margin-bottom:12px}
+.price-card .feats{text-align:left;font-size:13px;color:var(--text2);line-height:2}
+
+/* Comparison */
+.vs-table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card-bg);border-radius:12px;overflow:hidden}
+.vs-table th{background:var(--gold);color:#fff;padding:14px 16px;text-align:center;font-weight:700;font-size:13px}
+.vs-table th:first-child{background:#37352f}
+.vs-table td{padding:12px 16px;text-align:center;border-bottom:1px solid var(--border)}
+.vs-table td:first-child{font-weight:700;text-align:left;color:var(--text)}
+.vs-table .win{color:#1b7d46;font-weight:700}
+.vs-table .lose{color:#c0392b}
+
+/* CTA */
+.cta{background:linear-gradient(160deg,#1b2a4a,#0d1b2a);text-align:center;padding:80px 0}
+.cta h2{font-size:30px;font-weight:900;color:var(--white);margin-bottom:8px}
+.cta h2 span{color:var(--gold-light)}
+.cta p{font-size:16px;color:var(--text2);margin-bottom:32px}
+.contact-grid{display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
+.contact-item{text-align:center}
+.contact-item .label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.contact-item .value{font-size:22px;font-weight:800;color:var(--gold-light);font-family:'SF Mono',Consolas,monospace}
+.contact-name{margin-top:16px;font-size:15px;color:var(--text2)}
+
+/* Footer */
+.footer{background:#0a0e14;text-align:center;padding:20px;font-size:12px;color:var(--text2)}
+
+@media(max-width:768px){
+  .hero{padding:60px 0}.hero h1{font-size:26px}
+  .products-grid{grid-template-columns:1fr}
+  .product-body ul{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <div class="container">
+    <div class="hero-badge">WWW.ERP-FREE.COM</div>
+    <h1>你的企業，值得一套<span>真正用得起的</span><br>管理系統</h1>
+    <p>買賣業 ERP ＋ 人力資源薪資管理　｜　免安裝、免月費、雙擊就開<br>Excel 自由匯出匯入，資料永遠不被綁架</p>
+    <div class="hero-btns">
+      <a href="#download" class="btn btn-gold">📥 免費下載</a>
+      <a href="#contact" class="btn btn-outline">📞 預約導覽</a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ PAIN ═══════════ -->
+<section class="section">
+  <div class="container">
+    <div class="section-title"><h2>你的痛，<span>我們懂</span></h2><p>中小企業每天都在面對的管理難題</p></div>
+    <div class="pain-grid">
+      <div class="pain-card"><div class="icon">💸</div><h3>ERP 太貴買不起</h3><p>鼎新、正航動輒數十萬，導入半年起跳，小公司根本無法負擔</p></div>
+      <div class="pain-card"><div class="icon">📝</div><h3>Excel 管到崩潰</h3><p>帳務全靠手工，公式一錯全盤皆錯，版本混亂找不到最新資料</p></div>
+      <div class="pain-card"><div class="icon">🔒</div><h3>怕被系統綁架</h3><p>資料匯不出來，想換系統等於重來，廠商說多少就多少</p></div>
+      <div class="pain-card"><div class="icon">📅</div><h3>薪資算到眼花</h3><p>勞健保級距年年改，加班費分段計，一個算錯就違法</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PRODUCTS ═══════════ -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-title"><h2>兩套系統，<span>一次解決</span></h2><p>專為台灣中小企業打造的輕量化完整方案</p></div>
+    <div class="products-grid">
+      <div class="product-card featured">
+        <div class="product-head erp"><span class="picon">📊</span><h3>買賣業 ERP 系統</h3></div>
+        <div class="product-body">
+          <ul>
+            <li>會計科目管理</li><li>傳票登錄 + 借貸平衡</li>
+            <li>總分類帳 / 試算表</li><li>損益表 / 資產負債表</li>
+            <li>商品主檔管理</li><li>供應商 / 客戶管理</li>
+            <li>採購進貨 → 自動入庫</li><li>銷售銷貨 → 庫存扣減</li>
+            <li>庫存 KPI 儀表板</li><li>全模組 Excel 匯出/匯入</li>
+          </ul>
+        </div>
+      </div>
+      <div class="product-card featured">
+        <div class="product-head hr"><span class="picon">👥</span><h3>人力資源與薪資管理</h3></div>
+        <div class="product-body">
+          <ul>
+            <li>員工基本資料管理</li><li>組織架構圖</li>
+            <li>出勤 / 請假管理</li><li>加班費自動分段計酬</li>
+            <li>薪資結構設定</li><li>每月薪資一鍵計算</li>
+            <li>勞保+健保+勞退+所得稅</li><li>個人薪資單明細</li>
+            <li>年度薪資彙總報表</li><li>全模組 Excel 匯出/匯入</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ADVANTAGES ═══════════ -->
+<section class="section">
+  <div class="container">
+    <div class="section-title"><h2>為什麼選擇<span>我們</span></h2></div>
+    <div class="adv-grid">
+      <div class="adv-card"><div class="icon">🚀</div><h3>零門檻</h3><p>雙擊就開，免安裝<br>免資料庫，十分鐘上手</p></div>
+      <div class="adv-card"><div class="icon">📥</div><h3>不綁架</h3><p>所有資料可匯出 Excel<br>資料永遠是你的</p></div>
+      <div class="adv-card"><div class="icon">🇹🇼</div><h3>台灣在地</h3><p>勞健保+勞退+所得稅<br>依台灣法規計算</p></div>
+      <div class="adv-card"><div class="icon">💰</div><h3>免費入門</h3><p>完整功能免費版<br>用滿意再升級</p></div>
+      <div class="adv-card"><div class="icon">🔒</div><h3>資料本機</h3><p>所有資料存你電腦<br>不怕個資外洩</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COMPARISON ═══════════ -->
+<section class="section" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-title"><h2>不比<span>不知道</span></h2></div>
+    <table class="vs-table">
+      <tr><th></th><th style="background:var(--gold)">我們的方案</th><th>傳統 ERP</th><th>SaaS 雲端</th><th>Excel 手工</th></tr>
+      <tr><td>導入費用</td><td class="win">$0 起</td><td class="lose">20 萬起</td><td class="lose">月費累積</td><td class="win">$0</td></tr>
+      <tr><td>上手時間</td><td class="win">10 分鐘</td><td class="lose">3-12 個月</td><td>1-3 天</td><td>—</td></tr>
+      <tr><td>資料匯出</td><td class="win">Excel 一鍵</td><td class="lose">格式封閉</td><td>部分開放</td><td class="win">本身就是</td></tr>
+      <tr><td>離線使用</td><td class="win">✓</td><td>需伺服器</td><td class="lose">✗</td><td class="win">✓</td></tr>
+      <tr><td>台灣勞健保</td><td class="win">內建自動算</td><td>需客製</td><td>部分支援</td><td class="lose">自己查表</td></tr>
+      <tr><td>會計邏輯</td><td class="win">借貸平衡檢查</td><td class="win">完整</td><td>基礎</td><td class="lose">無</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ PRICING ═══════════ -->
+<section class="section" id="download">
+  <div class="container">
+    <div class="section-title"><h2>選擇適合<span>你的方案</span></h2><p>從免費入門開始，需要更多時再升級</p></div>
+    <div class="price-grid">
+      <div class="price-card">
+        <h3>🆓 免費版</h3><div class="amt">$0</div><div class="period">永久免費</div>
+        <div class="feats">✓ 完整功能無刪減<br>✓ 單機單人使用<br>✓ Excel 匯出匯入<br>✓ 手動備份<br>✓ 線上教學影片</div>
+      </div>
+      <div class="price-card popular">
+        <h3>⭐ 專業版</h3><div class="amt">9,800</div><div class="period">元 / 年</div>
+        <div class="feats">✓ 免費版全部功能<br>✓ 多使用者權限<br>✓ 大容量儲存<br>✓ 自動雲端備份<br>✓ 稅法級距自動更新<br>✓ Email 客服支援</div>
+      </div>
+      <div class="price-card">
+        <h3>🏢 企業版</h3><div class="amt">39,800</div><div class="period">元 / 年起</div>
+        <div class="feats">✓ 專業版全部功能<br>✓ 多公司帳本<br>✓ 跨據點同步<br>✓ API 介接<br>✓ 專屬客服窗口<br>✓ 到場導入服務</div>
+      </div>
+      <div class="price-card">
+        <h3>🏛️ 事務所版</h3><div class="amt">29,800</div><div class="period">元 / 年起</div>
+        <div class="feats">✓ 專業版全部功能<br>✓ 多客戶集中管理<br>✓ 客戶資料隔離<br>✓ 批次匯出匯入<br>✓ 白牌授權<br>✓ 優先功能建議</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CTA / CONTACT ═══════════ -->
+<section class="cta" id="contact">
+  <div class="container">
+    <h2>現在就<span>免費開始</span>使用</h2>
+    <p>立即下載，十分鐘內讓你的企業管理升級<br>或來電預約專人線上導覽，完全免費</p>
+    <div class="contact-grid">
+      <div class="contact-item"><div class="label">市話</div><div class="value">02-26293721</div></div>
+      <div class="contact-item"><div class="label">手機</div><div class="value">0931-818125</div></div>
+      <div class="contact-item"><div class="label">Email</div><div class="value" style="font-size:18px">janson168@gmail.com</div></div>
+    </div>
+    <div class="contact-name">聯絡人：李先生</div>
+  </div>
+</section>
+
+<footer class="footer">
+  買賣業 ERP 系統 ＋ 人力資源薪資管理系統　｜　專為台灣中小企業打造　｜　© 2026
+</footer>
+
+</body>
+</html>
