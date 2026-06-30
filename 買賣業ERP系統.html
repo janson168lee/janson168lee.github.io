@@ -623,7 +623,18 @@ async function initData() {
   users = await load('users', DEFAULT_USERS);
   await loadOpeningBalances();
 
-  // (Sample journal entries removed for clean start)
+  // Generate sample journal entries (zero amounts) for template
+  if (journalEntries.length === 0) {
+    const now = new Date(); const fmt = d => d.toISOString().split('T')[0]; const td = fmt(now);
+    journalEntries = [
+      {id:'j1',date:td,voucher:'TMPL-001',desc:'【範本】業主現金投資',lines:[{acc:'a1',debit:0,credit:0},{acc:'e1',debit:0,credit:0}]},
+      {id:'j2',date:td,voucher:'TMPL-002',desc:'【範本】進貨',lines:[{acc:'x1',debit:0,credit:0},{acc:'a2',debit:0,credit:0}]},
+      {id:'j3',date:td,voucher:'TMPL-003',desc:'【範本】銷貨收入',lines:[{acc:'a1',debit:0,credit:0},{acc:'r1',debit:0,credit:0}]},
+      {id:'j4',date:td,voucher:'TMPL-004',desc:'【範本】支付薪資',lines:[{acc:'x3',debit:0,credit:0},{acc:'a2',debit:0,credit:0}]},
+      {id:'j5',date:td,voucher:'TMPL-005',desc:'【範本】支付租金',lines:[{acc:'x4',debit:0,credit:0},{acc:'a2',debit:0,credit:0}]},
+    ];
+    await save('journalEntries', journalEntries);
+  }
 }
 
 // ── Helpers ──
