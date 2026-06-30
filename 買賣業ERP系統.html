@@ -1941,12 +1941,25 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Async init
+// Async init with IndexedDB fallback to localStorage
 (async function init() {
-  await initData();
+  try { await initData(); } catch(e) { console.warn('IndexedDB failed, using localStorage fallback'); DB=null; }
+  // Fallback: load from localStorage if IndexedDB didn't work
+  if(!DB){
+    accounts = JSON.parse(localStorage.getItem('erp_accounts')||'null')||DEFAULT_ACCOUNTS;
+    journalEntries = JSON.parse(localStorage.getItem('erp_journalEntries')||'null')||[];
+    products = JSON.parse(localStorage.getItem('erp_products')||'null')||DEFAULT_PRODUCTS;
+    suppliers = JSON.parse(localStorage.getItem('erp_suppliers')||'null')||DEFAULT_SUPPLIERS;
+    customers = JSON.parse(localStorage.getItem('erp_customers')||'null')||DEFAULT_CUSTOMERS;
+    purchaseOrders = JSON.parse(localStorage.getItem('erp_purchaseOrders')||'null')||[];
+    salesOrders = JSON.parse(localStorage.getItem('erp_salesOrders')||'null')||[];
+    users = JSON.parse(localStorage.getItem('erp_users')||'null')||DEFAULT_USERS;
+    // Override save to use localStorage
+    const origSave=save; save=async function(k,d){ localStorage.setItem('erp_'+k,JSON.stringify(d)); };
+  }
 
-  // Check license
-  const savedLicense = await dbLoad('license');
+  // Check license (IndexedDB or localStorage)
+  const savedLicense = DB ? await dbLoad('license') : JSON.parse(localStorage.getItem('erp_license')||'null');
   if (!savedLicense || savedLicense.length === 0) {
     showLicenseModal(); return;
   }
