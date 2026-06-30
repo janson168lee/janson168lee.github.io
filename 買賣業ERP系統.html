@@ -566,7 +566,8 @@ function showLicenseModal(errorMsg) {
   overlay.querySelector('#btnFreeTier').onclick = async () => {
     const company = overlay.querySelector('#licCompany').value.trim() || '免費試用';
     const licData = { id:'license', key:'FREE', company, tier:1, tierName:'免費版', expiry:'永久', valid:true };
-    await save('license', [licData]);
+    if (DB) { await save('license', [licData]); }
+    else { localStorage.setItem('erp_license', JSON.stringify([licData])); }
     location.reload();
   };
 
@@ -1860,10 +1861,21 @@ document.addEventListener('keydown', (e) => {
 
 // Async init
 (async function init() {
-  await initData();
+  try { await initData(); } catch(e) {
+    // IndexedDB unavailable, load from localStorage
+    accounts = JSON.parse(localStorage.getItem('erp_accounts')||'null')||DEFAULT_ACCOUNTS;
+    journalEntries = JSON.parse(localStorage.getItem('erp_journalEntries')||'null')||[];
+    products = JSON.parse(localStorage.getItem('erp_products')||'null')||DEFAULT_PRODUCTS;
+    suppliers = JSON.parse(localStorage.getItem('erp_suppliers')||'null')||DEFAULT_SUPPLIERS;
+    customers = JSON.parse(localStorage.getItem('erp_customers')||'null')||DEFAULT_CUSTOMERS;
+    purchaseOrders = JSON.parse(localStorage.getItem('erp_purchaseOrders')||'null')||[];
+    salesOrders = JSON.parse(localStorage.getItem('erp_salesOrders')||'null')||[];
+    users = JSON.parse(localStorage.getItem('erp_users')||'null')||DEFAULT_USERS;
+    DB = null;
+  }
 
   // Check license
-  const savedLicense = await dbLoad('license');
+  const savedLicense = DB ? await dbLoad('license') : JSON.parse(localStorage.getItem('erp_license')||'null');
   if (!savedLicense || savedLicense.length === 0) {
     showLicenseModal(); return;
   }
