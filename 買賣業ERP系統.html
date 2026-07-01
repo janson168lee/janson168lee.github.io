@@ -695,21 +695,7 @@ async function initData() {
   users = await load('users', DEFAULT_USERS);
   await loadOpeningBalances();
 
-  // Generate sample journal entries if empty
-  if (journalEntries.length === 0) {
-    const now = new Date();
-    const fmt = d => d.toISOString().split('T')[0];
-    journalEntries = [
-      {id:'j1',date:fmt(new Date(now.getFullYear(),0,15)),voucher:'1130115-001',desc:'業主現金投資',lines:[{acc:'a1',debit:2000000,credit:0},{acc:'e1',debit:0,credit:2000000}]},
-      {id:'j2',date:fmt(new Date(now.getFullYear(),1,20)),voucher:'1130220-001',desc:'進貨-筆記型電腦 10台',lines:[{acc:'x1',debit:220000,credit:0},{acc:'a2',debit:0,credit:220000}]},
-      {id:'j3',date:fmt(new Date(now.getFullYear(),2,10)),voucher:'1130310-001',desc:'銷貨-機械鍵盤 20個',lines:[{acc:'a1',debit:36000,credit:0},{acc:'r1',debit:0,credit:36000},{acc:'x1',debit:24000,credit:0},{acc:'a4',debit:0,credit:24000}]},
-      {id:'j4',date:fmt(new Date(now.getFullYear(),2,28)),voucher:'1130328-001',desc:'支付薪資',lines:[{acc:'x3',debit:80000,credit:0},{acc:'a2',debit:0,credit:80000}]},
-      {id:'j5',date:fmt(new Date(now.getFullYear(),3,5)),voucher:'1130405-001',desc:'支付辦公室租金',lines:[{acc:'x4',debit:45000,credit:0},{acc:'a2',debit:0,credit:45000}]},
-      {id:'j6',date:fmt(new Date(now.getFullYear(),3,15)),voucher:'1130415-001',desc:'銷貨-筆記型電腦 5台',lines:[{acc:'a1',debit:140000,credit:0},{acc:'r1',debit:0,credit:140000},{acc:'x1',debit:110000,credit:0},{acc:'a4',debit:0,credit:110000}]},
-      {id:'j7',date:fmt(new Date(now.getFullYear(),4,10)),voucher:'1130510-001',desc:'支付水電費',lines:[{acc:'x5',debit:12500,credit:0},{acc:'a2',debit:0,credit:12500}]},
-    ];
-    await save('journalEntries', journalEntries);
-  }
+  // No sample entries - clean start with zero balances
 }
 
 // ── Helpers ──
