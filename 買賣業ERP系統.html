@@ -1133,7 +1133,7 @@ function renderTrialBalance() {
   let totalDr = 0, totalCr = 0;
   for (const a of accounts) {
     const bal = balances[a.id] || 0;
-    if (bal === 0) continue;
+    // Show all accounts including zero
     const dr = bal > 0 ? bal : 0;
     const cr = bal < 0 ? -bal : 0;
     totalDr += dr; totalCr += cr;
@@ -1189,7 +1189,7 @@ function renderIncomeStatement() {
     html += `<div class="report-section"><h3>營業成本與費用</h3><table class="data-table"><tbody>`;
     for (const a of accounts.filter(x=>x.type==='expense')) {
       const bal = balances[a.id] || 0;
-      if (bal === 0) continue;
+      // Show all accounts including zero
       html += `<tr><td>${a.name}</td><td class="num credit">${fmtMoney(Math.abs(bal))}</td></tr>`;
     }
     html += `<tr class="total-row"><td>費用合計</td><td class="num credit">${fmtMoney(expenses)}</td></tr></tbody></table></div>`;
@@ -1240,7 +1240,7 @@ function renderIncomeStatement() {
     html += `<tr style="background:var(--bg-input);"><td colspan="14" style="font-weight:700;font-size:12px;">營業成本與費用</td></tr>`;
     for (const a of expAccounts) {
       const yb = Math.abs(yearBalances[a.id] || 0);
-      if (yb === 0) continue;
+      // Show all accounts including zero
       html += `<tr><td>${a.name}</td>`;
       for (const mo of months) {
         const bal = Math.abs(mo.balances[a.id] || 0);
@@ -1284,7 +1284,7 @@ function renderBalanceSheet() {
   let totalAssets = 0;
   for (const a of accounts.filter(x=>x.type==='asset')) {
     const bal = balances[a.id] || 0;
-    if (bal === 0) continue;
+    // Show all accounts including zero
     totalAssets += bal;
     html += `<tr><td>${a.name}</td><td class="num">${fmtMoney(bal)}</td></tr>`;
   }
@@ -1295,7 +1295,7 @@ function renderBalanceSheet() {
   let totalLiabilities = 0;
   for (const a of accounts.filter(x=>x.type==='liability')) {
     const bal = -(balances[a.id] || 0);
-    if (bal === 0) continue;
+    // Show all accounts including zero
     totalLiabilities += bal;
     html += `<tr><td>${a.name}</td><td class="num credit">${fmtMoney(bal)}</td></tr>`;
   }
@@ -1306,7 +1306,7 @@ function renderBalanceSheet() {
   let totalEquity = 0;
   for (const a of accounts.filter(x=>x.type==='equity')) {
     const bal = -(balances[a.id] || 0);
-    if (bal === 0) continue;
+    // Show all accounts including zero
     totalEquity += bal;
     html += `<tr><td>${a.name}</td><td class="num">${fmtMoney(bal)}</td></tr>`;
   }
