@@ -301,7 +301,49 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
       <span class="header-date" id="headerDate"></span>
     </div>
   </header>
-  <div class="content" id="mainContent"></div>
+  <div class="content" id="mainContent">
+    <!-- ── Product DM (shown when no data loaded) ── -->
+    <div id="dm-panel" style="max-width:210mm;margin:0 auto;background:#fff;box-shadow:0 2px 20px rgba(0,0,0,0.08);border-radius:6px;overflow:hidden;display:none;">
+      <div style="background:linear-gradient(135deg,#0d1b2a,#1b2a4a,#2d1a0a);padding:32px 30px;position:relative;overflow:hidden;">
+        <div style="display:inline-block;background:rgba(212,130,10,0.2);border:1px solid rgba(212,130,10,0.4);color:#f5a623;padding:3px 12px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:1.5px;margin-bottom:14px;">FOR TAIWAN SMEs</div>
+        <h2 style="font-size:26px;font-weight:900;color:#fff;line-height:1.3;margin:0;">你的企業值得一套<br><span style="color:#f5a623;">真正用得起的</span>管理系統</h2>
+        <p style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:8px;line-height:1.5;">買賣業 ERP + 人力資源薪資管理 | 免安裝、免月費、雙擊就開</p>
+        <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;">
+          <span style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:4px 10px;border-radius:4px;font-size:11px;">📊 財務會計</span>
+          <span style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:4px 10px;border-radius:4px;font-size:11px;">📦 進銷存</span>
+          <span style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:4px 10px;border-radius:4px;font-size:11px;">👥 人資管理</span>
+          <span style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:4px 10px;border-radius:4px;font-size:11px;">🇹🇼 台灣勞健保</span>
+          <span style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:4px 10px;border-radius:4px;font-size:11px;">📥 Excel 匯出匯入</span>
+        </div>
+      </div>
+      <div style="padding:24px 30px;">
+        <h3 style="font-size:15px;font-weight:800;color:#1b2a4a;margin:0 0 12px;">兩套系統，一次解決</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div style="border:2px solid #e0ded8;border-radius:8px;overflow:hidden;">
+            <div style="background:#1b2a4a;color:#fff;padding:10px 14px;font-size:13px;font-weight:700;">📊 買賣業 ERP 系統</div>
+            <div style="padding:12px 14px;font-size:11px;color:#37352f;line-height:1.7;">
+              ✓ 220 個會計科目 | ✓ 傳票/總帳/試算<br>
+              ✓ 損益表/資產負債表 | ✓ 進銷存管理<br>
+              ✓ 客戶/供應商/商品主檔 | ✓ Excel 全模組匯出匯入
+            </div>
+          </div>
+          <div style="border:2px solid #e0ded8;border-radius:8px;overflow:hidden;">
+            <div style="background:#d4820a;color:#fff;padding:10px 14px;font-size:13px;font-weight:700;">👥 人力資源薪資系統</div>
+            <div style="padding:12px 14px;font-size:11px;color:#37352f;line-height:1.7;">
+              ✓ 員工/出勤/請假 | ✓ 加班分段計酬<br>
+              ✓ 勞健保勞退自動算 | ✓ 每月薪資一鍵計算<br>
+              ✓ 年度彙總 | ✓ Excel 匯出匯入
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:20px;padding:16px;background:#faf9f7;border-radius:6px;">
+          <div style="font-size:12px;color:#8c8a84;">聯絡人：李先生</div>
+          <div style="font-size:15px;font-weight:800;color:#d4820a;margin-top:4px;">📞 02-26293721 | 📱 0931-818125</div>
+          <div style="font-size:11px;color:#6b6a65;">janson168@gmail.com</div>
+        </div>
+      </div>
+    </div>
+</div>
 </main>
 
 <!-- ═══════════════ LOGIN MODAL ═══════════════ -->
@@ -425,246 +467,266 @@ async function save(key, data) {
 
 // ── Default Chart of Accounts ──
 const DEFAULT_ACCOUNTS = [
-  {id:'a1',code:'1110',name:'零用金',type:'asset'},
-  {id:'a2',code:'1111',name:'現金',type:'asset'},
-  {id:'a3',code:'1112',name:'銀行存款',type:'asset'},
-  {id:'a4',code:'1112-01',name:'華南銀行存款',type:'asset'},
-  {id:'a5',code:'1112-03',name:'農會銀行存款',type:'asset'},
-  {id:'a6',code:'1112-04',name:'華南銀行美金',type:'asset'},
-  {id:'a7',code:'1112-05',name:'銀行存款-聯邦085',type:'asset'},
-  {id:'a8',code:'1112-06',name:'聯邦銀行美金存款',type:'asset'},
-  {id:'a9',code:'1113',name:'有價證券',type:'asset'},
-  {id:'a10',code:'1114',name:'短期投資',type:'asset'},
-  {id:'a11',code:'1115',name:'有價證券跌價損失準備',type:'asset'},
-  {id:'a12',code:'1121',name:'應收票據',type:'asset'},
-  {id:'a13',code:'1122',name:'備抵呆帳->應收票據',type:'asset'},
-  {id:'a14',code:'1123',name:'應收帳款',type:'asset'},
-  {id:'a15',code:'1124',name:'備抵呆帳->應收帳款',type:'asset'},
-  {id:'a16',code:'1129',name:'其他應收款',type:'asset'},
-  {id:'a17',code:'1131',name:'商品',type:'expense'},
-  {id:'a18',code:'1132',name:'製成品',type:'expense'},
-  {id:'a19',code:'1133',name:'在製品(或在建工程)',type:'expense'},
-  {id:'a20',code:'1134',name:'原料',type:'expense'},
-  {id:'a21',code:'1135',name:'物料',type:'expense'},
-  {id:'a22',code:'1136',name:'寄銷品',type:'expense'},
-  {id:'a23',code:'1137',name:'存貨跌價損失準備',type:'expense'},
-  {id:'a24',code:'1138',name:'其他',type:'expense'},
-  {id:'a25',code:'1139',name:'其他存貨',type:'asset'},
-  {id:'a26',code:'1141',name:'預付費用',type:'expense'},
-  {id:'a27',code:'1142',name:'用品盤存',type:'expense'},
-  {id:'a28',code:'1143',name:'預付貨款',type:'expense'},
-  {id:'a29',code:'1144',name:'預付利息',type:'expense'},
-  {id:'a30',code:'1145',name:'預付帳款',type:'expense'},
-  {id:'a31',code:'1149',name:'其他預付款',type:'expense'},
-  {id:'a32',code:'1191',name:'暫付款',type:'asset'},
-  {id:'a33',code:'1192',name:'股東往來',type:'expense'},
-  {id:'a34',code:'1193',name:'同業往來',type:'expense'},
-  {id:'a35',code:'1194',name:'進項稅額',type:'expense'},
-  {id:'a36',code:'1195',name:'留抵稅額',type:'expense'},
-  {id:'a37',code:'1196',name:'部門往來',type:'expense'},
-  {id:'a38',code:'1197',name:'員工借支',type:'expense'},
-  {id:'a39',code:'1199',name:'其他',type:'expense'},
-  {id:'a40',code:'1301',name:'備抵長期投資未實現跌價損失',type:'expense'},
-  {id:'a41',code:'1410',name:'土地',type:'asset'},
-  {id:'a42',code:'1411',name:'土地增值稅準備',type:'asset'},
-  {id:'a43',code:'1421',name:'礦源',type:'asset'},
-  {id:'a44',code:'1422',name:'累計耗竭->礦源',type:'asset'},
-  {id:'a45',code:'1431',name:'房屋及建築',type:'asset'},
-  {id:'a46',code:'1432',name:'累計折舊->房屋及建築',type:'asset'},
-  {id:'a47',code:'1441',name:'機械設備',type:'asset'},
-  {id:'a48',code:'1442',name:'累計折舊->機械設備',type:'asset'},
-  {id:'a49',code:'1451',name:'運輸設備',type:'asset'},
-  {id:'a50',code:'1452',name:'累計折舊->運輸設備',type:'asset'},
-  {id:'a51',code:'1461',name:'生財器具',type:'asset'},
-  {id:'a52',code:'1462',name:'累計折舊->生財器具',type:'asset'},
-  {id:'a53',code:'1470',name:'未完工程(不含營造業)',type:'asset'},
-  {id:'a54',code:'1480',name:'預付購置設備款',type:'asset'},
-  {id:'a55',code:'1491',name:'其他固定資產',type:'asset'},
-  {id:'a56',code:'1492',name:'累計折舊->其他資產',type:'asset'},
-  {id:'a57',code:'1510',name:'無形資產',type:'asset'},
-  {id:'a58',code:'1520',name:'累計攤折->無形資產',type:'asset'},
-  {id:'a59',code:'1910',name:'存出保證金',type:'expense'},
-  {id:'a60',code:'1920',name:'開辦費',type:'expense'},
-  {id:'a61',code:'1930',name:'應收保證票據',type:'expense'},
-  {id:'a62',code:'1940',name:'未攤銷費用',type:'expense'},
-  {id:'a63',code:'1950',name:'代付款項',type:'expense'},
-  {id:'a64',code:'1990',name:'其他',type:'expense'},
-  {id:'a65',code:'2111',name:'銀行透支',type:'expense'},
-  {id:'a66',code:'2112',name:'銀行借款',type:'expense'},
-  {id:'a67',code:'2113',name:'應付商業本票',type:'expense'},
-  {id:'a68',code:'2114',name:'票貼總額',type:'expense'},
-  {id:'a69',code:'2119',name:'其他短期借款',type:'expense'},
-  {id:'a70',code:'2121',name:'應付票據',type:'liability'},
-  {id:'a71',code:'2122',name:'應付帳款',type:'liability'},
-  {id:'a72',code:'2123',name:'應付費用',type:'liability'},
-  {id:'a73',code:'2124',name:'應付稅捐',type:'liability'},
-  {id:'a74',code:'2125',name:'應付股利',type:'liability'},
-  {id:'a75',code:'2126',name:'應付利息',type:'liability'},
-  {id:'a76',code:'2127',name:'應付佣金',type:'liability'},
-  {id:'a77',code:'2129',name:'其他應付款',type:'liability'},
-  {id:'a78',code:'2130',name:'應付薪資',type:'expense'},
-  {id:'a79',code:'2131',name:'預收貨款',type:'expense'},
-  {id:'a80',code:'2132',name:'預收房租',type:'expense'},
-  {id:'a81',code:'2133',name:'預收帳款',type:'liability'},
-  {id:'a82',code:'2139',name:'其他預收款',type:'expense'},
-  {id:'a83',code:'2191',name:'暫收款',type:'expense'},
-  {id:'a84',code:'2192',name:'股東往來',type:'expense'},
-  {id:'a85',code:'2193',name:'同業往來',type:'expense'},
-  {id:'a86',code:'2194',name:'銷項稅額',type:'expense'},
-  {id:'a87',code:'2195',name:'代收款項',type:'expense'},
-  {id:'a88',code:'2196',name:'其他',type:'expense'},
-  {id:'a89',code:'2210',name:'應付公司債券',type:'liability'},
-  {id:'a90',code:'2220',name:'長期借款',type:'liability'},
-  {id:'a91',code:'2290',name:'其他長期負債',type:'liability'},
-  {id:'a92',code:'2910',name:'存入保證金',type:'expense'},
-  {id:'a93',code:'2920',name:'土地增值稅準備',type:'expense'},
-  {id:'a94',code:'2930',name:'外幣債務兌換損失準備',type:'expense'},
-  {id:'a95',code:'2940',name:'退休金準備',type:'expense'},
-  {id:'a96',code:'2951',name:'國外投資損失準備',type:'expense'},
-  {id:'a97',code:'2960',name:'應付保證票據',type:'expense'},
-  {id:'a98',code:'2970',name:'受託承銷品',type:'expense'},
-  {id:'a99',code:'2980',name:'代收稅款',type:'expense'},
-  {id:'a100',code:'2999',name:'其他',type:'expense'},
-  {id:'a101',code:'3110',name:'股本(登記)',type:'equity'},
-  {id:'a102',code:'3120',name:'未發行股本',type:'equity'},
-  {id:'a103',code:'3130',name:'庫藏股(面值股)',type:'equity'},
-  {id:'a104',code:'3211',name:'法定盈餘公積(86年以前餘額)',type:'expense'},
-  {id:'a105',code:'3212',name:'法定盈餘公積(87年以後餘額)',type:'expense'},
-  {id:'a106',code:'3220',name:'資本公積',type:'expense'},
-  {id:'a107',code:'3231',name:'特別盈餘公積(86年以前餘額)',type:'expense'},
-  {id:'a108',code:'3232',name:'特別盈餘公積(87年以後餘額)',type:'expense'},
-  {id:'a109',code:'3240',name:'未實現長期投資跌價損失',type:'expense'},
-  {id:'a110',code:'3251',name:'累積盈虧(前期調整)',type:'expense'},
-  {id:'a111',code:'3252',name:'累積盈虧',type:'expense'},
-  {id:'a112',code:'3260',name:'本期損益(稅後)',type:'expense'},
-  {id:'a113',code:'3270',name:'其他權益',type:'expense'},
-  {id:'a114',code:'3280',name:'庫藏股(成本法)',type:'expense'},
-  {id:'a115',code:'3290',name:'本年累積損益(不含當期)',type:'expense'},
-  {id:'a116',code:'3291',name:'匯兌差異調整數',type:'expense'},
-  {id:'a117',code:'4101',name:'銷貨收入',type:'revenue'},
-  {id:'a118',code:'4102',name:'銷貨退回',type:'revenue'},
-  {id:'a119',code:'4103',name:'銷貨折讓',type:'revenue'},
-  {id:'a120',code:'4201',name:'勞務收入',type:'revenue'},
-  {id:'a121',code:'4601',name:'其他營業收入',type:'revenue'},
-  {id:'a122',code:'5100',name:'期初存貨',type:'expense'},
-  {id:'a123',code:'5101',name:'本期進貨',type:'expense'},
-  {id:'a124',code:'5102',name:'進貨退出',type:'expense'},
-  {id:'a125',code:'5103',name:'進貨折讓',type:'expense'},
-  {id:'a126',code:'5104',name:'期末存貨',type:'expense'},
-  {id:'a127',code:'5109',name:'銷貨成本',type:'expense'},
-  {id:'a128',code:'5110',name:'成本調整',type:'expense'},
-  {id:'a129',code:'5201',name:'製成品成本',type:'expense'},
-  {id:'a130',code:'5202',name:'製造成本',type:'expense'},
-  {id:'a131',code:'5203',name:'原料成本',type:'expense'},
-  {id:'a132',code:'5204',name:'期初存料',type:'expense'},
-  {id:'a133',code:'5205',name:'本期進料',type:'expense'},
-  {id:'a134',code:'5206',name:'進料退出',type:'expense'},
-  {id:'a135',code:'5207',name:'進料折讓',type:'expense'},
-  {id:'a136',code:'5208',name:'期末存料',type:'expense'},
-  {id:'a137',code:'5209',name:'物料成本',type:'expense'},
-  {id:'a138',code:'5210',name:'期初物料',type:'expense'},
-  {id:'a139',code:'5211',name:'本期進料',type:'expense'},
-  {id:'a140',code:'5212',name:'進料退出',type:'expense'},
-  {id:'a141',code:'5213',name:'進料折讓',type:'expense'},
-  {id:'a142',code:'5214',name:'期末物料',type:'expense'},
-  {id:'a143',code:'5215',name:'直接人工費用',type:'expense'},
-  {id:'a144',code:'5216',name:'間接人工費用',type:'expense'},
-  {id:'a145',code:'5217',name:'製造費用',type:'expense'},
-  {id:'a146',code:'521700',name:'加工費',type:'expense'},
-  {id:'a147',code:'521701',name:'稅捐',type:'expense'},
-  {id:'a148',code:'521702',name:'折舊',type:'expense'},
-  {id:'a149',code:'521703',name:'各項耗竭及攤提',type:'expense'},
-  {id:'a150',code:'521704',name:'伙食費',type:'expense'},
-  {id:'a151',code:'521705',name:'職工福利',type:'expense'},
-  {id:'a152',code:'521706',name:'訓練費',type:'expense'},
-  {id:'a153',code:'521707',name:'間接材料',type:'expense'},
-  {id:'a154',code:'521708',name:'折讓費用',type:'expense'},
-  {id:'a155',code:'521709',name:'其他費用',type:'expense'},
-  {id:'a156',code:'52171',name:'租金支出',type:'expense'},
-  {id:'a157',code:'52172',name:'文具用品',type:'expense'},
-  {id:'a158',code:'52173',name:'旅費',type:'expense'},
-  {id:'a159',code:'52174',name:'運費',type:'expense'},
-  {id:'a160',code:'52175',name:'郵電費',type:'expense'},
-  {id:'a161',code:'52176',name:'修繕費',type:'expense'},
-  {id:'a162',code:'52177',name:'包裝費',type:'expense'},
-  {id:'a163',code:'52178',name:'水電瓦斯費',type:'expense'},
-  {id:'a164',code:'52179',name:'保險費',type:'expense'},
-  {id:'a165',code:'5218',name:'外包加工費用',type:'expense'},
-  {id:'a166',code:'5219',name:'期初在製品',type:'expense'},
-  {id:'a167',code:'5220',name:'期末在製品',type:'expense'},
-  {id:'a168',code:'5221',name:'其他製造費用',type:'expense'},
-  {id:'a169',code:'5222',name:'勞務成本',type:'expense'},
-  {id:'a170',code:'5223',name:'業務成本',type:'expense'},
-  {id:'a171',code:'5224',name:'其他營業成本-其他',type:'expense'},
-  {id:'a172',code:'6101',name:'薪資支出',type:'expense'},
-  {id:'a173',code:'6102',name:'租金支出',type:'expense'},
-  {id:'a174',code:'6103',name:'文具用品',type:'expense'},
-  {id:'a175',code:'6104',name:'旅費',type:'expense'},
-  {id:'a176',code:'6105',name:'運費',type:'expense'},
-  {id:'a177',code:'6106',name:'郵電費',type:'expense'},
-  {id:'a178',code:'6107',name:'修繕費',type:'expense'},
-  {id:'a179',code:'6108',name:'廣告費',type:'expense'},
-  {id:'a180',code:'6109',name:'水電瓦斯費',type:'expense'},
-  {id:'a181',code:'6110',name:'保險費',type:'expense'},
-  {id:'a182',code:'6111',name:'交際費',type:'expense'},
-  {id:'a183',code:'6112',name:'捐贈',type:'expense'},
-  {id:'a184',code:'6113',name:'稅捐',type:'expense'},
-  {id:'a185',code:'6114',name:'呆帳損失',type:'expense'},
-  {id:'a186',code:'6115',name:'折舊',type:'expense'},
-  {id:'a187',code:'6116',name:'各項耗竭及攤提',type:'expense'},
-  {id:'a188',code:'6117',name:'外銷損失',type:'expense'},
-  {id:'a189',code:'6118',name:'伙食費',type:'expense'},
-  {id:'a190',code:'6119',name:'職工福利',type:'expense'},
-  {id:'a191',code:'6120',name:'研究費',type:'expense'},
-  {id:'a192',code:'6121',name:'佣金支出',type:'expense'},
-  {id:'a193',code:'6122',name:'訓練費',type:'expense'},
-  {id:'a194',code:'6123',name:'勞保費',type:'expense'},
-  {id:'a195',code:'6124',name:'手續費用',type:'expense'},
-  {id:'a196',code:'6125',name:'進貨折讓費用',type:'expense'},
-  {id:'a197',code:'6126',name:'健保費用',type:'expense'},
-  {id:'a198',code:'6127',name:'勞退費用',type:'expense'},
-  {id:'a199',code:'6128',name:'報關費用',type:'expense'},
-  {id:'a200',code:'6129',name:'辦公用品',type:'expense'},
-  {id:'a201',code:'6131',name:'勞務費用',type:'expense'},
-  {id:'a202',code:'6199',name:'其他營業費用',type:'expense'},
-  {id:'a203',code:'7101',name:'投資收益及一般股息及紅利',type:'expense'},
-  {id:'a204',code:'7102',name:'依稅法取得之股利',type:'expense'},
-  {id:'a205',code:'7103',name:'依條例免所得股票',type:'expense'},
-  {id:'a206',code:'7104',name:'利息收入',type:'expense'},
-  {id:'a207',code:'7105',name:'租賃收入',type:'expense'},
-  {id:'a208',code:'7106',name:'出售資產增益',type:'expense'},
-  {id:'a209',code:'7107',name:'佣金收入',type:'expense'},
-  {id:'a210',code:'7108',name:'商品盤盈',type:'expense'},
-  {id:'a211',code:'7109',name:'兌換盈益',type:'expense'},
-  {id:'a212',code:'7110',name:'其他非營業收入',type:'expense'},
-  {id:'a213',code:'8101',name:'利息支出',type:'expense'},
-  {id:'a214',code:'8102',name:'投資損失',type:'expense'},
-  {id:'a215',code:'8103',name:'出售資產損失',type:'expense'},
-  {id:'a216',code:'8104',name:'災害損失',type:'expense'},
-  {id:'a217',code:'8105',name:'商品盤損',type:'expense'},
-  {id:'a218',code:'8106',name:'兌換虧損',type:'expense'},
-  {id:'a219',code:'8107',name:'其它非營業損失',type:'expense'},
-  {id:'a220',code:'9001',name:'營所稅',type:'expense'},
+  {id:'aa1',code:'1110',name:'零用金',type:'asset'},
+  {id:'aa2',code:'1111',name:'現金',type:'asset'},
+  {id:'aa3',code:'1112',name:'銀行存款',type:'asset'},
+  {id:'aa4',code:'1112-01',name:'華南銀行存款',type:'asset'},
+  {id:'aa5',code:'1112-03',name:'農會銀行存款',type:'asset'},
+  {id:'aa6',code:'1112-04',name:'華南銀行美金',type:'asset'},
+  {id:'aa7',code:'1112-05',name:'銀行存款-聯邦',type:'asset'},
+  {id:'aa8',code:'1112-06',name:'聯邦銀行美金存款',type:'asset'},
+  {id:'aa9',code:'1113',name:'有價證券',type:'asset'},
+  {id:'aa10',code:'1114',name:'短期投資',type:'asset'},
+  {id:'aa11',code:'1115',name:'有價證券跌價損失準備',type:'asset'},
+  {id:'aa12',code:'1121',name:'應收票據',type:'asset'},
+  {id:'aa13',code:'1122',name:'備抵呆帳->應收票據',type:'asset'},
+  {id:'aa14',code:'1123',name:'應收帳款',type:'asset'},
+  {id:'aa15',code:'1124',name:'備抵呆帳->應收帳款',type:'asset'},
+  {id:'aa16',code:'1129',name:'其他應收款',type:'asset'},
+  {id:'aa17',code:'1131',name:'商品',type:'asset'},
+  {id:'aa18',code:'1132',name:'製成品',type:'asset'},
+  {id:'aa19',code:'1133',name:'在製品(或在建工程)',type:'asset'},
+  {id:'aa20',code:'1134',name:'原料',type:'asset'},
+  {id:'aa21',code:'1135',name:'物料',type:'asset'},
+  {id:'aa22',code:'1136',name:'寄銷品',type:'asset'},
+  {id:'aa23',code:'1137',name:'存貨跌價損失準備',type:'asset'},
+  {id:'aa24',code:'1138',name:'其他',type:'asset'},
+  {id:'aa25',code:'1139',name:'其他存貨',type:'asset'},
+  {id:'aa26',code:'1141',name:'預付費用',type:'asset'},
+  {id:'aa27',code:'1142',name:'用品盤存',type:'asset'},
+  {id:'aa28',code:'1143',name:'預付貨款',type:'asset'},
+  {id:'aa29',code:'1144',name:'預付利息',type:'asset'},
+  {id:'aa30',code:'1145',name:'預付帳款',type:'asset'},
+  {id:'aa31',code:'1149',name:'其他預付款',type:'asset'},
+  {id:'aa32',code:'1191',name:'暫付款',type:'asset'},
+  {id:'aa33',code:'1192',name:'股東往來',type:'asset'},
+  {id:'aa34',code:'1193',name:'同業往來',type:'asset'},
+  {id:'aa35',code:'1194',name:'進項稅額',type:'asset'},
+  {id:'aa36',code:'1195',name:'留抵稅額',type:'asset'},
+  {id:'aa37',code:'1196',name:'部門往來',type:'asset'},
+  {id:'aa38',code:'1197',name:'員工借支',type:'asset'},
+  {id:'aa39',code:'1199',name:'其他',type:'asset'},
+  {id:'aa40',code:'1301',name:'備抵長期投資未實現跌價損失',type:'asset'},
+  {id:'aa41',code:'1410',name:'土地',type:'asset'},
+  {id:'aa42',code:'1411',name:'土地增值稅準備',type:'asset'},
+  {id:'aa43',code:'1421',name:'礦源',type:'asset'},
+  {id:'aa44',code:'1422',name:'累計耗竭->礦源',type:'asset'},
+  {id:'aa45',code:'1431',name:'房屋及建築',type:'asset'},
+  {id:'aa46',code:'1432',name:'累計折舊->房屋及建築',type:'asset'},
+  {id:'aa47',code:'1441',name:'機械設備',type:'asset'},
+  {id:'aa48',code:'1442',name:'累計折舊->機械設備',type:'asset'},
+  {id:'aa49',code:'1451',name:'運輸設備',type:'asset'},
+  {id:'aa50',code:'1452',name:'累計折舊->運輸設備',type:'asset'},
+  {id:'aa51',code:'1461',name:'生財器具',type:'asset'},
+  {id:'aa52',code:'1462',name:'累計折舊->生財器具',type:'asset'},
+  {id:'aa53',code:'1470',name:'未完工程(不含營造業)',type:'asset'},
+  {id:'aa54',code:'1480',name:'預付購置設備款',type:'asset'},
+  {id:'aa55',code:'1491',name:'其他固定資產',type:'asset'},
+  {id:'aa56',code:'1492',name:'累計折舊->其他資產',type:'asset'},
+  {id:'aa57',code:'1510',name:'無形資產',type:'asset'},
+  {id:'aa58',code:'1520',name:'累計攤折->無形資產',type:'asset'},
+  {id:'aa59',code:'1910',name:'存出保證金',type:'asset'},
+  {id:'aa60',code:'1920',name:'開辦費',type:'asset'},
+  {id:'aa61',code:'1930',name:'應收保證票據',type:'asset'},
+  {id:'aa62',code:'1940',name:'未攤銷費用',type:'asset'},
+  {id:'aa63',code:'1950',name:'代付款項',type:'asset'},
+  {id:'aa64',code:'1990',name:'其他',type:'asset'},
+  {id:'aa65',code:'2111',name:'銀行透支',type:'liability'},
+  {id:'aa66',code:'2112',name:'銀行借款',type:'liability'},
+  {id:'aa67',code:'2113',name:'應付商業本票',type:'liability'},
+  {id:'aa68',code:'2114',name:'票貼總額',type:'liability'},
+  {id:'aa69',code:'2119',name:'其他短期借款',type:'liability'},
+  {id:'aa70',code:'2121',name:'應付票據',type:'liability'},
+  {id:'aa71',code:'2122',name:'應付帳款',type:'liability'},
+  {id:'aa72',code:'2123',name:'應付費用',type:'liability'},
+  {id:'aa73',code:'2124',name:'應付稅捐',type:'liability'},
+  {id:'aa74',code:'2125',name:'應付股利',type:'liability'},
+  {id:'aa75',code:'2126',name:'應付利息',type:'liability'},
+  {id:'aa76',code:'2127',name:'應付佣金',type:'liability'},
+  {id:'aa77',code:'2129',name:'其他應付款',type:'liability'},
+  {id:'aa78',code:'2130',name:'應付薪資',type:'liability'},
+  {id:'aa79',code:'2131',name:'預收貨款',type:'liability'},
+  {id:'aa80',code:'2132',name:'預收房租',type:'liability'},
+  {id:'aa81',code:'2133',name:'預收帳款',type:'liability'},
+  {id:'aa82',code:'2139',name:'其他預收款',type:'liability'},
+  {id:'aa83',code:'2191',name:'暫收款',type:'liability'},
+  {id:'aa84',code:'2192',name:'股東往來',type:'liability'},
+  {id:'aa85',code:'2193',name:'同業往來',type:'liability'},
+  {id:'aa86',code:'2194',name:'銷項稅額',type:'liability'},
+  {id:'aa87',code:'2195',name:'代收款項',type:'liability'},
+  {id:'aa88',code:'2196',name:'其他',type:'liability'},
+  {id:'aa89',code:'2210',name:'應付公司債券',type:'liability'},
+  {id:'aa90',code:'2220',name:'長期借款',type:'liability'},
+  {id:'aa91',code:'2290',name:'其他長期負債',type:'liability'},
+  {id:'aa92',code:'2910',name:'存入保證金',type:'liability'},
+  {id:'aa93',code:'2920',name:'土地增值稅準備',type:'liability'},
+  {id:'aa94',code:'2930',name:'外幣債務兌換損失準備',type:'liability'},
+  {id:'aa95',code:'2940',name:'退休金準備',type:'liability'},
+  {id:'aa96',code:'2951',name:'國外投資損失準備',type:'liability'},
+  {id:'aa97',code:'2960',name:'應付保證票據',type:'liability'},
+  {id:'aa98',code:'2970',name:'受託承銷品',type:'liability'},
+  {id:'aa99',code:'2980',name:'代收稅款',type:'liability'},
+  {id:'aa100',code:'2999',name:'其他',type:'liability'},
+  {id:'aa101',code:'3110',name:'股本(登記)',type:'equity'},
+  {id:'aa102',code:'3120',name:'未發行股本',type:'equity'},
+  {id:'aa103',code:'3130',name:'庫藏股(面值股)',type:'equity'},
+  {id:'aa104',code:'3211',name:'法定盈餘公積(86年以前餘額)',type:'equity'},
+  {id:'aa105',code:'3212',name:'法定盈餘公積(87年以後餘額)',type:'equity'},
+  {id:'aa106',code:'3220',name:'資本公積',type:'equity'},
+  {id:'aa107',code:'3231',name:'特別盈餘公積(86年以前餘額)',type:'equity'},
+  {id:'aa108',code:'3232',name:'特別盈餘公積(87年以後餘額)',type:'equity'},
+  {id:'aa109',code:'3240',name:'未實現長期投資跌價損失',type:'equity'},
+  {id:'aa110',code:'3251',name:'累積盈虧(前期調整)',type:'equity'},
+  {id:'aa111',code:'3252',name:'累積盈虧',type:'equity'},
+  {id:'aa112',code:'3260',name:'本期損益(稅後)',type:'equity'},
+  {id:'aa113',code:'3270',name:'其他權益',type:'equity'},
+  {id:'aa114',code:'3280',name:'庫藏股(成本法)',type:'equity'},
+  {id:'aa115',code:'3290',name:'本年累積損益(不含當期)',type:'equity'},
+  {id:'aa116',code:'3291',name:'匯兌差異調整數',type:'equity'},
+  {id:'aa117',code:'4101',name:'銷貨收入',type:'revenue'},
+  {id:'aa118',code:'4102',name:'銷貨退回',type:'revenue'},
+  {id:'aa119',code:'4103',name:'銷貨折讓',type:'revenue'},
+  {id:'aa120',code:'4201',name:'勞務收入',type:'revenue'},
+  {id:'aa121',code:'4601',name:'其他營業收入',type:'revenue'},
+  {id:'aa122',code:'5100',name:'期初存貨',type:'expense'},
+  {id:'aa123',code:'5101',name:'本期進貨',type:'expense'},
+  {id:'aa124',code:'5102',name:'進貨退出',type:'expense'},
+  {id:'aa125',code:'5103',name:'進貨折讓',type:'expense'},
+  {id:'aa126',code:'5104',name:'期末存貨',type:'expense'},
+  {id:'aa127',code:'5109',name:'銷貨成本',type:'expense'},
+  {id:'aa128',code:'5110',name:'成本調整',type:'expense'},
+  {id:'aa129',code:'5201',name:'製成品成本',type:'expense'},
+  {id:'aa130',code:'5202',name:'製造成本',type:'expense'},
+  {id:'aa131',code:'5203',name:'原料成本',type:'expense'},
+  {id:'aa132',code:'5204',name:'期初存料',type:'expense'},
+  {id:'aa133',code:'5205',name:'本期進料',type:'expense'},
+  {id:'aa134',code:'5206',name:'進料退出',type:'expense'},
+  {id:'aa135',code:'5207',name:'進料折讓',type:'expense'},
+  {id:'aa136',code:'5208',name:'期末存料',type:'expense'},
+  {id:'aa137',code:'5209',name:'物料成本',type:'expense'},
+  {id:'aa138',code:'5210',name:'期初物料',type:'expense'},
+  {id:'aa139',code:'5211',name:'本期進料',type:'expense'},
+  {id:'aa140',code:'5212',name:'進料退出',type:'expense'},
+  {id:'aa141',code:'5213',name:'進料折讓',type:'expense'},
+  {id:'aa142',code:'5214',name:'期末物料',type:'expense'},
+  {id:'aa143',code:'5215',name:'直接人工費用',type:'expense'},
+  {id:'aa144',code:'5216',name:'間接人工費用',type:'expense'},
+  {id:'aa145',code:'5217',name:'製造費用',type:'expense'},
+  {id:'aa146',code:'521700',name:'加工費',type:'expense'},
+  {id:'aa147',code:'521701',name:'稅捐',type:'expense'},
+  {id:'aa148',code:'521702',name:'折舊',type:'expense'},
+  {id:'aa149',code:'521703',name:'各項耗竭及攤提',type:'expense'},
+  {id:'aa150',code:'521704',name:'伙食費',type:'expense'},
+  {id:'aa151',code:'521705',name:'職工福利',type:'expense'},
+  {id:'aa152',code:'521706',name:'訓練費',type:'expense'},
+  {id:'aa153',code:'521707',name:'間接材料',type:'expense'},
+  {id:'aa154',code:'521708',name:'折讓費用',type:'expense'},
+  {id:'aa155',code:'521709',name:'其他費用',type:'expense'},
+  {id:'aa156',code:'52171',name:'租金支出',type:'expense'},
+  {id:'aa157',code:'52172',name:'文具用品',type:'expense'},
+  {id:'aa158',code:'52173',name:'旅費',type:'expense'},
+  {id:'aa159',code:'52174',name:'運費',type:'expense'},
+  {id:'aa160',code:'52175',name:'郵電費',type:'expense'},
+  {id:'aa161',code:'52176',name:'修繕費',type:'expense'},
+  {id:'aa162',code:'52177',name:'包裝費',type:'expense'},
+  {id:'aa163',code:'52178',name:'水電瓦斯費',type:'expense'},
+  {id:'aa164',code:'52179',name:'保險費',type:'expense'},
+  {id:'aa165',code:'5218',name:'外包加工費用',type:'expense'},
+  {id:'aa166',code:'5219',name:'期初在製品',type:'expense'},
+  {id:'aa167',code:'5220',name:'期末在製品',type:'expense'},
+  {id:'aa168',code:'5221',name:'其他製造費用',type:'expense'},
+  {id:'aa169',code:'5222',name:'勞務成本',type:'expense'},
+  {id:'aa170',code:'5223',name:'業務成本',type:'expense'},
+  {id:'aa171',code:'5224',name:'其他營業成本-其他',type:'expense'},
+  {id:'aa172',code:'6101',name:'薪資支出',type:'expense'},
+  {id:'aa173',code:'6102',name:'租金支出',type:'expense'},
+  {id:'aa174',code:'6103',name:'文具用品',type:'expense'},
+  {id:'aa175',code:'6104',name:'旅費',type:'expense'},
+  {id:'aa176',code:'6105',name:'運費',type:'expense'},
+  {id:'aa177',code:'6106',name:'郵電費',type:'expense'},
+  {id:'aa178',code:'6107',name:'修繕費',type:'expense'},
+  {id:'aa179',code:'6108',name:'廣告費',type:'expense'},
+  {id:'aa180',code:'6109',name:'水電瓦斯費',type:'expense'},
+  {id:'aa181',code:'6110',name:'保險費',type:'expense'},
+  {id:'aa182',code:'6111',name:'交際費',type:'expense'},
+  {id:'aa183',code:'6112',name:'捐贈',type:'expense'},
+  {id:'aa184',code:'6113',name:'稅捐',type:'expense'},
+  {id:'aa185',code:'6114',name:'呆帳損失',type:'expense'},
+  {id:'aa186',code:'6115',name:'折舊',type:'expense'},
+  {id:'aa187',code:'6116',name:'各項耗竭及攤提',type:'expense'},
+  {id:'aa188',code:'6117',name:'外銷損失',type:'expense'},
+  {id:'aa189',code:'6118',name:'伙食費',type:'expense'},
+  {id:'aa190',code:'6119',name:'職工福利',type:'expense'},
+  {id:'aa191',code:'6120',name:'研究費',type:'expense'},
+  {id:'aa192',code:'6121',name:'佣金支出',type:'expense'},
+  {id:'aa193',code:'6122',name:'訓練費',type:'expense'},
+  {id:'aa194',code:'6123',name:'勞保費',type:'expense'},
+  {id:'aa195',code:'6124',name:'手續費用',type:'expense'},
+  {id:'aa196',code:'6125',name:'進貨折讓費用',type:'expense'},
+  {id:'aa197',code:'6126',name:'健保費用',type:'expense'},
+  {id:'aa198',code:'6127',name:'勞退費用',type:'expense'},
+  {id:'aa199',code:'6128',name:'報關費用',type:'expense'},
+  {id:'aa200',code:'6129',name:'辦公用品',type:'expense'},
+  {id:'aa201',code:'6131',name:'勞務費用',type:'expense'},
+  {id:'aa202',code:'6199',name:'其他營業費用',type:'expense'},
+  {id:'aa203',code:'7101',name:'投資收益及一般股息及紅利',type:'expense'},
+  {id:'aa204',code:'7102',name:'依稅法取得之股利',type:'expense'},
+  {id:'aa205',code:'7103',name:'依條例免所得股票',type:'expense'},
+  {id:'aa206',code:'7104',name:'利息收入',type:'expense'},
+  {id:'aa207',code:'7105',name:'租賃收入',type:'expense'},
+  {id:'aa208',code:'7106',name:'出售資產增益',type:'expense'},
+  {id:'aa209',code:'7107',name:'佣金收入',type:'expense'},
+  {id:'aa210',code:'7108',name:'商品盤盈',type:'expense'},
+  {id:'aa211',code:'7109',name:'兌換盈益',type:'expense'},
+  {id:'aa212',code:'7110',name:'其他非營業收入',type:'expense'},
+  {id:'aa213',code:'8101',name:'利息支出',type:'expense'},
+  {id:'aa214',code:'8102',name:'投資損失',type:'expense'},
+  {id:'aa215',code:'8103',name:'出售資產損失',type:'expense'},
+  {id:'aa216',code:'8104',name:'災害損失',type:'expense'},
+  {id:'aa217',code:'8105',name:'商品盤損',type:'expense'},
+  {id:'aa218',code:'8106',name:'兌換虧損',type:'expense'},
+  {id:'aa219',code:'8107',name:'其它非營業損失',type:'expense'},
+  {id:'aa220',code:'9001',name:'營所稅',type:'expense'}
 ];
 
 
-const DEFAULT_PRODUCTS = [
-  {id:'p1',code:'P001',name:'筆記型電腦',unit:'台',cost:22000,sale:28000,stock:15,minStock:5},
-  {id:'p2',code:'P002',name:'無線滑鼠',unit:'個',cost:350,sale:550,stock:80,minStock:20},
-  {id:'p3',code:'P003',name:'機械鍵盤',unit:'個',cost:1200,sale:1800,stock:45,minStock:10},
-  {id:'p4',code:'P004',name:'USB 隨身碟 128G',unit:'個',cost:280,sale:450,stock:120,minStock:30},
-  {id:'p5',code:'P005',name:'外接螢幕 24"',unit:'台',cost:3800,sale:5200,stock:22,minStock:5},
-];
 
-const DEFAULT_SUPPLIERS = [
-  {id:'s1',code:'S001',name:'台灣電子供應公司',contact:'王經理',phone:'02-1234-5678',addr:'台北市信義區信義路100號'},
-  {id:'s2',code:'S002',name:'數位周邊批發',contact:'林小姐',phone:'02-8765-4321',addr:'新北市板橋區文化路200號'},
-];
 
-const DEFAULT_CUSTOMERS = [
-  {id:'c1',code:'C001',name:'企業資訊科技',contact:'陳總',phone:'02-2345-6789',addr:'台北市內湖區瑞光路300號'},
-  {id:'c2',code:'C002',name:'校園採購處',contact:'李主任',phone:'03-456-7890',addr:'桃園市中壢區中大路1號'},
-];
+
+
+// ── Account CRUD ──
+function addAccount() {
+  const code = prompt('科目代碼（如 1110）：');
+  if (!code) return;
+  const name = prompt('科目名稱：');
+  if (!name) return;
+  const type = prompt('類型（asset/liability/equity/revenue/expense）：','expense');
+  const id = 'acc_' + Date.now();
+  accounts.push({id, code, name, type: type || 'expense'});
+  save('accounts', accounts);
+  renderAccounts();
+}
+function editAccount(id) {
+  const a = accounts.find(x => x.id === id);
+  if (!a) return;
+  const name = prompt('科目名稱：', a.name);
+  if (name) { a.name = name; save('accounts', accounts); renderAccounts(); }
+}
+function deleteAccount(id) {
+  if (!confirm('確定刪除此科目？')) return;
+  accounts = accounts.filter(x => x.id !== id);
+  save('accounts', accounts);
+  renderAccounts();
+}
+function renderAccounts() {
+  const tbody = document.getElementById('accounts-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = accounts.map((a,i) => 
+    `<tr><td>${a.code}</td><td>${a.name}</td><td>${a.type}</td>
+    <td><button onclick="editAccount('${a.id}')" class="btn btn-sm">編輯</button>
+    <button onclick="deleteAccount('${a.id}')" class="btn btn-sm btn-danger">刪除</button></td></tr>`
+  ).join('');
+}
 
 // ── Data variables (loaded async) ──
 let accounts = [];
@@ -823,9 +885,9 @@ async function initData() {
   // 3. Load all data from IndexedDB
   accounts = await load('accounts', DEFAULT_ACCOUNTS);
   journalEntries = await load('journalEntries', []);
-  products = await load('products', DEFAULT_PRODUCTS);
-  suppliers = await load('suppliers', DEFAULT_SUPPLIERS);
-  customers = await load('customers', DEFAULT_CUSTOMERS);
+  products = await load('products', []);
+  suppliers = await load('suppliers', []);
+  customers = await load('customers', []);
   purchaseOrders = await load('purchaseOrders', []);
   salesOrders = await load('salesOrders', []);
   users = await load('users', DEFAULT_USERS);
@@ -2182,9 +2244,13 @@ document.addEventListener('keydown', (e) => {
   try { await initData(); } catch(e) {
     // IndexedDB unavailable, load from localStorage
     accounts = JSON.parse(localStorage.getItem('erp_accounts')||'null')||DEFAULT_ACCOUNTS;
+  // Show product DM when no data
+  const dmPanel = document.getElementById('dm-panel');
+  if (dmPanel && journalEntries.length === 0) dmPanel.style.display = 'block';
+
     journalEntries = JSON.parse(localStorage.getItem('erp_journalEntries')||'null')||[];
-    products = JSON.parse(localStorage.getItem('erp_products')||'null')||DEFAULT_PRODUCTS;
-    suppliers = JSON.parse(localStorage.getItem('erp_suppliers')||'null')||DEFAULT_SUPPLIERS;
+    products = JSON.parse(localStorage.getItem('erp_products')||'null')||[];
+    suppliers = JSON.parse(localStorage.getItem('erp_suppliers')||'null')||[];
     customers = JSON.parse(localStorage.getItem('erp_customers')||'null')||DEFAULT_CUSTOMERS;
     purchaseOrders = JSON.parse(localStorage.getItem('erp_purchaseOrders')||'null')||[];
     salesOrders = JSON.parse(localStorage.getItem('erp_salesOrders')||'null')||[];
