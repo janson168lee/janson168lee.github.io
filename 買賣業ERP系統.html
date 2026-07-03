@@ -1447,14 +1447,24 @@ function renderBalanceSheet() {
   const company = (STATE.license && STATE.license.company) || '';
   let html = `<div class="card"><div class="card-header"><h2>${company?company+' — ':''}資產負債表</h2><span style="font-size:12px;color:var(--text-muted);"><input type="date" id="bsDate" value="${asOf}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()"></span></div><div class="card-body">`;
 
-  // Assets
+  // Assets (with contra-asset handling for 累計折舊, 備抵)
   html += `<div class="report-section"><h3>資產</h3><table class="data-table"><tbody>`;
   let totalAssets = 0;
-  for (const a of accounts.filter(x=>x.type==='asset')) {
+  const assetAccounts = accounts.filter(x=>x.type==='asset');
+  for (let i = 0; i < assetAccounts.length; i++) {
+    const a = assetAccounts[i];
     const bal = balances[a.id] || 0;
-    // Show all accounts including zero
-    totalAssets += bal;
-    html += `<tr><td>${a.name}</td><td class="num">${fmtMoney(bal)}</td></tr>`;
+    const isContra = a.name.includes('累計折舊') || a.name.includes('備抵') || a.name.includes('跌價損失準備');
+    if (isContra) {
+      const absBal = Math.abs(bal);
+      if (absBal === 0) continue;
+      totalAssets -= absBal;
+      html += `<tr style="color:var(--text-muted);"><td>　減：${a.name}</td><td class="num">(${fmtMoney(absBal)})</td></tr>`;
+    } else {
+      if (bal === 0) continue;
+      totalAssets += bal;
+      html += `<tr><td>${a.name}</td><td class="num">${fmtMoney(bal)}</td></tr>`;
+    }
   }
   html += `<tr class="total-row"><td>資產合計</td><td class="num">${fmtMoney(totalAssets)}</td></tr></tbody></table></div>`;
 
