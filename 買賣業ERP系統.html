@@ -10,8 +10,8 @@
    Palette: Deep Space + Signal Amber accents
    ═══════════════════════════════════════════════ */
 :root {
-  --bg-app: #0a0e14;
-  --bg-sidebar: #0d1117;
+  --bg-app: #f0efe9;
+  --bg-sidebar: #ffffff;
   --bg-main: #f5f3ef;
   --bg-card: #ffffff;
   --bg-input: #f8f7f4;
@@ -20,8 +20,8 @@
   --text-primary: #1a1a18;
   --text-secondary: #6b6a65;
   --text-muted: #9a9995;
-  --text-sidebar: #8b949e;
-  --text-sidebar-active: #e6edf3;
+  --text-sidebar: #5a5955;
+  --text-sidebar-active: #1b2a4a;
   --accent: #d4820a;
   --accent-light: #f5a623;
   --positive: #1b7d46;
@@ -44,32 +44,32 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 /* ── Sidebar ── */
 .sidebar {
   width:var(--sidebar-w); min-width:var(--sidebar-w); background:var(--bg-sidebar);
-  display:flex; flex-direction:column; border-right:1px solid #1c2128; z-index:10;
+  display:flex; flex-direction:column; border-right:1px solid var(--border); z-index:10;
 }
 .sidebar-brand {
-  padding:16px 18px; border-bottom:1px solid #1c2128;
+  padding:16px 18px; border-bottom:1px solid var(--border);
   display:flex; align-items:center; gap:10px;
 }
 .sidebar-brand .icon { width:28px; height:28px; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; }
-.sidebar-brand .title { font-size:14px; font-weight:700; color:var(--text-sidebar-active); letter-spacing:-0.3px; }
-.sidebar-brand .sub { font-size:10px; color:var(--text-sidebar); margin-top:1px; }
+.sidebar-brand .title { font-size:14px; font-weight:700; color:var(--text-primary); letter-spacing:-0.3px; }
+.sidebar-brand .sub { font-size:10px; color:var(--text-muted); margin-top:1px; }
 
 .sidebar-nav { flex:1; overflow-y:auto; padding:8px 0; }
 .nav-section { margin-bottom:6px; }
 .nav-section-title {
   padding:10px 18px 4px; font-size:10px; font-weight:700;
-  text-transform:uppercase; letter-spacing:1.2px; color:var(--accent); opacity:0.7;
+  text-transform:uppercase; letter-spacing:1.2px; color:var(--accent); opacity:0.8;
 }
 .nav-item {
   display:flex; align-items:center; gap:8px; padding:8px 18px; cursor:pointer;
   font-size:13px; color:var(--text-sidebar); transition:all 0.15s; border-left:2px solid transparent;
   user-select:none;
 }
-.nav-item:hover { background:rgba(255,255,255,0.04); color:var(--text-sidebar-active); }
-.nav-item.active { background:rgba(212,130,10,0.08); color:var(--accent-light); border-left-color:var(--accent); font-weight:600; }
+.nav-item:hover { background:#f5f3ef; color:var(--text-primary); }
+.nav-item.active { background:rgba(212,130,10,0.08); color:var(--accent); border-left-color:var(--accent); font-weight:600; }
 .nav-item .nav-icon { font-size:14px; width:18px; text-align:center; }
 
-.sidebar-footer { padding:12px 18px; border-top:1px solid #1c2128; font-size:11px; color:var(--text-sidebar); display:flex; justify-content:space-between; }
+.sidebar-footer { padding:12px 18px; border-top:1px solid var(--border); font-size:11px; color:var(--text-sidebar); display:flex; justify-content:space-between; }
 
 /* ── Main ── */
 .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
@@ -185,7 +185,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 /* ── Version Badge ── */
 .sidebar-version {
   text-align:center; padding:8px 18px 4px; font-size:11px; font-weight:700;
-  color:#d4820a; letter-spacing:0.5px; border-top:1px solid #1c2128;
+  color:#d4820a; letter-spacing:0.5px; border-top:1px solid var(--border);
 }
 .sidebar-version span {
   display:inline-block; padding:3px 10px; border-radius:10px;
@@ -193,21 +193,9 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 }
 
 /* ── Login Modal ── */
-.login-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:200;
-  display:flex; align-items:center; justify-content:center;
-}
-.login-box {
-  background:var(--bg-card); border-radius:var(--radius); box-shadow:var(--shadow-lg);
-  width:380px; max-width:90vw; padding:0;
-}
-.login-box-header {
-  padding:20px 24px 0; text-align:center;
-}
 .login-box-header .login-icon { font-size:36px; margin-bottom:8px; }
 .login-box-header h2 { font-size:18px; font-weight:700; color:var(--text-primary); }
 .login-box-header p { font-size:12px; color:var(--text-muted); margin-top:4px; }
-.login-box-body { padding:20px 24px; }
 .login-box-body .form-group { margin-bottom:14px; }
 .login-box-body .form-group label { font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px; }
 .login-box-body .form-group input {
@@ -347,23 +335,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 </main>
 
 <!-- ═══════════════ LOGIN MODAL ═══════════════ -->
-<div class="login-overlay hidden" id="loginOverlay">
-  <div class="login-box">
-    <div class="login-box-header">
-      <div class="login-icon">📊</div>
-      <h2>買賣業 ERP 系統</h2>
-      <p>專業版 V2.0 · 請登入以繼續</p>
-    </div>
-    <div class="login-box-body">
-      <div class="login-error" id="loginError"></div>
-      <div class="form-group"><label>帳號</label><input id="loginUsername" placeholder="請輸入帳號" autocomplete="username"></div>
-      <div class="form-group"><label>密碼</label><input type="password" id="loginPassword" placeholder="請輸入密碼" autocomplete="current-password"></div>
-    </div>
-    <div class="login-box-footer">
-      <button class="btn btn-primary" onclick="doLogin()">登入</button>
-    </div>
-  </div>
-</div>
+
 
 <!-- ═══════════════ MODAL ═══════════════ -->
 <div class="modal-overlay hidden" id="modalOverlay">
@@ -378,7 +350,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 
 // ── State ──
 const STATE = {
-  currentPage: 'chart-of-accounts',
+  currentPage: '',
   editingId: null,
 };
 
@@ -690,10 +662,6 @@ const DEFAULT_ACCOUNTS = [
 ];
 
 
-
-
-
-
 // ── Account CRUD ──
 function addAccount() {
   const code = prompt('科目代碼（如 1110）：');
@@ -930,7 +898,7 @@ function doLogin() {
   if (!u) { errEl.textContent = '帳號或密碼錯誤'; return; }
   currentUser = u;
   sessionStorage.setItem('erp_session', JSON.stringify({id:u.id, username:u.username, role:u.role}));
-  document.getElementById('loginOverlay').classList.add('hidden');
+  null.classList.add('hidden');
   updateUserDisplay();
   renderPage();
 }
@@ -945,7 +913,7 @@ function doLogout() {
   }
   document.getElementById('userMenu').style.display = 'none';
   document.getElementById('userDropdown').classList.remove('show');
-  document.getElementById('loginOverlay').classList.remove('hidden');
+  null.classList.remove('hidden');
   document.getElementById('loginUsername').value = '';
   document.getElementById('loginPassword').value = '';
   document.getElementById('loginError').textContent = '';
@@ -1091,7 +1059,33 @@ function renderPage() {
     case 'purchase-orders': content.innerHTML = renderPurchaseOrders(); break;
     case 'sales-orders': content.innerHTML = renderSalesOrders(); break;
     case 'inventory': content.innerHTML = renderInventory(); break;
-    default: content.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>請選擇功能模組</p></div>';
+    default:
+      const lic = STATE.license;
+      const comp = lic?.company || '';
+      const initPanel = '<div style="max-width:700px;margin:30px auto;">'
+        + '<div style="background:linear-gradient(135deg,#1b2a4a,#2d1a0a);border-radius:12px;padding:36px;color:#fff;text-align:center;margin-bottom:20px;">'
+        + '<h1 style="font-size:24px;font-weight:900;margin:0 0 8px;">歡迎使用買賣業 ERP 系統</h1>'
+        + '<p style="font-size:13px;color:rgba(255,255,255,0.7);">220 個會計科目已就緒 | 初始值為 0 | 無示範資料</p></div>'
+        + '<div class="card"><div class="card-body" style="padding:24px;">'
+        + '<h2 style="font-size:16px;font-weight:700;margin:0 0 16px;color:#1b2a4a;">系統初始化</h2>'
+        + '<div class="form-group" style="margin-bottom:16px;"><label style="font-size:13px;font-weight:600;">公司名稱</label>'
+        + '<input id="initCompany" placeholder="輸入你的公司名稱" style="width:100%;padding:10px 12px;border:1px solid #e0ded8;border-radius:6px;font-size:14px;margin-top:4px;" value="' + comp + '"></div>'
+        + '<div class="form-group" style="margin-bottom:16px;"><label style="font-size:13px;font-weight:600;">授權金鑰（選填，升級專業版）</label>'
+        + '<input id="initKey" placeholder="XXXX-XXXX-XXXX-XXXX" style="width:100%;padding:10px 12px;border:1px solid #e0ded8;border-radius:6px;font-size:14px;margin-top:4px;font-family:var(--font-mono);"></div>'
+        + '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">'
+        + '<button class="btn btn-primary" onclick="initSystem()" style="padding:10px 28px;font-size:14px;">啟動系統</button>'
+        + '<span style="font-size:12px;color:var(--text-muted);">不填金鑰 = 免費版 | 填入金鑰 = 專業版</span></div>'
+        + '<div style="margin-top:20px;padding:16px;background:#f8f7f4;border-radius:8px;">'
+        + '<h3 style="font-size:13px;font-weight:700;margin:0 0 10px;color:#d4820a;">開始使用三步驟</h3>'
+        + '<div style="font-size:12px;color:#6b6a65;line-height:1.8;">'
+        + '<b>1.</b> 輸入公司名稱 → 點「啟動系統」<br>'
+        + '<b>2.</b> 左側選「資產負債表」→ 匯入期初餘額 Excel<br>'
+        + '<b>3.</b> 左側選「傳票登錄」→ 新增傳票開始記帳</div></div>'
+        + '<div style="margin-top:12px;font-size:11px;color:var(--text-muted);text-align:center;">'
+        + '聯絡：李先生 02-26293721 / 0931-818125 / janson168@gmail.com | www.erp-free.com</div>'
+        + '</div></div>';
+      content.innerHTML = initPanel;
+      break;
   }
   // Free tier warning for salary page
   if (STATE.license && STATE.license.tier === 1 && page === 'salary') {
@@ -2234,7 +2228,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal
 
 // Enter key for login
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !document.getElementById('loginOverlay').classList.contains('hidden')) {
+  if (e.key === 'Enter' && !null.classList.contains('hidden')) {
     doLogin();
   }
 });
@@ -2277,24 +2271,45 @@ document.addEventListener('keydown', (e) => {
   updateLicenseDisplay();
 
   // Free version: auto-login, skip login screen
-  if (STATE.license && STATE.license.tier === 1) {
-    currentUser = { id:'free', username:'訪客', role:'免費版' };
-    sessionStorage.setItem('erp_session', JSON.stringify({id:'free', username:'訪客', role:'免費版'}));
-    updateUserDisplay();
-    document.getElementById('loginOverlay').classList.add('hidden');
-    renderPage();
-    return;
-  }
-
-  if (checkLogin()) {
-    updateUserDisplay();
-    document.getElementById('loginOverlay').classList.add('hidden');
+  // Auto-load license if exists, skip login overlay
+  const savedLic = await load('license', []);
+  if (savedLic && savedLic.length > 0) {
+    STATE.license = savedLic[0];
+    currentUser = { id: STATE.license.tier >= 2 ? 'pro' : 'free', username: STATE.license.company || '訪客', role: STATE.license.tier >= 2 ? '專業版' : '免費版' };
   } else {
-    document.getElementById('loginOverlay').classList.remove('hidden');
-    document.getElementById('loginUsername').focus();
+    STATE.license = null;
+    currentUser = { id:'free', username:'訪客', role:'免費版' };
   }
+  updateUserDisplay();
   renderPage();
 })();
+
+// ── System initialization (called from default page) ──
+async function initSystem() {
+  const company = document.getElementById('initCompany')?.value.trim() || '';
+  const key = document.getElementById('initKey')?.value.trim() || '';
+  if (!company) { alert('請輸入公司名稱'); return; }
+  
+  if (key) {
+    const result = await verifyLicenseAsync(key, company);
+    if (result.valid) {
+      STATE.license = { id: 'lic1', key, company, tier: result.tier, expiry: result.expiry };
+      await save('license', [STATE.license]);
+      alert('專業版啟動成功！\n公司：' + company + '\n到期：' + result.expiry);
+    } else {
+      if (!confirm('金鑰驗證失敗：' + (result.reason || '未知錯誤') + '\n是否以免費版繼續？')) return;
+      STATE.license = { id: 'lic1', key: '', company, tier: 1, expiry: '' };
+      await save('license', [STATE.license]);
+    }
+  } else {
+    STATE.license = { id: 'lic1', key: '', company, tier: 1, expiry: '' };
+    await save('license', [STATE.license]);
+  }
+  
+  currentUser = { id: STATE.license.tier >= 2 ? 'pro' : 'free', username: company, role: STATE.license.tier >= 2 ? '專業版' : '免費版' };
+  updateUserDisplay();
+  document.querySelector('[data-page="chart-of-accounts"]')?.click();
+}
 </script>
 </body>
 </html>
