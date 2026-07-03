@@ -1109,6 +1109,7 @@ function renderJournal() {
         <td>${je.desc}</td><td class="num">${fmtMoney(totalDr)}</td><td class="num credit">${fmtMoney(totalCr)}</td>
         <td style="text-align:right;">
           <button class="btn btn-outline btn-xs" onclick="viewJournalDetail('${je.id}')">明細</button>
+          <button class="btn btn-outline btn-xs" style="margin-left:4px;" onclick="showJournalModal('${je.id}','edit')">編輯</button>
           ${canDelete() ? `<button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteJournal('${je.id}')">刪除</button>` : ''}
         </td></tr>`;
     }
@@ -1118,9 +1119,10 @@ function renderJournal() {
   return html;
 }
 
-function showJournalModal(id) {
+function showJournalModal(id, mode) {
+  const isEdit = mode === 'edit';
   const je = id ? journalEntries.find(j => j.id === id) : null;
-  STATE.editingId = id || null;
+  STATE.editingId = isEdit ? id : null;
   const lines = je ? je.lines : [{acc:'',debit:0,credit:0},{acc:'',debit:0,credit:0}];
   const accOptions = accounts.map(a => `<option value="${a.id}">${a.code} ${a.name}</option>`).join('');
 
@@ -1346,6 +1348,7 @@ function renderIncomeStatement() {
     html += `<div class="report-section"><h3>營業收入</h3><table class="data-table"><tbody>`;
     for (const a of accounts.filter(x=>x.type==='revenue')) {
       const bal = balances[a.id] || 0;
+      if (bal === 0) continue;
       html += `<tr><td>${a.name}</td><td class="num">${fmtMoney(Math.abs(bal))}</td></tr>`;
     }
     html += `<tr class="total-row"><td>營業收入合計</td><td class="num">${fmtMoney(revenue)}</td></tr></tbody></table></div>`;
@@ -1387,6 +1390,7 @@ function renderIncomeStatement() {
     // Revenue rows
     html += `<tr style="background:var(--bg-input);"><td colspan="14" style="font-weight:700;font-size:12px;">營業收入</td></tr>`;
     for (const a of revAccounts) {
+      if (Math.abs(yearBalances[a.id] || 0) === 0) continue;
       html += `<tr><td>${a.name}</td>`;
       for (const mo of months) {
         const bal = Math.abs(mo.balances[a.id] || 0);
@@ -2186,6 +2190,54 @@ document.addEventListener('keydown', (e) => {
 })();
 
 // ── System initialization (called from default page) ──
+
+function printIncomeStatement() {
+  const mode = document.getElementById('isMode')?.value || 'year';
+  const year = Number(document.getElementById('isYear')?.value) || new Date().getFullYear();
+  const printWin = window.open('', '_blank', 'width=1200,height=800');
+  let html = '<html><head><meta charset="UTF-8"><title>損益表</title><style>';
+  html += 'body{font-family:-apple-system,sans-serif;padding:20px;}';
+  html += 'table{border-collapse:collapse;width:100%;font-size:12px;margin-top:10px;}';
+  html += 'th,td{border:1px solid #ccc;padding:6px 10px;text-align:right;}';
+  html += 'th{background:#1b2a4a;color:#fff;text-align:center;}';
+  html += 'td:first-child{text-align:left;}';
+  html += '.total{font-weight:700;background:#fef9e7;}';
+  html += 'h2{text-align:center;color:#1b2a4a;}';
+  html += '</style></head><body>';
+  if (mode === 'period') {
+    const from = document.getElementById('isFrom')?.value || '';
+    const to = document.getElementById('isTo')?.value || '';
+    const balances = from || to ? getBalancesForPeriod(from, to) : getBalances();
+    html += '<h2>損益表</h2><p style="text-align:center;color:#888;">期間：' + (from||'起始') + ' ~ ' + (to||'至今') + '</p>';
+    html += '<table><tr><th>科目</th><th>金額</th></tr>';
+    html += '<tr><td colspan="2" style="background:#f0f0f0;font-weight:700;text-align:center;">營業收入</td></tr>';
+    for (const a of accounts.filter(x => x.type === 'revenue')) { const bal = balances[a.id] || 0; if (bal === 0) continue; html += '<tr><td>' + a.code + ' ' + a.name + '</td><td>' + (-bal).toLocaleString() + '</td></tr>'; }
+    html += '<tr class="total"><td>收入合計</td><td>' + sumByType('revenue', balances).toLocaleString() + '</td></tr>';
+    html += '<tr><td colspan="2" style="background:#f0f0f0;font-weight:700;text-align:center;">營業成本與費用</td></tr>';
+    for (const a of accounts.filter(x => x.type === 'expense')) { const bal = balances[a.id] || 0; if (bal === 0) continue; html += '<tr><td>' + a.code + ' ' + a.name + '</td><td>' + bal.toLocaleString() + '</td></tr>'; }
+    html += '<tr class="total"><td>費用合計</td><td>' + sumByType('expense', balances).toLocaleString() + '</td></tr>';
+    const net = sumByType('revenue', balances) - sumByType('expense', balances);
+    html += '<tr class="total"><td>本期淨利（損）</td><td>' + net.toLocaleString() + '</td></tr>';
+  } else {
+    html += '<h2>' + year + ' 年度各月損益比較表</h2>';
+    html += '<table><tr><th>月份</th><th>營業收入</th><th>營業費用</th><th>本期淨利</th></tr>';
+    let tr=0, te=0;
+    for (let m = 1; m <= 12; m++) {
+      const from = year + '-' + String(m).padStart(2,'0') + '-01';
+      const to = year + '-' + String(m).padStart(2,'0') + '-' + new Date(year,m,0).getDate();
+      const b = getBalancesForPeriod(from, to);
+      const r = sumByType('revenue', b), e = sumByType('expense', b);
+      tr+=r; te+=e;
+      html += '<tr><td>' + m + '月</td><td>' + r.toLocaleString() + '</td><td>' + e.toLocaleString() + '</td><td style="color:' + (r>=e?'#1b7d46':'#c0392b') + ';">' + (r-e).toLocaleString() + '</td></tr>';
+    }
+    html += '<tr class="total"><td>年度合計</td><td>' + tr.toLocaleString() + '</td><td>' + te.toLocaleString() + '</td><td>' + (tr-te).toLocaleString() + '</td></tr>';
+  }
+  html += '</table></body></html>';
+  printWin.document.write(html);
+  printWin.document.close();
+  setTimeout(() => printWin.print(), 500);
+}
+
 async function initSystem() {
   const company = document.getElementById('initCompany')?.value.trim() || '';
   const key = document.getElementById('initKey')?.value.trim() || '';
