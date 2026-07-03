@@ -10,8 +10,8 @@
    Palette: Deep Space + Signal Amber accents
    ═══════════════════════════════════════════════ */
 :root {
-  --bg-app: #f0efe9;
-  --bg-sidebar: #ffffff;
+  --bg-app: #0a0e14;
+  --bg-sidebar: #0d1117;
   --bg-main: #f5f3ef;
   --bg-card: #ffffff;
   --bg-input: #f8f7f4;
@@ -20,8 +20,8 @@
   --text-primary: #1a1a18;
   --text-secondary: #6b6a65;
   --text-muted: #9a9995;
-  --text-sidebar: #5a5955;
-  --text-sidebar-active: #1b2a4a;
+  --text-sidebar: #8b949e;
+  --text-sidebar-active: #e6edf3;
   --accent: #d4820a;
   --accent-light: #f5a623;
   --positive: #1b7d46;
@@ -44,32 +44,32 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 /* ── Sidebar ── */
 .sidebar {
   width:var(--sidebar-w); min-width:var(--sidebar-w); background:var(--bg-sidebar);
-  display:flex; flex-direction:column; border-right:1px solid var(--border); z-index:10;
+  display:flex; flex-direction:column; border-right:1px solid #1c2128; z-index:10;
 }
 .sidebar-brand {
-  padding:16px 18px; border-bottom:1px solid var(--border);
+  padding:16px 18px; border-bottom:1px solid #1c2128;
   display:flex; align-items:center; gap:10px;
 }
 .sidebar-brand .icon { width:28px; height:28px; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; }
-.sidebar-brand .title { font-size:14px; font-weight:700; color:var(--text-primary); letter-spacing:-0.3px; }
-.sidebar-brand .sub { font-size:10px; color:var(--text-muted); margin-top:1px; }
+.sidebar-brand .title { font-size:14px; font-weight:700; color:var(--text-sidebar-active); letter-spacing:-0.3px; }
+.sidebar-brand .sub { font-size:10px; color:var(--text-sidebar); margin-top:1px; }
 
 .sidebar-nav { flex:1; overflow-y:auto; padding:8px 0; }
 .nav-section { margin-bottom:6px; }
 .nav-section-title {
   padding:10px 18px 4px; font-size:10px; font-weight:700;
-  text-transform:uppercase; letter-spacing:1.2px; color:var(--accent); opacity:0.8;
+  text-transform:uppercase; letter-spacing:1.2px; color:var(--accent); opacity:0.7;
 }
 .nav-item {
   display:flex; align-items:center; gap:8px; padding:8px 18px; cursor:pointer;
   font-size:13px; color:var(--text-sidebar); transition:all 0.15s; border-left:2px solid transparent;
   user-select:none;
 }
-.nav-item:hover { background:#f5f3ef; color:var(--text-primary); }
-.nav-item.active { background:rgba(212,130,10,0.08); color:var(--accent); border-left-color:var(--accent); font-weight:600; }
+.nav-item:hover { background:rgba(255,255,255,0.04); color:var(--text-sidebar-active); }
+.nav-item.active { background:rgba(212,130,10,0.08); color:var(--accent-light); border-left-color:var(--accent); font-weight:600; }
 .nav-item .nav-icon { font-size:14px; width:18px; text-align:center; }
 
-.sidebar-footer { padding:12px 18px; border-top:1px solid var(--border); font-size:11px; color:var(--text-sidebar); display:flex; justify-content:space-between; }
+.sidebar-footer { padding:12px 18px; border-top:1px solid #1c2128; font-size:11px; color:var(--text-sidebar); display:flex; justify-content:space-between; }
 
 /* ── Main ── */
 .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
@@ -78,7 +78,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
   border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 20px;
   justify-content:space-between; box-shadow:var(--shadow);
 }
-.header h1 { font-size:16px; font-weight:700; color:var(--text-primary); letter-spacing:-0.3px; }
+.header h1 { font-size:16px; font-weight:700; color:var(--text-sidebar-active); letter-spacing:-0.3px; }
 .header-actions { display:flex; gap:8px; align-items:center; }
 .header-date { font-size:12px; color:var(--text-muted); font-family:var(--font-mono); }
 
