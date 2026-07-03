@@ -760,83 +760,7 @@ function updateLicenseDisplay() {
   if(ver&&STATE.license){ ver.textContent = isPro()?'專業版 V2.0':'免費版 V2.0'; }
 }
 
-function // showLicenseModal(errorMsg) {
-  // Remove existing license modal if any
-  const existing = document.getElementById('licenseOverlay');
-  if (existing) existing.remove();
-
-  const overlay = document.createElement('div');
-  overlay.id = 'licenseOverlay';
-  overlay.className = 'modal-overlay';
-  overlay.style.zIndex = '250';
-
-  overlay.innerHTML = `
-    <div class="modal" style="width:480px;max-width:90vw;">
-      <div class="modal-header">
-        <h3>🔑 授權啟用 — 買賣業 ERP 系統</h3>
-      </div>
-      <div class="modal-body">
-        ${errorMsg ? `<div style="background:#fef2f2;color:var(--negative);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:12px;font-size:13px;">${errorMsg}</div>` : ''}
-        <div class="form-group">
-          <label>公司名稱</label>
-          <input id="licCompany" placeholder="請輸入公司名稱" autocomplete="off">
-        </div>
-        <div class="form-group">
-          <label>授權金鑰</label>
-          <input id="licKey" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" style="font-family:var(--font-mono);letter-spacing:1px;">
-        </div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:8px;text-align:center;">
-          聯絡我們：02-26293721 ｜ janson168@gmail.com
-        </div>
-      </div>
-      <div class="modal-footer" style="justify-content:space-between;">
-        <button class="btn btn-outline" id="btnFreeTier">🆓 啟用免費版</button>
-        <button class="btn btn-primary" id="btnActivate">🔓 驗證並啟用</button>
-      </div>
-    </div>`;
-
-  document.body.appendChild(overlay);
-
-  overlay.querySelector('#btnFreeTier').onclick = async () => {
-    const company = overlay.querySelector('#licCompany').value.trim() || '免費試用';
-    const licData = { id:'license', key:'FREE', company, tier:1, tierName:'免費版', expiry:'永久', valid:true };
-    if (DB) { await save('license', [licData]); }
-    else { localStorage.setItem('erp_license', JSON.stringify([licData])); }
-    location.reload();
-  };
-
-  overlay.querySelector('#btnActivate').onclick = async () => {
-    const company = overlay.querySelector('#licCompany').value.trim();
-    const key = overlay.querySelector('#licKey').value.trim();
-    const result = await verifyLicenseAsync(key, company);
-    if (!result.valid) {
-      // Remove previous error if any
-      const prevErr = overlay.querySelector('.lic-error');
-      if (prevErr) prevErr.remove();
-      const errDiv = document.createElement('div');
-      errDiv.className = 'lic-error';
-      errDiv.style.cssText = 'background:#fef2f2;color:var(--negative);padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:12px;font-size:13px;';
-      errDiv.textContent = result.reason;
-      const modalBody = overlay.querySelector('.modal-body');
-      modalBody.insertBefore(errDiv, modalBody.querySelector('.form-group'));
-      return;
-    }
-    STATE.license = result;
-    await save('license', [{ id:'license', key: result.key, company: result.company, tier: result.tier, tierName: result.tierName }]);
-    location.reload();
-  };
-
-  // Enter key support
-  overlay.querySelector('#licKey').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') overlay.querySelector('#btnActivate').click();
-  });
-  overlay.querySelector('#licCompany').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') overlay.querySelector('#licKey').focus();
-  });
-
-  // Focus company input
-  setTimeout(() => overlay.querySelector('#licCompany').focus(), 100);
-}
+// showLicenseModal removed
 
 const DEFAULT_USERS = [
   {id:'u1', username:'admin', password:'admin123', role:'admin'}
@@ -2228,7 +2152,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal
 
 // Enter key for login
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !null.classList.contains('hidden')) {
+  if (e.key === 'Enter') {
     doLogin();
   }
 });
@@ -2238,10 +2162,6 @@ document.addEventListener('keydown', (e) => {
   try { await initData(); } catch(e) {
     // IndexedDB unavailable, load from localStorage
     accounts = JSON.parse(localStorage.getItem('erp_accounts')||'null')||DEFAULT_ACCOUNTS;
-  // Show product DM when no data
-  const dmPanel = document.getElementById('dm-panel');
-  if (dmPanel && journalEntries.length === 0) dmPanel.style.display = 'block';
-
     journalEntries = JSON.parse(localStorage.getItem('erp_journalEntries')||'null')||[];
     products = JSON.parse(localStorage.getItem('erp_products')||'null')||[];
     suppliers = JSON.parse(localStorage.getItem('erp_suppliers')||'null')||[];
