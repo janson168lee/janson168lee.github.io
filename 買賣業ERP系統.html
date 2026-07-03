@@ -760,7 +760,7 @@ function updateLicenseDisplay() {
   if(ver&&STATE.license){ ver.textContent = isPro()?'專業版 V2.0':'免費版 V2.0'; }
 }
 
-function showLicenseModal(errorMsg) {
+function // showLicenseModal(errorMsg) {
   // Remove existing license modal if any
   const existing = document.getElementById('licenseOverlay');
   if (existing) existing.remove();
@@ -2252,25 +2252,6 @@ document.addEventListener('keydown', (e) => {
     DB = null;
   }
 
-  // Check license
-  const savedLicense = DB ? await dbLoad('license') : JSON.parse(localStorage.getItem('erp_license')||'null');
-  if (!savedLicense || savedLicense.length === 0) {
-    showLicenseModal(); return;
-  }
-  const lic = savedLicense[0];
-  // Free tier: skip crypto verification, use stored data directly
-  if (lic.tier === 1 || (lic.key && lic.key.startsWith('FREE'))) {
-    STATE.license = { valid:true, tier:1, tierName:'免費版', company:lic.company||'免費試用', key:lic.key||'FREE', expiry:'永久' };
-  } else {
-    const result = await verifyLicenseAsync(lic.key, lic.company);
-    if (!result.valid) {
-      showLicenseModal('授權已失效：' + result.reason); return;
-    }
-    STATE.license = result;
-  }
-  updateLicenseDisplay();
-
-  // Free version: auto-login, skip login screen
   // Auto-load license if exists, skip login overlay
   const savedLic = await load('license', []);
   if (savedLic && savedLic.length > 0) {
