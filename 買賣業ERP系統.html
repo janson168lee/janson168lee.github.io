@@ -1319,6 +1319,18 @@ function renderTrialBalance() {
 // ═══════════════════════════════════════════════
 //  5. INCOME STATEMENT
 // ═══════════════════════════════════════════════
+
+function sumByPrefix(prefixes, balances) {
+  let sum = 0;
+  for (const a of accounts) {
+    if (prefixes.some(p => a.code.startsWith(p))) {
+      const bal = balances[a.id] || 0;
+      sum += Math.abs(bal);
+    }
+  }
+  return sum;
+}
+
 function renderIncomeStatement() {
   const now = new Date();
   const mode = document.getElementById('isMode')?.value || 'year';
@@ -1334,9 +1346,7 @@ function renderIncomeStatement() {
     const from = document.getElementById('isFrom')?.value || '';
     const to = document.getElementById('isTo')?.value || '';
     const balances = from || to ? getBalancesForPeriod(from, to) : getBalances();
-    const revenue = sumByType('revenue', balances);
-    const expenses = sumByType('expense', balances);
-    const netIncome = revenue - expenses;
+    // Revenue/expense calculated below by code prefix
 
     html += `<input type="date" id="isFrom" value="${from}" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">
       <span style="font-size:12px;color:var(--text-muted);">～</span>
@@ -1345,25 +1355,71 @@ function renderIncomeStatement() {
       <span style="font-size:12px;color:var(--text-muted);">${from||to?(from||'起始')+'～'+(to||'今日'):'全部期間'}</span>
     </div></div><div class="card-body">`;
 
+    // 營業收入 (code 4 + code 7)
+    const opRev = sumByPrefix(['4'], balances);
+    const nonOpRev = sumByPrefix(['7'], balances);
+    
     html += `<div class="report-section"><h3>營業收入</h3><table class="data-table"><tbody>`;
-    for (const a of accounts.filter(x=>x.type==='revenue')) {
+    for (const a of accounts.filter(x => x.code.startsWith('4'))) {
       const bal = balances[a.id] || 0;
       if (bal === 0) continue;
       html += `<tr><td>${a.name}</td><td class="num">${fmtMoney(Math.abs(bal))}</td></tr>`;
     }
-    html += `<tr class="total-row"><td>營業收入合計</td><td class="num">${fmtMoney(revenue)}</td></tr></tbody></table></div>`;
+    html += `<tr class="total-row"><td>營業收入合計</td><td class="num">${fmtMoney(opRev)}</td></tr></tbody></table></div>`;
 
-    html += `<div class="report-section"><h3>營業成本與費用</h3><table class="data-table"><tbody>`;
-    for (const a of accounts.filter(x=>x.type==='expense')) {
+    // 銷貨成本 (code 5)
+    const cogs = sumByPrefix(['5'], balances);
+    const grossProfit = opRev - cogs;
+    
+    html += `<div class="report-section"><h3>銷貨成本</h3><table class="data-table"><tbody>`;
+    for (const a of accounts.filter(x => x.code.startsWith('5'))) {
       const bal = balances[a.id] || 0;
-      // Show all accounts including zero
+      if (bal === 0) continue;
       html += `<tr><td>${a.name}</td><td class="num credit">${fmtMoney(Math.abs(bal))}</td></tr>`;
     }
-    html += `<tr class="total-row"><td>費用合計</td><td class="num credit">${fmtMoney(expenses)}</td></tr></tbody></table></div>`;
+    html += `<tr class="total-row"><td>銷貨成本合計</td><td class="num credit">${fmtMoney(cogs)}</td></tr></tbody></table></div>`;
+    html += `<div class="report-section"><div class="kpi-card"><div class="kpi-label">營業毛利</div><div class="kpi-value ${grossProfit>=0?'positive':'negative'}">${fmtMoney(grossProfit)}</div></div></div>`;
 
+    // 營業費用 (code 6)
+    const opExp = sumByPrefix(['6'], balances);
+    const opNet = grossProfit - opExp;
+    
+    html += `<div class="report-section"><h3>營業費用</h3><table class="data-table"><tbody>`;
+    for (const a of accounts.filter(x => x.code.startsWith('6'))) {
+      const bal = balances[a.id] || 0;
+      if (bal === 0) continue;
+      html += `<tr><td>${a.name}</td><td class="num credit">${fmtMoney(Math.abs(bal))}</td></tr>`;
+    }
+    html += `<tr class="total-row"><td>營業費用合計</td><td class="num credit">${fmtMoney(opExp)}</td></tr></tbody></table></div>`;
+    html += `<div class="report-section"><div class="kpi-card"><div class="kpi-label">營業淨利</div><div class="kpi-value ${opNet>=0?'positive':'negative'}">${fmtMoney(opNet)}</div></div></div>`;
+
+    // 非營業收入 (code 7)
+    if (nonOpRev > 0) {
+      html += `<div class="report-section"><h3>非營業收入</h3><table class="data-table"><tbody>`;
+      for (const a of accounts.filter(x => x.code.startsWith('7'))) {
+        const bal = balances[a.id] || 0;
+        if (bal === 0) continue;
+        html += `<tr><td>${a.name}</td><td class="num">${fmtMoney(Math.abs(bal))}</td></tr>`;
+      }
+      html += `<tr class="total-row"><td>非營業收入合計</td><td class="num">${fmtMoney(nonOpRev)}</td></tr></tbody></table></div>`;
+    }
+
+    // 非營業費用 (code 8-9)
+    const nonOpExp = sumByPrefix(['8','9'], balances);
+    if (nonOpExp > 0) {
+      html += `<div class="report-section"><h3>非營業費用</h3><table class="data-table"><tbody>`;
+      for (const a of accounts.filter(x => x.code.startsWith('8') || x.code.startsWith('9'))) {
+        const bal = balances[a.id] || 0;
+        if (bal === 0) continue;
+        html += `<tr><td>${a.name}</td><td class="num credit">${fmtMoney(Math.abs(bal))}</td></tr>`;
+      }
+      html += `<tr class="total-row"><td>非營業費用合計</td><td class="num credit">${fmtMoney(nonOpExp)}</td></tr></tbody></table></div>`;
+    }
+
+    const netIncome2 = opNet + nonOpRev - nonOpExp;
     html += `<div class="report-section"><h3>本期損益</h3>
       <div class="kpi-card" style="margin-top:8px;"><div class="kpi-label">本期淨利（損）</div>
-      <div class="kpi-value ${netIncome>=0?'positive':'negative'}">${fmtMoney(netIncome)}</div></div></div>`;
+      <div class="kpi-value ${netIncome2>=0?'positive':'negative'}">${fmtMoney(netIncome2)}</div></div></div>`;
   } else {
     const year = Number(document.getElementById('isYear')?.value) || now.getFullYear();
     html += `<select id="isYear" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">`;
