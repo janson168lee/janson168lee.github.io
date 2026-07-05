@@ -798,7 +798,7 @@ function accName(id) { const a=accounts.find(x=>x.id===id); return a ? `${a.code
 function accTypeLabel(t) { const m={asset:'資產',liability:'負債',equity:'權益',revenue:'收入',expense:'費用'}; return m[t]||t; }
 
 // ═══ User Management ═══
-function isAdmin() { return currentUser && (currentUser.role === 'admin' || currentUser.role === '免費版' || currentUser.role === '專業版'); }
+function isAdmin() { return true; } // No login overlay — all users have full access
 function canDelete() { return isAdmin(); }
 
 function checkLogin() {
