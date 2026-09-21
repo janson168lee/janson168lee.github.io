@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>買賣業 ERP 系統 — 財會單位</title>
+<title>買賣業 ERP 系統 V2.2</title>
 <style>
 /* ═══════════════════════════════════════════════
    DESIGN: Industrial Utilitarian — Bloomberg-inspired
@@ -148,6 +148,17 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 .kpi-value.negative { color:var(--negative); }
 .kpi-value.neutral { color:var(--text-primary); }
 
+/* ── KPI Index Analysis (V2.2) ── */
+.kpi-progress { height:8px; background:#f0eee8; border-radius:4px; overflow:hidden; margin-top:8px; }
+.kpi-progress-bar { height:100%; border-radius:4px; }
+.kpi-insight { display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:1.55; padding:8px 2px; border-bottom:1px dashed var(--border-light); }
+.kpi-insight:last-child { border-bottom:none; }
+.kpi-insight .dot { width:9px; height:9px; border-radius:50%; margin-top:5px; flex:none; }
+.kpi-top-grid { display:grid; grid-template-columns:300px 1fr; gap:14px; margin-bottom:18px; }
+.kpi-mid-grid { display:grid; grid-template-columns:320px 1fr; gap:14px; margin-bottom:18px; }
+.kpi-pillar-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:900px) { .kpi-top-grid, .kpi-mid-grid, .kpi-pillar-grid { grid-template-columns:1fr; } }
+
 /* ── Badge / Status ── */
 .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:600; }
 .badge-success { background:#e6f4ea; color:var(--positive); }
@@ -252,6 +263,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
       <div class="nav-item" data-page="trial-balance"><span class="nav-icon">⚖️</span>試算表</div>
       <div class="nav-item" data-page="income-statement"><span class="nav-icon">📈</span>財務報表—損益表</div>
       <div class="nav-item" data-page="balance-sheet"><span class="nav-icon">🏦</span>財務報表—資產負債表</div>
+      <div class="nav-item" data-page="kpi-analysis"><span class="nav-icon">🎯</span>經營指標指數分析</div>
     </div>
     <div class="nav-section">
       <div class="nav-section-title">進銷存</div>
@@ -263,11 +275,11 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
       <div class="nav-item" data-page="inventory"><span class="nav-icon">🏗️</span>庫存管理</div>
     </div>
   </nav>
-  <div class="sidebar-version"><span><span id="sidebarVer">專業版 V2.0</span></span>
+  <div class="sidebar-version"><span><span id="sidebarVer">專業版 V2.2</span></span>
   <div id="sidebarLicense" style="font-size:9px;color:var(--text-sidebar);margin-top:2px;display:none;"></div>
 </div>
   <div class="sidebar-footer">
-    <span>財會單位</span>
+    <span id="sidebarCompany">erp-free.com</span>
     <span id="sidebarClock">--</span>
   </div>
 </aside>
@@ -311,7 +323,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
             <div style="background:#1b2a4a;color:#fff;padding:10px 14px;font-size:13px;font-weight:700;">📊 買賣業 ERP 系統</div>
             <div style="padding:12px 14px;font-size:11px;color:#37352f;line-height:1.7;">
               ✓ 220 個會計科目 | ✓ 傳票/總帳/試算<br>
-              ✓ 損益表/資產負債表 | ✓ 進銷存管理<br>
+              ✓ 損益表/資產負債表 | ✓ 經營指標分析<br>
               ✓ 客戶/供應商/商品主檔 | ✓ Excel 全模組匯出匯入
             </div>
           </div>
@@ -344,7 +356,7 @@ body { font-family:var(--font-sans); background:var(--bg-app); color:var(--text-
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   ERP SYSTEM — 買賣業進銷存 + 財務會計（專業版 V2.0）
+   ERP SYSTEM — 買賣業進銷存 + 財務會計（專業版 V2.2）
    Data persisted in IndexedDB
    ═══════════════════════════════════════════════════════ */
 
@@ -662,40 +674,6 @@ const DEFAULT_ACCOUNTS = [
 ];
 
 
-// ── Account CRUD ──
-function addAccount() {
-  const code = prompt('科目代碼（如 1110）：');
-  if (!code) return;
-  const name = prompt('科目名稱：');
-  if (!name) return;
-  const type = prompt('類型（asset/liability/equity/revenue/expense）：','expense');
-  const id = 'acc_' + Date.now();
-  accounts.push({id, code, name, type: type || 'expense'});
-  save('accounts', accounts);
-  renderAccounts();
-}
-function editAccount(id) {
-  const a = accounts.find(x => x.id === id);
-  if (!a) return;
-  const name = prompt('科目名稱：', a.name);
-  if (name) { a.name = name; save('accounts', accounts); renderAccounts(); }
-}
-function deleteAccount(id) {
-  if (!confirm('確定刪除此科目？')) return;
-  accounts = accounts.filter(x => x.id !== id);
-  save('accounts', accounts);
-  renderAccounts();
-}
-function renderAccounts() {
-  const tbody = document.getElementById('accounts-tbody');
-  if (!tbody) return;
-  tbody.innerHTML = accounts.map((a,i) => 
-    `<tr><td>${a.code}</td><td>${a.name}</td><td>${a.type}</td>
-    <td><button onclick="editAccount('${a.id}')" class="btn btn-sm">編輯</button>
-    <button onclick="deleteAccount('${a.id}')" class="btn btn-sm btn-danger">刪除</button></td></tr>`
-  ).join('');
-}
-
 // ── Data variables (loaded async) ──
 let accounts = [];
 let journalEntries = [];
@@ -757,7 +735,10 @@ function updateLicenseDisplay() {
   }
   // Update version badge
   const ver = document.getElementById('sidebarVer');
-  if(ver&&STATE.license){ ver.textContent = isPro()?'專業版 V2.0':'免費版 V2.0'; }
+  if(ver&&STATE.license){ ver.textContent = isPro()?'專業版 V2.2':'免費版 V2.2'; }
+  // V2.1：sidebar footer 顯示公司名
+  const comp = document.getElementById('sidebarCompany');
+  if(comp){ comp.textContent = (STATE.license && STATE.license.company) ? STATE.license.company : 'erp-free.com'; }
 }
 
 // showLicenseModal removed
@@ -814,35 +795,21 @@ function checkLogin() {
 }
 
 function doLogin() {
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  if (!username || !password) { errEl.textContent = '請輸入帳號與密碼'; return; }
-  const u = users.find(x => x.username === username && x.password === password);
-  if (!u) { errEl.textContent = '帳號或密碼錯誤'; return; }
-  currentUser = u;
-  sessionStorage.setItem('erp_session', JSON.stringify({id:u.id, username:u.username, role:u.role}));
-  null.classList.add('hidden');
-  updateUserDisplay();
+  // V2.1：登入畫面已移除，保留 stub 避免外部呼叫錯誤
+  return;
+}
+
+
+function doLogout() {
+  // V2.1：無登入流程，登出 = 回首頁
+  currentUser = null;
+  sessionStorage.removeItem('erp_session');
+  const dd = document.getElementById('userDropdown');
+  if (dd) dd.classList.remove('show');
+  STATE.currentPage = '';
   renderPage();
 }
 
-function doLogout() {
-  currentUser = null;
-  sessionStorage.removeItem('erp_session');
-  // Free tier: just reload to auto-login
-  if (STATE.license && STATE.license.tier === 1) {
-    location.reload();
-    return;
-  }
-  document.getElementById('userMenu').style.display = 'none';
-  document.getElementById('userDropdown').classList.remove('show');
-  null.classList.remove('hidden');
-  document.getElementById('loginUsername').value = '';
-  document.getElementById('loginPassword').value = '';
-  document.getElementById('loginError').textContent = '';
-  document.getElementById('mainContent').innerHTML = '<div class="empty-state"><div class="empty-icon">🔒</div><p>請先登入</p></div>';
-}
 
 function updateUserDisplay() {
   const menu = document.getElementById('userMenu');
@@ -957,6 +924,7 @@ const pageTitles = {
   'trial-balance':'試算表',
   'income-statement':'財務報表—損益表',
   'balance-sheet':'財務報表—資產負債表',
+  'kpi-analysis':'經營指標指數分析',
   'products':'商品主檔',
   'suppliers':'供應商管理',
   'customers':'客戶管理',
@@ -977,6 +945,7 @@ function renderPage() {
     case 'trial-balance': content.innerHTML = renderTrialBalance(); break;
     case 'income-statement': content.innerHTML = renderIncomeStatement(); break;
     case 'balance-sheet': content.innerHTML = renderBalanceSheet(); break;
+    case 'kpi-analysis': content.innerHTML = renderKpiAnalysis(); break;
     case 'products': content.innerHTML = renderProducts(); break;
     case 'suppliers': content.innerHTML = renderSuppliers(); break;
     case 'customers': content.innerHTML = renderCustomers(); break;
@@ -1212,7 +1181,11 @@ function saveJournal() {
 
   if (!voucher) {
     const d = new Date(date);
-    voucher = `${d.getFullYear()-1911}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}-${String(journalEntries.length+1).padStart(3,'0')}`;
+    const prefix = `${d.getFullYear()-1911}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}`;
+    const sameDay = journalEntries.filter(j => j.voucher && j.voucher.startsWith(prefix + '-')).length;
+    let seq = sameDay + 1;
+    while (journalEntries.some(j => j.voucher === `${prefix}-${String(seq).padStart(3,'0')}`)) seq++;
+    voucher = `${prefix}-${String(seq).padStart(3,'0')}`;
     document.getElementById('jeVoucher').value = voucher;
   }
 
@@ -1553,19 +1526,365 @@ function renderBalanceSheet() {
   return html;
 }
 
-function getBalances() {
-  const balances = {};
-  for (const a of accounts) balances[a.id] = 0;
-  for (const je of journalEntries) {
-    for (const l of je.lines) {
-      balances[l.acc] = (balances[l.acc] || 0) + l.debit - l.credit;
+// ═══════════════════════════════════════════
+//  6b. 經營指標指數分析（V2.2 新增）
+// ═══════════════════════════════════════════
+function kpiSafeDiv(a, b) { return (b && b !== 0 && isFinite(a/b)) ? a/b : null; }
+
+function kpiBsAgg(balances) {
+  let totalAssets=0, currentAssets=0, inventory=0, receivables=0, totalLiab=0, currentLiab=0, equity=0;
+  for (const a of accounts) {
+    const bal = balances[a.id] || 0;
+    const contra = a.name.includes('累計折舊') || a.name.includes('備抵') || a.name.includes('跌價損失準備');
+    if (a.type === 'asset') {
+      const v = contra ? -Math.abs(bal) : bal;
+      totalAssets += v;
+      if (a.code.startsWith('11')) {
+        currentAssets += v;
+        if (a.code.startsWith('113')) inventory += v;
+        if (a.code.startsWith('112')) receivables += v;
+      }
+    } else if (a.type === 'liability') {
+      const v = -bal; totalLiab += v;
+      if (a.code.startsWith('21')) currentLiab += v;
+    } else if (a.type === 'equity') {
+      equity += -bal;
     }
   }
-  return balances;
+  return { totalAssets, currentAssets, inventory, receivables, totalLiab, currentLiab, equity };
+}
+
+function kpiYearPnl(y) {
+  const b = getBalancesForPeriod(`${y}-01-01`, `${y}-12-31`);
+  return {
+    rev: sumByPrefix(['4'], b),
+    cogs: sumByPrefix(['5'], b),
+    opex: sumByPrefix(['6'], b),
+    net: sumByType('revenue', b) - sumByType('expense', b),
+  };
+}
+
+function kpiRawVals(y) {
+  const pnl = kpiYearPnl(y);
+  const end = kpiBsAgg(getBalancesAsOf(`${y}-12-31`));
+  // 期初：開帳日在分析年度內時，以開帳日餘額為期初（公司最早財務狀態）
+  const begAsOf = (openingDate && openingDate > `${y-1}-12-31` && openingDate <= `${y}-12-31`) ? openingDate : `${y-1}-12-31`;
+  const beg = kpiBsAgg(getBalancesAsOf(begAsOf));
+  const avg = (a,b) => (a+b)/2;
+  const P = (a,b) => { const v = kpiSafeDiv(a,b); return v===null ? null : v*100; };
+  const avgInv = avg(beg.inventory, end.inventory);
+  const avgAR  = avg(beg.receivables, end.receivables);
+  const avgTA  = avg(beg.totalAssets, end.totalAssets);
+  return {
+    pnl, end, beg,
+    gm:  P(pnl.rev - pnl.cogs, pnl.rev),
+    om:  P(pnl.rev - pnl.cogs - pnl.opex, pnl.rev),
+    nm:  P(pnl.net, pnl.rev),
+    exp: P(pnl.opex, pnl.rev),
+    cr:  P(end.currentAssets, end.currentLiab),
+    qr:  P(end.currentAssets - end.inventory, end.currentLiab),
+    dr:  P(end.totalLiab, end.totalAssets),
+    invT: avgInv > 0 ? kpiSafeDiv(pnl.cogs, avgInv) : null,
+    arT:  avgAR  > 0 ? kpiSafeDiv(pnl.rev, avgAR)  : null,
+    taT:  avgTA  > 0 ? kpiSafeDiv(pnl.rev, avgTA)  : null,
+  };
+}
+
+function kpiScore(val, best, worst, hi) {
+  if (val === null || val === undefined || isNaN(val)) return null;
+  let s = hi ? (val - worst) / (best - worst) : (worst - val) / (worst - best);
+  return Math.max(0, Math.min(100, Math.round(s * 100)));
+}
+
+function kpiGradeOf(score) {
+  if (score === null || score === undefined) return { label: '—', cls: 'badge', color: '#8b949e' };
+  if (score >= 80) return { label: '優', cls: 'badge-success', color: '#1b7d46' };
+  if (score >= 65) return { label: '佳', cls: 'badge-success', color: '#4a9d5f' };
+  if (score >= 50) return { label: '中', cls: 'badge-warning', color: '#d4820a' };
+  if (score >= 35) return { label: '弱', cls: 'badge-warning', color: '#e67e22' };
+  return { label: '危', cls: 'badge-danger', color: '#c0392b' };
+}
+
+function kpiCompositeGrade(s) {
+  if (s >= 80) return { label: '優良', color: '#1b7d46', note: '整體經營健全，獲利與財務結構均佳。' };
+  if (s >= 65) return { label: '穩健', color: '#4a9d5f', note: '經營體質良好，少數指標仍有成長空間。' };
+  if (s >= 50) return { label: '尚可', color: '#d4820a', note: '營運正常，建議針對弱項指標優先改善。' };
+  if (s >= 35) return { label: '待改善', color: '#e67e22', note: '多項指標偏弱，需檢視成本與財務結構。' };
+  return { label: '風險', color: '#c0392b', note: '經營風險偏高，建議儘速檢討損益與資金調度。' };
+}
+
+function kpiFmtV(v, unit) {
+  if (v === null || v === undefined || isNaN(v)) return '—';
+  return `${v.toFixed(1)} ${unit}`;
+}
+
+function computeKpiIndex(year) {
+  const y = Number(year) || new Date().getFullYear();
+  const cur = kpiRawVals(y);
+  const prv = kpiRawVals(y - 1);
+  const revG = prv.pnl.rev > 0 ? (cur.pnl.rev - prv.pnl.rev) / prv.pnl.rev * 100 : null;
+  const netG = prv.pnl.net > 0 ? (cur.pnl.net - prv.pnl.net) / prv.pnl.net * 100 : null;
+  const M = [
+    { g:'獲利能力', name:'毛利率', key:'gm',  unit:'%',  best:35,   worst:2,    hi:true,  bm:'買賣業常見 15～30%' },
+    { g:'獲利能力', name:'營業利益率', key:'om',  unit:'%',  best:15,   worst:0,    hi:true,  bm:'常見 3～10%' },
+    { g:'獲利能力', name:'純益率', key:'nm',  unit:'%',  best:12,   worst:-5,   hi:true,  bm:'常見 3～8%（含業外損益）' },
+    { g:'償債安全', name:'流動比率', key:'cr',  unit:'%',  best:250,  worst:50,   hi:true,  bm:'≥ 200% 為佳' },
+    { g:'償債安全', name:'速動比率', key:'qr',  unit:'%',  best:150,  worst:20,   hi:true,  bm:'≥ 100% 為佳' },
+    { g:'償債安全', name:'負債比率', key:'dr',  unit:'%',  best:35,   worst:85,   hi:false, bm:'≤ 50% 為佳' },
+    { g:'經營效率', name:'存貨週轉率', key:'invT', unit:'次', best:12,   worst:1,    hi:true,  bm:'6～12 次/年' },
+    { g:'經營效率', name:'應收帳款週轉率', key:'arT',  unit:'次', best:12,   worst:2,    hi:true,  bm:'8～12 次/年' },
+    { g:'經營效率', name:'總資產週轉率', key:'taT',  unit:'次', best:2.5,  worst:0.4,  hi:true,  bm:'1.5～2.5 次/年' },
+    { g:'成長性', name:'營收成長率', key:'revG', unit:'%',  best:20,   worst:-15,  hi:true,  bm:'與上年度比較' },
+    { g:'成長性', name:'淨利成長率', key:'netG', unit:'%',  best:20,   worst:-15,  hi:true,  bm:'與上年度比較' },
+  ];
+  const vmap = { gm:cur.gm, om:cur.om, nm:cur.nm, cr:cur.cr, qr:cur.qr, dr:cur.dr, invT:cur.invT, arT:cur.arT, taT:cur.taT, revG, netG };
+  for (const m of M) { m.v = vmap[m.key]; m.score = kpiScore(m.v, m.best, m.worst, m.hi); }
+  const groups = [
+    { name:'獲利能力', weight:0.35 },
+    { name:'償債安全', weight:0.25 },
+    { name:'經營效率', weight:0.25 },
+    { name:'成長性', weight:0.15 },
+  ];
+  for (const g of groups) {
+    const arr = M.filter(m => m.g === g.name && m.score !== null);
+    g.score = arr.length ? Math.round(arr.reduce((s,m)=>s+m.score,0) / arr.length) : null;
+    g.n = arr.length;
+  }
+  const wg = groups.filter(g => g.score !== null);
+  const wsum = wg.reduce((s,g)=>s+g.weight, 0);
+  const composite = wsum > 0 ? Math.round(wg.reduce((s,g)=>s+g.score*g.weight,0) / wsum) : null;
+  const prevMap = { gm:prv.gm, om:prv.om, nm:prv.nm, cr:prv.cr, qr:prv.qr, dr:prv.dr, invT:prv.invT, arT:prv.arT, taT:prv.taT, revG:null, netG:null };
+  return { year:y, pnl:cur.pnl, expRate:cur.exp, metrics:M, groups, composite, prevMap,
+           hasData: journalEntries.length > 0 || openingBalances.length > 0 };
+}
+
+function kpiGaugeSVG(score) {
+  const g = kpiCompositeGrade(score);
+  return `<svg viewBox="0 0 200 122" style="width:100%;max-width:240px;display:block;margin:0 auto;">
+    <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="#e9e6df" stroke-width="15" stroke-linecap="round" pathLength="100"/>
+    <path d="M 20 110 A 80 80 0 0 1 180 110" fill="none" stroke="${g.color}" stroke-width="15" stroke-linecap="round" pathLength="100" stroke-dasharray="${score} 100"/>
+    <text x="100" y="86" text-anchor="middle" font-size="38" font-weight="800" fill="${g.color}" font-family="Consolas,monospace">${score}</text>
+    <text x="100" y="105" text-anchor="middle" font-size="10" fill="#8b949e">綜合經營指數（滿分 100）</text>
+  </svg>`;
+}
+
+function kpiRadarSVG(groups) {
+  const cx=140, cy=122, R=76;
+  const ang = i => -Math.PI/2 + i*(2*Math.PI/groups.length);
+  const ring = k => groups.map((g,i)=>`${(cx+R*k/100*Math.cos(ang(i))).toFixed(1)},${(cy+R*k/100*Math.sin(ang(i))).toFixed(1)}`).join(' ');
+  let s = `<svg viewBox="0 0 280 240" style="width:100%;max-width:300px;display:block;margin:0 auto;">`;
+  for (const k of [25,50,75,100]) s += `<polygon points="${ring(k)}" fill="none" stroke="#e9e6df" stroke-width="1"/>`;
+  groups.forEach((g,i)=>{
+    s += `<line x1="${cx}" y1="${cy}" x2="${(cx+R*Math.cos(ang(i))).toFixed(1)}" y2="${(cy+R*Math.sin(ang(i))).toFixed(1)}" stroke="#e9e6df" stroke-width="1"/>`;
+  });
+  const pts = groups.map((g,i)=>{
+    const r = R * (g.score===null?0:g.score)/100;
+    return `${(cx+r*Math.cos(ang(i))).toFixed(1)},${(cy+r*Math.sin(ang(i))).toFixed(1)}`;
+  }).join(' ');
+  s += `<polygon points="${pts}" fill="rgba(212,130,10,0.18)" stroke="#d4820a" stroke-width="2"/>`;
+  groups.forEach((g,i)=>{
+    const r = R * (g.score===null?0:g.score)/100;
+    s += `<circle cx="${(cx+r*Math.cos(ang(i))).toFixed(1)}" cy="${(cy+r*Math.sin(ang(i))).toFixed(1)}" r="3" fill="#d4820a"/>`;
+  });
+  const labels = ['獲利能力','償債安全','經營效率','成長性'];
+  groups.forEach((g,i)=>{
+    const a = ang(i), lx = cx + (R+18)*Math.cos(a), ly = cy + (R+18)*Math.sin(a);
+    const anchor = Math.abs(Math.cos(a)) < 0.3 ? 'middle' : (Math.cos(a) > 0 ? 'start' : 'end');
+    const vtxt = g.score===null ? '無資料' : `${g.score} 分`;
+    const vcol = g.score===null ? '#8b949e' : '#1b7d46';
+    s += `<text x="${lx.toFixed(1)}" y="${(ly-3).toFixed(1)}" text-anchor="${anchor}" font-size="11" font-weight="700" fill="#37352f">${labels[i]}</text>`;
+    s += `<text x="${lx.toFixed(1)}" y="${(ly+9).toFixed(1)}" text-anchor="${anchor}" font-size="10" fill="${vcol}">${vtxt}</text>`;
+  });
+  s += `</svg>`;
+  return s;
+}
+
+function kpiTrendSVG(year) {
+  const months = [];
+  for (let m=1; m<=12; m++) {
+    const from = `${year}-${String(m).padStart(2,'0')}-01`;
+    const to = `${year}-${String(m).padStart(2,'0')}-${new Date(year,m,0).getDate()}`;
+    const b = getBalancesForPeriod(from, to);
+    months.push({ m, rev: sumByPrefix(['4'], b), net: sumByType('revenue', b) - sumByType('expense', b) });
+  }
+  let maxPos = 1, maxNeg = 0;
+  months.forEach(mo => { maxPos = Math.max(maxPos, mo.rev, mo.net); maxNeg = Math.max(maxNeg, -mo.net); });
+  const W=920, L=64, R=8, topY=30, spanPos=104;
+  const k = spanPos / maxPos;
+  const baseY = topY + spanPos;
+  const spanNeg = Math.ceil(maxNeg * k);
+  const H = baseY + (maxNeg > 0 ? spanNeg : 0) + 34;
+  const slot = (W-L-R)/12;
+  const gridY = baseY - spanPos/2;
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;" preserveAspectRatio="xMidYMid meet">`;
+  s += `<rect x="${L}" y="8" width="10" height="10" fill="#d4820a" rx="2"/><text x="${L+15}" y="17" font-size="11" fill="#6b6a65">營業收入</text>`;
+  s += `<rect x="${L+84}" y="8" width="10" height="10" fill="#1b7d46" rx="2"/><text x="${L+99}" y="17" font-size="11" fill="#6b6a65">本期淨利</text>`;
+  s += `<rect x="${L+176}" y="8" width="10" height="10" fill="#c0392b" rx="2"/><text x="${L+191}" y="17" font-size="11" fill="#6b6a65">淨損</text>`;
+  s += `<text x="${W-R}" y="17" text-anchor="end" font-size="11" fill="#8b949e">單位：元</text>`;
+  s += `<line x1="${L}" y1="${gridY}" x2="${W-R}" y2="${gridY}" stroke="#efece5" stroke-width="1" stroke-dasharray="4 4"/>`;
+  s += `<line x1="${L}" y1="${baseY}" x2="${W-R}" y2="${baseY}" stroke="#d8d5cd" stroke-width="1.5"/>`;
+  s += `<text x="${L-6}" y="${baseY+4}" text-anchor="end" font-size="10" fill="#8b949e">0</text>`;
+  s += `<text x="${L-6}" y="${gridY+4}" text-anchor="end" font-size="10" fill="#8b949e">${fmtMoney(Math.round(maxPos/2))}</text>`;
+  s += `<text x="${L-6}" y="${topY+4}" text-anchor="end" font-size="10" fill="#8b949e">${fmtMoney(maxPos)}</text>`;
+  months.forEach((mo,i)=>{
+    const x0 = L + i*slot, bw = Math.min(22, slot*0.3);
+    const xr = x0 + slot/2 - bw - 2, xn = x0 + slot/2 + 2;
+    const hR = mo.rev * k;
+    if (hR > 0.5) s += `<rect x="${xr.toFixed(1)}" y="${(baseY-hR).toFixed(1)}" width="${bw.toFixed(1)}" height="${hR.toFixed(1)}" fill="#d4820a" rx="2"/>`;
+    if (mo.net >= 0) {
+      const hN = mo.net * k;
+      if (hN > 0.5) s += `<rect x="${xn.toFixed(1)}" y="${(baseY-hN).toFixed(1)}" width="${bw.toFixed(1)}" height="${hN.toFixed(1)}" fill="#1b7d46" rx="2"/>`;
+    } else {
+      const hN = -mo.net * k;
+      s += `<rect x="${xn.toFixed(1)}" y="${baseY}" width="${bw.toFixed(1)}" height="${hN.toFixed(1)}" fill="#c0392b" rx="2" opacity="0.85"/>`;
+    }
+    s += `<text x="${(x0+slot/2).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="10" fill="#8b949e">${mo.m}月</text>`;
+  });
+  s += `</svg>`;
+  return s;
+}
+
+function kpiInsights(D) {
+  const out = [];
+  const add = (color, text) => out.push({ color, text });
+  const m = {}; D.metrics.forEach(x => m[x.name] = x);
+  const V = k => (m[k] && m[k].v !== null && m[k].v !== undefined) ? m[k].v : null;
+  const p1 = v => v.toFixed(1) + '%';
+  if (D.pnl.rev === 0) add('#e67e22', `${D.year} 年尚無營業收入記錄，多數指標無法評分——請先於「傳票登錄」完成記帳。`);
+  if (D.pnl.net < 0) add('#c0392b', `本期稅前虧損 ${fmtMoney(-D.pnl.net)} 元，建議優先檢視毛利結構與費用管控。`);
+  const gm = V('毛利率');
+  if (gm !== null && gm < 10) add('#e67e22', `毛利率僅 ${p1(gm)}，低於買賣業常見水準（15～30%）——檢視進貨成本與定價策略。`);
+  else if (gm !== null && gm >= 30) add('#1b7d46', `毛利率 ${p1(gm)}，優於一般買賣業水準，商品定價與成本控管得宜。`);
+  if (D.expRate !== null && D.expRate > 20) add('#e67e22', `營業費用占收入 ${p1(D.expRate)}，偏高——檢視薪資、租金與行銷等固定支出。`);
+  else if (D.expRate !== null && D.expRate > 0 && D.expRate <= 12) add('#1b7d46', `營業費用率 ${p1(D.expRate)}，費用控制良好。`);
+  const cr = V('流動比率');
+  if (cr !== null && cr < 100) add('#c0392b', `流動比率 ${p1(cr)}，低於 100%——短期償債能力不足，注意資金調度與應收催收。`);
+  const qr = V('速動比率');
+  if (qr !== null && qr < 60) add('#e67e22', `速動比率 ${p1(qr)}，扣除存貨後短期支付能力偏弱，建議預留安全現金部位。`);
+  const dr = V('負債比率');
+  if (dr !== null && dr > 70) add('#e67e22', `負債比率 ${p1(dr)}，財務槓桿偏高，建議增厚自有資金或提前償還借款。`);
+  else if (dr !== null && dr <= 40) add('#1b7d46', `負債比率 ${p1(dr)}，財務結構穩健。`);
+  const invT = V('存貨週轉率');
+  if (invT !== null && invT < 3) add('#e67e22', `存貨週轉率僅 ${invT.toFixed(1)} 次/年（約每 ${Math.round(365/invT)} 天週轉一次）——注意呆滯庫存與進貨節奏。`);
+  const arT = V('應收帳款週轉率');
+  if (arT !== null && arT < 6) add('#e67e22', `應收帳款平均約 ${Math.round(365/arT)} 天收回，天數偏長——加強客戶信用管理與催收。`);
+  const revG = V('營收成長率');
+  if (revG !== null && revG < 0) add('#e67e22', `營收較 ${D.year-1} 年衰退 ${Math.abs(revG).toFixed(1)}%——建議檢視客戶結構與拓銷策略。`);
+  else if (revG !== null && revG >= 10) add('#1b7d46', `營收較 ${D.year-1} 年成長 ${revG.toFixed(1)}%，成長動能良好。`);
+  if (out.length === 0) add('#1b7d46', '各項指標均落在合理區間，整體經營穩定，維持現行節奏即可。');
+  return out.slice(0, 7);
+}
+
+function renderKpiAnalysis() {
+  const now = new Date();
+  const D = computeKpiIndex(document.getElementById('kpiYear')?.value || now.getFullYear());
+  const company = (STATE.license && STATE.license.company) || '';
+  let yearSel = `<select id="kpiYear" style="padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;" onchange="renderPage()">`;
+  for (let y = now.getFullYear(); y >= now.getFullYear() - 10; y--) {
+    yearSel += `<option value="${y}"${y===D.year?' selected':''}>${y} 年</option>`;
+  }
+  yearSel += `</select>`;
+
+  let html = `<div class="card"><div class="card-header"><h2>${company?company+' — ':''}經營指標指數分析</h2>
+    <div style="display:flex;gap:8px;align-items:center;">${yearSel}
+    <span style="font-size:11px;color:var(--text-muted);">指數＝獲利35%＋償債25%＋效率25%＋成長15%</span></div></div><div class="card-body">`;
+
+  if (!D.hasData) {
+    html += `<div class="empty-state"><div class="empty-icon">📊</div><p>尚無任何帳務資料。<br>請先於「傳票登錄」記帳，或於「資產負債表」匯入期初餘額，<br>系統即會自動產生經營指標與綜合指數。</p></div>`;
+    html += `</div></div>`;
+    return html;
+  }
+
+  const allNull = D.composite === null;
+  const cg = kpiCompositeGrade(allNull ? 0 : D.composite);
+  const pillarIcons = { '獲利能力':'💰', '償債安全':'🛡️', '經營效率':'⚙️', '成長性':'🚀' };
+  const pillarHtml = D.groups.map(g => {
+    const gr = kpiGradeOf(g.score);
+    const barW = g.score===null ? 0 : g.score;
+    return `<div class="kpi-card">
+      <div class="kpi-label">${pillarIcons[g.name]||''} ${g.name}<span style="float:right;font-size:9px;background:var(--bg-input);padding:1px 6px;border-radius:8px;">權重 ${Math.round(g.weight*100)}%</span></div>
+      <div class="kpi-value" style="color:${gr.color};font-size:30px;">${g.score===null?'—':g.score}<span style="font-size:13px;color:var(--text-muted);font-weight:600;"> 分</span></div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width:${barW}%;background:${gr.color};"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">${g.score===null?'暫無資料':`${g.n} 項指標納入評分`}</div>
+    </div>`;
+  }).join('');
+
+  html += `<div class="kpi-top-grid">
+    <div class="kpi-card" style="text-align:center;">
+      <div class="kpi-label">綜合經營指數 ${D.year} 年度</div>
+      ${allNull ? '<div style="font-size:13px;color:var(--text-muted);padding:44px 8px;">資料不足以評分<br>請登錄傳票後再回來看分析</div>' : kpiGaugeSVG(D.composite)}
+      <div style="margin-top:6px;"><span class="badge" style="background:${cg.color};color:#fff;padding:4px 14px;font-size:13px;">${allNull?'待建置':cg.label}</span></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.5;">${allNull?'尚未登錄營收或費用資料':cg.note}</div>
+    </div>
+    <div class="kpi-pillar-grid">${pillarHtml}</div>
+  </div>`;
+
+  html += `<div class="kpi-mid-grid">
+    <div class="kpi-card"><div class="kpi-label">四大構面雷達</div>${kpiRadarSVG(D.groups)}</div>
+    <div class="kpi-card"><div class="kpi-label">月度營收與淨利趨勢（${D.year} 年）</div>${kpiTrendSVG(D.year)}</div>
+  </div>`;
+
+  for (const gname of ['獲利能力','償債安全','經營效率','成長性']) {
+    html += `<div class="report-section"><h3>${gname}</h3><table class="data-table">
+      <thead><tr><th>指標</th><th class="num">${D.year} 年</th><th class="num">${D.year-1} 年</th><th class="num">評分</th><th>評等</th><th>參考基準</th></tr></thead><tbody>`;
+    for (const m of D.metrics.filter(x => x.g === gname)) {
+      const gr = kpiGradeOf(m.score);
+      const pv = D.prevMap[m.key];
+      html += `<tr><td style="font-weight:600;">${m.name}</td>
+        <td class="num" style="font-weight:600;">${kpiFmtV(m.v, m.unit)}</td>
+        <td class="num" style="color:var(--text-muted);">${kpiFmtV(pv, m.unit)}</td>
+        <td class="num" style="font-weight:700;color:${gr.color};">${m.score===null?'—':m.score}</td>
+        <td><span class="badge ${gr.cls}">${gr.label}</span></td>
+        <td style="font-size:11px;color:var(--text-muted);">${m.bm}</td></tr>`;
+    }
+    html += `</tbody></table></div>`;
+  }
+
+  html += `<div class="report-section"><h3>智慧診斷與建議</h3><div>`;
+  for (const i of kpiInsights(D)) {
+    html += `<div class="kpi-insight"><span class="dot" style="background:${i.color};"></span><span>${i.text}</span></div>`;
+  }
+  html += `</div></div>`;
+
+  html += `<div style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.8;">
+    計算口徑：損益類指標採 ${D.year}/1/1～12/31 傳票；資產負債類項目以期初（上年 12/31）與期末平均計算；流動資產＝11xx 科目、流動負債＝21xx 科目、存貨＝113x、應收＝112x（含應收票據，已扣除備抵呆帳）；純益率含業外損益。指數與評分僅供經營管理參考，非法定財務報告。
+  </div>`;
+
+  html += `</div></div>`;
+  return html;
+}
+
+function exportKpiAnalysis() {
+  const D = computeKpiIndex(document.getElementById('kpiYear')?.value || new Date().getFullYear());
+  const d = [];
+  d.push({ 面向:'綜合', 指標:'綜合經營指數', 本期:D.composite===null?'—':D.composite, 上期:'', 評分:D.composite===null?'':D.composite, 評等:D.composite===null?'待建置':kpiCompositeGrade(D.composite).label, 參考基準:'滿分100：80優良/65穩健/50尚可/35待改善' });
+  for (const g of D.groups) {
+    d.push({ 面向:g.name, 指標:`${g.name}構面分數`, 本期:g.score===null?'—':g.score, 上期:'', 評分:g.score===null?'':g.score, 評等:kpiGradeOf(g.score).label, 參考基準:`權重 ${Math.round(g.weight*100)}%` });
+  }
+  for (const m of D.metrics) {
+    const pv = D.prevMap[m.key];
+    d.push({ 面向:m.g, 指標:m.name, 本期:kpiFmtV(m.v, m.unit), 上期:kpiFmtV(pv, m.unit), 評分:m.score===null?'':m.score, 評等:kpiGradeOf(m.score).label, 參考基準:m.bm });
+  }
+  d.push({ 面向:'', 指標:'', 本期:'', 上期:'', 評分:'', 評等:'', 參考基準:'' });
+  d.push({ 面向:'備註', 指標:'年度營業收入', 本期:D.pnl.rev, 上期:'', 評分:'', 評等:'', 參考基準:'元' });
+  d.push({ 面向:'備註', 指標:'年度銷貨成本', 本期:D.pnl.cogs, 上期:'', 評分:'', 評等:'', 參考基準:'元' });
+  d.push({ 面向:'備註', 指標:'年度營業費用', 本期:D.pnl.opex, 上期:'', 評分:'', 評等:'', 參考基準:'元' });
+  d.push({ 面向:'備註', 指標:'本期淨利（損）', 本期:D.pnl.net, 上期:'', 評分:'', 評等:'', 參考基準:'元' });
+  expXLSX(d, `經營指標指數分析_${D.year}`);
+}
+
+function getBalances() {
+  // V2.1：統一改用 getBalancesAsOf（含期初餘額），與資產負債表口徑一致
+  return getBalancesAsOf('');
 }
 function getBalancesForPeriod(from, to) {
+  // V2.1：from 早於開帳日時自動含期初餘額，避免損益表與資產負債表金額斷裂
   const balances = {};
   for (const a of accounts) balances[a.id] = 0;
+  const includeOpening = openingDate && openingBalances.length > 0 && (!from || from <= openingDate);
+  if (includeOpening) {
+    for (const ob of openingBalances) balances[ob.acc] = (balances[ob.acc] || 0) + ob.debit - ob.credit;
+  }
   for (const je of journalEntries) {
     if (from && je.date < from) continue;
     if (to && je.date > to) continue;
@@ -1895,14 +2214,25 @@ function savePurchase() {
     poNo = `PO${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}-${String(purchaseOrders.length+1).padStart(3,'0')}`;
   }
 
-  // Update stock
+  // Update stock（V2.1：編輯時以差額調整）
   if (!STATE.editingId) {
     for (const l of lines) {
       const prod = products.find(p => p.id === l.prod);
       if (prod) prod.stock += l.qty;
     }
-    save('products', products);
+  } else {
+    const old = purchaseOrders.find(x => x.id === STATE.editingId);
+    if (old) {
+      const oldMap = {};
+      old.lines.forEach(l => { oldMap[l.prod] = (oldMap[l.prod]||0) + l.qty; });
+      lines.forEach(l => { oldMap[l.prod] = (oldMap[l.prod]||0) - l.qty; });
+      for (const pid in oldMap) {
+        const prod = products.find(p => p.id === pid);
+        if (prod) prod.stock = Math.max(0, prod.stock + oldMap[pid]);
+      }
+    }
   }
+  save('products', products);
 
   const data = {id: STATE.editingId || genId(), date, poNo, supplierId, status:'已完成', lines};
   if (STATE.editingId) {
@@ -1915,10 +2245,18 @@ function savePurchase() {
 }
 
 function viewPurchase(id) { showPurchaseModal(id); }
-function deletePurchase(id) {
-  if (!confirm('確定刪除此進貨單？（庫存不會自動扣回）')) return;
+async function deletePurchase(id) {
+  if (!confirm('確定刪除此進貨單？庫存將自動扣回。')) return;
+  const po = purchaseOrders.find(x => x.id === id);
+  if (po) {
+    for (const l of po.lines) {
+      const prod = products.find(p => p.id === l.prod);
+      if (prod) prod.stock = Math.max(0, prod.stock - l.qty);
+    }
+    await save('products', products);
+  }
   purchaseOrders = purchaseOrders.filter(x => x.id !== id);
-  save('purchaseOrders', purchaseOrders);
+  await save('purchaseOrders', purchaseOrders);
   renderPage();
 }
 
@@ -2021,11 +2359,17 @@ function saveSales() {
   });
   if (lines.length === 0) return alert('至少需一個銷貨品項');
 
-  // Check stock
+  // Check stock（V2.1：編輯時併計舊單可釋放數量）
+  const editRelease = {};
+  if (STATE.editingId) {
+    const old = salesOrders.find(x => x.id === STATE.editingId);
+    if (old) old.lines.forEach(l => { editRelease[l.prod] = (editRelease[l.prod]||0) + l.qty; });
+  }
   for (const l of lines) {
     const prod = products.find(p => p.id === l.prod);
-    if (prod && prod.stock < l.qty && !STATE.editingId) {
-      return alert(`${prod.name} 庫存不足！（目前：${prod.stock}，需要：${l.qty}）`);
+    const avail = (prod ? prod.stock : 0) + (editRelease[l.prod] || 0);
+    if (prod && avail < l.qty) {
+      return alert(`${prod.name} 庫存不足！（目前可用：${avail}，需要：${l.qty}）`);
     }
   }
 
@@ -2034,14 +2378,25 @@ function saveSales() {
     soNo = `SO${d.getFullYear()}${(d.getMonth()+1).toString().padStart(2,'0')}${d.getDate().toString().padStart(2,'0')}-${String(salesOrders.length+1).padStart(3,'0')}`;
   }
 
-  // Deduct stock
+  // Deduct stock（V2.1：編輯時以差額調整）
   if (!STATE.editingId) {
     for (const l of lines) {
       const prod = products.find(p => p.id === l.prod);
       if (prod) prod.stock -= l.qty;
     }
-    save('products', products);
+  } else {
+    const old = salesOrders.find(x => x.id === STATE.editingId);
+    if (old) {
+      const oldMap = {};
+      old.lines.forEach(l => { oldMap[l.prod] = (oldMap[l.prod]||0) + l.qty; });
+      lines.forEach(l => { oldMap[l.prod] = (oldMap[l.prod]||0) - l.qty; });
+      for (const pid in oldMap) {
+        const prod = products.find(p => p.id === pid);
+        if (prod) prod.stock = Math.max(0, prod.stock + oldMap[pid]);
+      }
+    }
   }
+  save('products', products);
 
   const data = {id: STATE.editingId || genId(), date, soNo, customerId, status:'已完成', lines};
   if (STATE.editingId) {
@@ -2054,10 +2409,18 @@ function saveSales() {
 }
 
 function viewSales(id) { showSalesModal(id); }
-function deleteSales(id) {
-  if (!confirm('確定刪除此銷貨單？（庫存不會自動補回）')) return;
+async function deleteSales(id) {
+  if (!confirm('確定刪除此銷貨單？庫存將自動補回。')) return;
+  const so = salesOrders.find(x => x.id === id);
+  if (so) {
+    for (const l of so.lines) {
+      const prod = products.find(p => p.id === l.prod);
+      if (prod) prod.stock += l.qty;
+    }
+    await save('products', products);
+  }
   salesOrders = salesOrders.filter(x => x.id !== id);
-  save('salesOrders', salesOrders);
+  await save('salesOrders', salesOrders);
   renderPage();
 }
 
@@ -2098,8 +2461,9 @@ function renderInventory() {
 // ═══════════════════════════════════════════════
 //  EXCEL EXPORT / IMPORT
 // ═══════════════════════════════════════════════
-function expXLSX(data, fn) { if(!data||data.length===0){alert('無資料可匯出');return;} const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Sheet1'); XLSX.writeFile(wb,fn+'.xlsx'); }
-function impXLSX(cb) { const i=document.createElement('input'); i.type='file'; i.accept='.xlsx,.xls'; i.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=ev=>{ try{ const wb=XLSX.read(ev.target.result,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; const d=XLSX.utils.sheet_to_json(ws); if(d.length===0){alert('無資料');return;} cb(d); }catch(err){alert('讀取失敗:'+err.message);} }; r.readAsArrayBuffer(f); }; i.click(); }
+function ensureXLSX(){ if(typeof XLSX==='undefined'){ alert('Excel 元件尚未載入成功。\n若以 file:// 直接開啟本頁且無網路，請改用「啟動ERP.bat」或 exe 版本（內建離線 Excel 元件）。'); return false; } return true; }
+function expXLSX(data, fn) { if(!ensureXLSX())return; if(!data||data.length===0){alert('無資料可匯出');return;} const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Sheet1'); XLSX.writeFile(wb,fn+'.xlsx'); }
+function impXLSX(cb) { if(!ensureXLSX())return; const i=document.createElement('input'); i.type='file'; i.accept='.xlsx,.xls'; i.onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=ev=>{ try{ const wb=XLSX.read(ev.target.result,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]]; const d=XLSX.utils.sheet_to_json(ws); if(d.length===0){alert('無資料');return;} cb(d); }catch(err){alert('讀取失敗:'+err.message);} }; r.readAsArrayBuffer(f); }; i.click(); }
 
 function updateToolbar(){
   const t=document.getElementById('toolbarArea'); if(!t)return;
@@ -2110,8 +2474,9 @@ function updateToolbar(){
     case 'chart-of-accounts': h=eb("exportAccounts()","匯出科目")+ib("importAccounts()","匯入科目"); break;
     case 'journal': h=eb("exportJournal()","匯出傳票")+ib("importJournal()","匯入傳票"); break;
     case 'general-ledger': case 'trial-balance': h=eb("exportTrialBalance()","匯出試算表"); break;
-    case 'income-statement': h=eb("exportIncomeStatement()","匯出損益表"); break;
-    case 'balance-sheet': h=eb("exportBalanceSheet()","匯出資產負債表")+ib("importOpeningBalances()","匯入期初餘額"); break;
+    case 'income-statement': h=eb("exportIncomeStatement()","匯出損益表")+'<button class="btn btn-outline btn-sm" onclick="printIncomeStatement()">🖨️ 列印</button>'; break;
+    case 'kpi-analysis': h=eb("exportKpiAnalysis()","匯出經營分析"); break;
+    case 'balance-sheet': h=eb("exportBalanceSheet()","匯出資產負債表")+ib("importOpeningBalances()","匯入期初餘額")+'<button class="btn btn-outline btn-sm" onclick="clearOpeningBalances()">清除期初餘額</button>'; break;
     case 'products': h=eb("exportProducts()","匯出商品")+ib("importProducts()","匯入商品"); break;
     case 'suppliers': h=eb("exportSuppliers()","匯出供應商")+ib("importSuppliers()","匯入供應商"); break;
     case 'customers': h=eb("exportCustomers()","匯出客戶")+ib("importCustomers()","匯入客戶"); break;
@@ -2158,8 +2523,12 @@ function importOpeningBalances(){ impXLSX(async data=>{
   const lines = obs.filter(o=>o.debit>0||o.credit>0).map(o=>({acc:o.acc, debit:o.debit, credit:o.credit}));
   const diff = totalDr - totalCr;
   if(Math.abs(diff)>0.5){
-    if(diff > 0) lines.push({acc:'e2', debit:0, credit:diff});
-    else lines.push({acc:'e2', debit:-diff, credit:0});
+    // V2.1：差額自動入「累積盈虧(3252)」，找不到則找 3251 前期損益，最後 fallback 權益第一個科目
+    let plAcc = accounts.find(a=>a.code==='3252') || accounts.find(a=>a.code==='3251') || accounts.find(a=>a.type==='equity');
+    if(plAcc){
+      if(diff > 0) lines.push({acc:plAcc.id, debit:0, credit:diff});
+      else lines.push({acc:plAcc.id, debit:-diff, credit:0});
+    }
   }
   const je = {id:genId(), date, voucher, desc:'期初開帳', lines};
   const idx = journalEntries.findIndex(j=>j.voucher===voucher);
@@ -2168,6 +2537,19 @@ function importOpeningBalances(){ impXLSX(async data=>{
   alert('已匯入 '+obs.length+' 筆期初餘額（日期：'+date+'）\n開帳傳票：'+voucher);
   renderPage();
 }); }
+
+// ── 清除期初餘額（V2.1）──
+async function clearOpeningBalances(){
+  if(!confirm('確定清除期初餘額？將同時刪除開帳傳票。')) return;
+  const voucherPrefix = (openingDate||'').replace(/-/g,'').slice(2)+'-OPEN';
+  journalEntries = journalEntries.filter(j => j.voucher !== voucherPrefix);
+  openingBalances = [];
+  openingDate = '';
+  await save('openingBalances', []);
+  await save('openingDate', []);
+  await save('journalEntries', journalEntries);
+  renderPage();
+}
 
 // Import functions
 function importAccounts(){ impXLSX(data=>{ data.forEach(r=>{ if(r.代碼&&r.科目名稱){ const tMap={'資產':'asset','負債':'liability','權益':'equity','收入':'revenue','費用':'expense'}; const ty=tMap[r.類別]||'asset'; const ex=accounts.find(a=>a.code===r.代碼); if(ex){ex.name=r.科目名稱;ex.type=ty;} else{accounts.push({id:genId(),code:String(r.代碼),name:r.科目名稱,type:ty,parent:''});} } }); save('accounts',accounts); renderPage(); }); }
@@ -2220,10 +2602,13 @@ setInterval(() => {
 // Keyboard shortcut: Escape to close modal
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-// Enter key for login
+// Enter：modal 開啟時等同按「儲存」（V2.1）
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    doLogin();
+  if (e.key === 'Enter' && !document.getElementById('modalOverlay').classList.contains('hidden')) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+      const btn = document.querySelector('#modalBox .modal-footer .btn-primary');
+      if (btn) btn.click();
+    }
   }
 });
 
