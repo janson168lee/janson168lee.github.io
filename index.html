@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="免費台灣中小企業ERP系統，含會計科目管理、傳票登錄、損益表、資產負債表、經營指標指數分析、進銷存管理。免安裝、免月費，瀏覽器直接開。220個EAS會計科目，Excel匯出匯入，勞健保薪資計算。">
-<meta name="keywords" content="免費ERP,台灣ERP,中小企業ERP,會計系統,進銷存,損益表,資產負債表,經營指標,經營分析,財務分析,傳票,會計科目,EAS,免費會計軟體,勞健保,薪資計算,買賣業ERP,erp-free">
+<meta name="description" content="免費台灣中小企業ERP系統三合一：財務會計（220會計科目、傳票、損益表、資產負債表）、進銷存（採購銷貨庫存）、人力資源薪資（勞健保、薪資傳票），含經營指標與人力指標分析。免安裝、免月費，瀏覽器直接開，Excel匯出匯入，計費分級可升級。">
+<meta name="keywords" content="免費ERP,台灣ERP,中小企業ERP,會計系統,進銷存,人力資源,薪資系統,損益表,資產負債表,經營指標,人力指標,勞健保,薪資計算,傳票,會計科目,EAS,買賣業ERP,erp-free">
 <meta name="author" content="李先生">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="免費台灣中小企業ERP系統 | erp-free.com">
-<meta property="og:description" content="免安裝、免月費的台灣中小企業ERP系統。220會計科目、傳票、損益表、資產負債表、經營指標指數分析、進銷存、Excel匯出匯入。">
+<meta property="og:title" content="ERP 企業管理系統 V3.0 | 財會＋進銷存＋人資 三合一 | erp-free.com">
+<meta property="og:description" content="免安裝、免月費的台灣中小企業 ERP：財務會計＋進銷存＋人力資源薪資三合一，經營指標與人力指標分析，跨模組自動傳票，計費分級免費開始。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.erp-free.com">
 <meta property="og:locale" content="zh_TW">
 <link rel="canonical" href="https://www.erp-free.com">
-<title>免費台灣中小企業ERP系統 | 會計+進銷存+薪資 | erp-free.com</title>
+<title>ERP 企業管理系統 V3.0 | 財會＋進銷存＋人資三合一 | erp-free.com</title>
 <style>
 :root{--bg:#0d1b2a;--bg2:#111d2e;--gold:#d4820a;--gold-light:#f5a623;--text:#e6edf3;--text2:#8b949e;--white:#fff;--card-bg:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -26,44 +26,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
 .hero::before{content:'';position:absolute;top:-20%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(212,130,10,0.1),transparent 70%)}
 .hero h1{font-size:clamp(26px,5vw,40px);font-weight:900;line-height:1.2;color:var(--white);margin-bottom:12px;position:relative;z-index:1}
 .hero h1 span{color:var(--gold-light)}
-.hero p{font-size:16px;color:var(--text2);max-width:600px;margin:0 auto 28px;position:relative;z-index:1}
+.hero p{font-size:16px;color:var(--text2);max-width:640px;margin:0 auto 28px;position:relative;z-index:1}
 .hero-dl{display:inline-flex;align-items:center;gap:12px;background:var(--gold);color:#fff;padding:16px 36px;border-radius:10px;font-size:18px;font-weight:800;text-decoration:none;transition:all .2s;position:relative;z-index:1;box-shadow:0 4px 20px rgba(212,130,10,0.3)}
 .hero-dl:hover{background:#b87008;transform:translateY(-2px)}
 .hero-dl .size{font-size:12px;font-weight:400;opacity:.7}
 .hero-note{margin-top:14px;font-size:13px;color:var(--text2);position:relative;z-index:1}
 
-/* Steps */
-.steps{background:var(--bg2);padding:60px 0}
-.steps h2{text-align:center;font-size:24px;font-weight:800;color:var(--white);margin-bottom:32px}
-.steps h2 span{color:var(--gold-light)}
-.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.step-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:28px 20px;text-align:center;position:relative}
-.step-num{width:36px;height:36px;background:var(--gold);color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;margin-bottom:12px}
-.step-card h3{font-size:15px;color:var(--white);margin-bottom:6px}
-.step-card p{font-size:13px;color:var(--text2)}
+/* Modules */
+.mods{background:var(--bg2);padding:60px 0}
+.mods h2{text-align:center;font-size:24px;font-weight:800;color:var(--white);margin-bottom:8px}
+.mods h2 span{color:var(--gold-light)}
+.mods .sub{text-align:center;color:var(--text2);font-size:14px;margin-bottom:32px}
+.mod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.mod-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.mod-head{padding:16px 18px;font-size:15px;font-weight:800;color:var(--white)}
+.mod-head.f{background:#1b2a4a}.mod-head.t{background:#4a2c0a}.mod-head.h{background:#123a2a}
+.mod-body{padding:16px 18px}
+.mod-body span{display:block;font-size:13px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--border)}
+.mod-body span::before{content:'✓ ';color:#1b7d46;font-weight:700}
+.mod-body .hl{color:var(--gold-light);font-weight:700}
+.mod-body .hl::before{content:'★ ';color:var(--gold-light)}
 
-/* Products */
-.products h2{text-align:center;font-size:24px;font-weight:800;color:var(--white);margin-bottom:8px}
-.products .sub{text-align:center;color:var(--text2);font-size:14px;margin-bottom:32px}
-.prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.prod-card{background:var(--card-bg);border:2px solid var(--border);border-radius:12px;overflow:hidden}
-.prod-head{padding:18px 20px;display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;color:var(--white)}
-.prod-head.e{background:#1b2a4a}.prod-head.h{background:#2d1a0a}
-.prod-body{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.prod-body span{font-size:13px;color:var(--text);padding:4px 0;border-bottom:1px solid var(--border)}
-.prod-body span::before{content:'✓ ';color:#1b7d46;font-weight:700}
+/* Integration */
+.integ{padding:60px 0}
+.integ h2{text-align:center;font-size:24px;font-weight:800;color:var(--white);margin-bottom:8px}
+.integ h2 span{color:var(--gold-light)}
+.integ .sub{text-align:center;color:var(--text2);font-size:14px;margin-bottom:32px}
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:860px;margin:0 auto}
+.flow-card{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:18px}
+.flow-card h3{font-size:13px;color:var(--gold-light);margin-bottom:8px}
+.flow-card p{font-size:12px;color:var(--text2);line-height:1.7}
 
 /* Pricing */
 .pricing{background:var(--bg2)}
 .pricing h2{text-align:center;font-size:24px;font-weight:800;color:var(--white);margin-bottom:8px}
 .pricing .sub{text-align:center;color:var(--text2);font-size:14px;margin-bottom:32px}
-.price-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.pc{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:24px 14px;text-align:center;position:relative}
-.pc.pop{border-color:var(--gold)}.pc.pop::before{content:'熱門';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;padding:2px 12px;border-radius:10px;font-size:10px;font-weight:700}
-.pc h3{font-size:15px;color:var(--white);margin-bottom:4px}
-.pc .amt{font-size:26px;font-weight:900;color:var(--gold-light)}
-.pc .period{font-size:11px;color:var(--text2);margin:4px 0 10px}
-.pc .feats{text-align:left;font-size:12px;color:var(--text2);line-height:1.8}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:900px;margin:0 auto}
+.pc{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:26px 18px;position:relative}
+.pc.pop{border-color:var(--gold)}.pc.pop::before{content:'最熱門';position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;padding:2px 12px;border-radius:10px;font-size:10px;font-weight:700}
+.pc h3{font-size:16px;color:var(--white);margin-bottom:4px}
+.pc .amt{font-size:28px;font-weight:900;color:var(--gold-light)}
+.pc .period{font-size:11px;color:var(--text2);margin:4px 0 12px}
+.pc .feats{text-align:left;font-size:12px;color:var(--text2);line-height:1.9}
+.pc .feats b{color:var(--text)}
+.firm-note{text-align:center;font-size:12px;color:var(--text2);margin-top:14px}
 
 /* Contact */
 .contact{text-align:center;padding:60px 0}
@@ -77,9 +83,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
 .footer{background:#0a0e14;text-align:center;padding:16px;font-size:11px;color:var(--text2)}
 
 @media(max-width:768px){
-  .steps-grid{grid-template-columns:1fr}
-  .prod-grid{grid-template-columns:1fr}.prod-body{grid-template-columns:1fr}
-  .price-grid{grid-template-columns:1fr 1fr}
+  .mod-grid{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr}
+  .price-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -88,54 +94,67 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
 <!-- ══ HERO ══ -->
 <header class="hero">
   <div class="container">
-    <h1>中小企業<span>管理系統</span><br>免安裝 · 免月費 · 瀏覽器直接開</h1>
-    <p>買賣業 ERP ＋ 人力資源薪資管理　｜　雙擊 HTML 即用，無安全警告，不到 40KB</p>
+    <h1>ERP 企業管理系統 <span>V3.0</span><br>財務會計 · 進銷存 · 人力資源 三合一</h1>
+    <p>一套完成企業營運管理：220 會計科目全套帳務、進銷存自動庫存、薪資勞健保自動計算，<br>再加「經營指標」與「人力指標」健康指數分析。免安裝、免月費，雙擊即用。</p>
     <a href="erp-free-業務推展包.zip" class="hero-dl" download>
       📥 立即免費下載 <span class="size">(56 KB)</span>
     </a>
-    <div class="hero-note">下載即用，不需安裝任何軟體，Windows/Mac 皆可</div>
+    <div class="hero-note">下載即用，不需安裝任何軟體，Windows/Mac 皆可｜舊版資料自動匯入</div>
   </div>
 </header>
 
-<!-- ══ STEPS ══ -->
-<section class="steps">
+<!-- ══ MODULES ══ -->
+<section class="mods">
   <div class="container">
-    <h2>三步<span>開始使用</span></h2>
-    <div class="steps-grid">
-      <div class="step-card"><div class="step-num">1</div><h3>下載並解壓縮</h3><p>點擊上方按鈕下載 ZIP（56KB），解壓縮到任意資料夾</p></div>
-      <div class="step-card"><div class="step-num">2</div><h3>雙擊 HTML 檔案</h3><p>打開「買賣業ERP系統.html」或「人力資源薪資系統.html」</p></div>
-      <div class="step-card"><div class="step-num">3</div><h3>開始管理你的企業</h3><p>瀏覽器自動開啟，點「啟用免費版」直接進入完整功能</p></div>
+    <h2>三大模組，<span>一套整合</span></h2>
+    <p class="sub">下載 ZIP 即包含完整系統（ERP企業管理系統.html）</p>
+    <div class="mod-grid">
+      <div class="mod-card">
+        <div class="mod-head f">📊 財務會計</div>
+        <div class="mod-body">
+          <span>220 個 EAS 標準會計科目</span>
+          <span>傳票登錄・借貸平衡自動檢查</span>
+          <span>總分類帳 / 試算表</span>
+          <span>損益表（可列印）/ 資產負債表</span>
+          <span class="hl">經營指標指數分析（11 項指標＋指數儀表）</span>
+          <span>期初餘額 Excel 匯入</span>
+        </div>
+      </div>
+      <div class="mod-card">
+        <div class="mod-head t">📦 進銷存</div>
+        <div class="mod-body">
+          <span>商品 / 供應商 / 客戶主檔</span>
+          <span>採購進貨 → 自動入庫</span>
+          <span>銷售銷貨 → 庫存扣減＋預警</span>
+          <span>庫存儀表板・安全存量</span>
+          <span class="hl">進銷貨單一鍵產生會計傳票</span>
+          <span>Excel 全模組匯出匯入</span>
+        </div>
+      </div>
+      <div class="mod-card">
+        <div class="mod-head h">👥 人力資源・薪資</div>
+        <div class="mod-body">
+          <span>員工名冊 / 組織架構</span>
+          <span>出勤 / 請假 / 加班管理</span>
+          <span>薪資自動計算（勞健保＋勞退＋所得稅）</span>
+          <span>薪資單 / 年度彙總</span>
+          <span class="hl">薪資一鍵產生會計傳票</span>
+          <span class="hl">人力指標指數分析（離職率・負荷・特休）</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ══ PRODUCTS ══ -->
-<section class="section products">
+<!-- ══ INTEGRATION ══ -->
+<section class="integ">
   <div class="container">
-    <h2>兩套系統，一次擁有</h2>
-    <p class="sub">下載 ZIP 包含以下兩套完整系統</p>
-    <div class="prod-grid">
-      <div class="prod-card">
-        <div class="prod-head e">📊 買賣業 ERP 系統</div>
-        <div class="prod-body">
-          <span>會計科目管理</span><span>傳票登錄 + 借貸平衡</span>
-          <span>總分類帳 / 試算表</span><span>損益表 / 資產負債表</span>
-          <span>商品主檔</span><span>供應商 / 客戶管理</span>
-          <span>採購進貨 → 自動入庫</span><span>銷售銷貨 → 庫存扣減</span>
-          <span>庫存 KPI 儀表板</span><span>經營指標指數分析</span>
-          <span>Excel 匯出/匯入</span><span>V2.2 免安裝</span>
-        </div>
-      </div>
-      <div class="prod-card">
-        <div class="prod-head h">👥 人力資源與薪資管理</div>
-        <div class="prod-body">
-          <span>員工基本資料</span><span>組織架構圖</span>
-          <span>出勤 / 請假管理</span><span>加班費自動分段計酬</span>
-          <span>薪資結構設定</span><span>每月薪資一鍵計算</span>
-          <span>勞保+健保+勞退+所得稅</span><span>個人薪資單明細</span>
-          <span>年度薪資彙總</span><span>Excel 匯出/匯入</span>
-        </div>
-      </div>
+    <h2>跨模組<span>自動整合</span></h2>
+    <p class="sub">V3.0 核心升級：業務單據直接變會計帳</p>
+    <div class="flow">
+      <div class="flow-card"><h3>🛒 進貨單 → 傳票</h3><p>點一下「傳票」按鈕，自動產生 借 商品／貸 應付帳款 分錄，編號與手工傳票一致。</p></div>
+      <div class="flow-card"><h3>💰 銷貨單 → 傳票</h3><p>自動產生 應收帳款＋銷貨收入，並依商品成本自動認列 銷貨成本／存貨，毛利即時正確。</p></div>
+      <div class="flow-card"><h3>🧾 薪資 → 傳票</h3><p>每月薪資產生後一鍵轉傳票：借 薪資支出／貸 銀行存款＋代扣款（勞健保＋所得稅），金額自動平衡。</p></div>
     </div>
   </div>
 </section>
@@ -143,14 +162,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
 <!-- ══ PRICING ══ -->
 <section class="section pricing">
   <div class="container">
-    <h2>免費入門，需要時再升級</h2>
-    <p class="sub">所有方案均為免安裝 HTML 版本，瀏覽器直接執行</p>
+    <h2>計費分級：免費開始，需要時再升級</h2>
+    <p class="sub">所有方案均為免安裝單檔 HTML，瀏覽器直接執行，資料存自己電腦</p>
     <div class="price-grid">
-      <div class="pc"><h3>🆓 免費版</h3><div class="amt">$0</div><div class="period">永久免費</div><div class="feats">✓ 完整功能無刪減<br>✓ 單人使用<br>✓ Excel 匯出匯入</div></div>
-      <div class="pc pop"><h3>⭐ 專業版</h3><div class="amt" data-price="pro">9,800</div><div class="period">元 / 年</div><div class="feats">✓ 免費版全功能<br>✓ 多使用者權限<br>✓ 大容量儲存<br>✓ 雲端備份<br>✓ 客服支援</div></div>
-      <div class="pc"><h3>🏢 企業版</h3><div class="amt" data-price="enterprise">39,800</div><div class="period">元 / 年起</div><div class="feats">✓ 專業版全功能<br>✓ 多公司帳本<br>✓ 跨據點同步<br>✓ API 介接<br>✓ 到場導入</div></div>
-      <div class="pc"><h3>🏛️ 事務所版</h3><div class="amt" data-price="firm">29,800</div><div class="period">元 / 年起</div><div class="feats">✓ 專業版全功能<br>✓ 多客戶管理<br>✓ 資料隔離<br>✓ 白牌授權</div></div>
+      <div class="pc"><h3>🆓 免費版</h3><div class="amt">$0</div><div class="period">永久免費</div><div class="feats"><b>財務會計＋進銷存 全功能</b><br>✓ 傳票 100 筆／商品 50 項<br>✓ 客戶供應商各 50 家<br>✓ Excel 匯出＋匯入<br>✓ 財務報表完整</div></div>
+      <div class="pc pop"><h3>⭐ 專業版</h3><div class="amt" data-price="pro">9,800</div><div class="period">元 / 年</div><div class="feats"><b>免費版全部＋</b><br>✓ 人力資源＋薪資模組<br>✓ 經營指標＋人力指標分析<br>✓ 跨模組自動傳票<br>✓ 資料筆數無限制</div></div>
+      <div class="pc"><h3>🏢 企業版</h3><div class="amt" data-price="enterprise">39,800</div><div class="period">元 / 年起</div><div class="feats"><b>專業版全部＋</b><br>✓ 多公司帳本<br>✓ 多使用者權限<br>✓ 合併報表<br>✓ 優先客服支援</div></div>
     </div>
+    <div class="firm-note">事務所版（代記帳／顧問白牌）$29,800／年起 — 歡迎洽詢</div>
   </div>
 </section>
 
@@ -167,14 +186,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
   </div>
 </section>
 
-<footer class="footer">買賣業 ERP ＋ 人力資源薪資管理　｜　免安裝 HTML 版本　｜　© 2026 erp-free.com</footer>
+<footer class="footer">ERP 企業管理系統 V3.0（財會＋進銷存＋人資）｜免安裝 HTML 版本｜© 2026 erp-free.com</footer>
 
 <script>
 const DP={pro:9800,enterprise:39800,firm:29800};
 function pr(k){return JSON.parse(localStorage.getItem('erpfree_prices')||'{}')[k]||DP[k];}
 function loadPrices(){document.querySelectorAll('[data-price]').forEach(el=>{el.textContent=Number(pr(el.dataset.price)).toLocaleString();});}
-(function(){if(location.search.includes('admin')){let p=JSON.parse(localStorage.getItem('erpfree_prices')||'{}');document.body.insertAdjacentHTML('afterbegin','<div id=\"adminBar\" style=\"position:fixed;top:0;left:0;right:0;z-index:9999;background:#1b2a4a;color:#fff;padding:10px 20px;display:flex;gap:10px;align-items:center;font-size:13px;flex-wrap:wrap;\"><strong>🔧 價格設定</strong> 專業版 <input id=\"apPro\" type=\"number\" value=\"'+(p.pro||DP.pro)+'\" style=\"width:70px;padding:3px;border-radius:4px;border:none;\"> 企業版 <input id=\"apEnt\" type=\"number\" value=\"'+(p.enterprise||DP.enterprise)+'\" style=\"width:70px;padding:3px;border-radius:4px;border:none;\"> 事務所版 <input id=\"apFirm\" type=\"number\" value=\"'+(p.firm||DP.firm)+'\" style=\"width:70px;padding:3px;border-radius:4px;border:none;\"> <button onclick=\"saveAdminPrices()\" style=\"padding:5px 14px;background:#d4820a;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700;\">儲存</button> <button onclick=\"location.href=location.pathname\" style=\"padding:5px 14px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:4px;cursor:pointer;\">關閉</button></div>');document.body.style.paddingTop='52px';}})();
-function saveAdminPrices(){const p={pro:Number(document.getElementById('apPro').value)||9800,enterprise:Number(document.getElementById('apEnt').value)||39800,firm:Number(document.getElementById('apFirm').value)||29800};localStorage.setItem('erpfree_prices',JSON.stringify(p));loadPrices();}
+(function(){if(location.search.includes('admin')){let p=JSON.parse(localStorage.getItem('erpfree_prices')||'{}');document.body.insertAdjacentHTML('afterbegin','<div id=\"adminBar\" style=\"position:fixed;top:0;left:0;right:0;z-index:9999;background:#1b2a4a;color:#fff;padding:10px 20px;display:flex;gap:10px;align-items:center;font-size:13px;flex-wrap:wrap;\"><strong>🔧 價格設定</strong> 專業版 <input id=\"apPro\" type=\"number\" value=\"'+(p.pro||DP.pro)+'\" style=\"width:70px;padding:3px;border-radius:4px;border:none;\"> 企業版 <input id=\"apEnt\" type=\"number\" value=\"'+(p.enterprise||DP.enterprise)+'\" style=\"width:70px;padding:3px;border-radius:4px;border:none;\"> <button onclick=\"saveAdminPrices()\" style=\"padding:5px 14px;background:#d4820a;color:#fff;border:none;border-radius:4px;cursor:pointer;font-weight:700;\">儲存</button> <button onclick=\"location.href=location.pathname\" style=\"padding:5px 14px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:4px;cursor:pointer;\">關閉</button></div>');document.body.style.paddingTop='52px';}})();
+function saveAdminPrices(){const p={pro:Number(document.getElementById('apPro').value)||9800,enterprise:Number(document.getElementById('apEnt').value)||39800};localStorage.setItem('erpfree_prices',JSON.stringify(p));loadPrices();}
 loadPrices();
 </script>
 </body>
