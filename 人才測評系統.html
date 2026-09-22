@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>適才適所人才測評系統 V1.0 — 企業招募心理測驗 | erp-free.com</title>
+<style>
+:root{
+  --bg:#f6f5f2; --bg-card:#ffffff; --bg-input:#faf9f7; --bg-modal:#ffffff;
+  --bg-sidebar:#0d1117; --text-primary:#1c1917; --text-secondary:#44403c; --text-muted:#8a8580;
+  --accent:#b45309; --accent-light:#d97706; --positive:#166534; --negative:#b91c1c;
+  --border:#e7e5e4; --border-light:#efedeb; --radius:10px; --radius-sm:6px;
+  --font-sans:'Segoe UI','Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+  --font-mono:Consolas,'SF Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,0.06); --shadow-lg:0 10px 30px rgba(0,0,0,0.12);
+  --sidebar-w:240px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text-primary);font-size:14px;line-height:1.65;display:flex;min-height:100vh}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#d6d3d1;border-radius:4px}
+.sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);background:var(--bg-sidebar);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.sidebar-brand{display:flex;align-items:center;gap:10px;padding:18px 16px 14px;border-bottom:1px solid #1c2128}
+.sidebar-brand .icon{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff}
+.sidebar-brand .title{font-size:14px;font-weight:700;color:#e6edf3;letter-spacing:-.3px}
+.sidebar-brand .sub{font-size:10px;color:#8b949e;margin-top:1px}
+.sidebar-nav{flex:1;overflow-y:auto;padding:10px 0}
+.nav-section-title{font-size:10px;font-weight:700;color:#6b7280;letter-spacing:1.2px;padding:14px 18px 6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;font-size:13px;color:#8b949e;transition:all .15s;border-left:2px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.04);color:#e6edf3}
+.nav-item.active{background:rgba(180,83,9,.12);color:#f0b25f;border-left-color:var(--accent);font-weight:600}
+.nav-item .nav-icon{font-size:14px;width:18px;text-align:center}
+.sidebar-version{text-align:center;padding:10px 14px 4px;font-size:11px;font-weight:700;color:#d97706;letter-spacing:.5px;border-top:1px solid #1c2128}
+.sidebar-version span{display:inline-block;padding:3px 10px;border-radius:10px;background:rgba(217,119,6,.12);border:1px solid rgba(217,119,6,.25)}
+#sidebarLicense{font-size:9px;color:#8b949e;margin-top:2px}
+.sidebar-footer{padding:12px 16px;border-top:1px solid #1c2128;font-size:11px;color:#8b949e;display:flex;justify-content:space-between}
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.header{background:var(--bg-card);border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header h1{font-size:17px;font-weight:800;color:var(--text-primary);letter-spacing:-.3px}
+.header-actions{display:flex;gap:8px;align-items:center}
+.header-date{font-size:12px;color:var(--text-muted)}
+.content{padding:24px 26px;max-width:1060px;width:100%;margin:0 auto}
+.card{background:var(--bg-card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border-light)}
+.card-header{padding:15px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.card-header h2{font-size:15px;font-weight:800;color:var(--text-primary)}
+.card-body{padding:20px}
+.btn{border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;padding:8px 16px;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#9a4508}
+.btn-outline{background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:#fee2e2;color:var(--negative)}
+.btn-success{background:#166534;color:#fff}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-xs{padding:3px 9px;font-size:11px}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-success{background:#dcfce7;color:var(--positive)}
+.badge-warning{background:#fef3c7;color:#92400e}
+.badge-danger{background:#fee2e2;color:var(--negative)}
+.badge-info{background:#dbeafe;color:#1d4ed8}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{background:var(--bg-input);font-weight:700;color:var(--text-secondary);padding:9px 12px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+.data-table tr:hover td{background:var(--bg-input)}
+.num{text-align:right;font-family:var(--font-mono)}
+.total-row td{font-weight:700;border-top:2px solid var(--border);background:var(--bg-input)}
+.empty-state{text-align:center;padding:44px 20px;color:var(--text-muted)}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px}
+.search-input{padding:7px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;width:190px;background:var(--bg-input)}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.kpi-card{background:var(--bg-card);border-radius:var(--radius);padding:14px;border:1px solid var(--border-light);box-shadow:var(--shadow)}
+.kpi-label{font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:5px}
+.kpi-value{font-size:23px;font-weight:800;font-family:var(--font-mono);letter-spacing:-1px}
+.kpi-value.positive{color:var(--positive)}.kpi-value.negative{color:var(--negative)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--bg-modal);border-radius:var(--radius);box-shadow:var(--shadow-lg);width:660px;max-width:92vw;max-height:88vh;overflow-y:auto}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:15px;font-weight:700}
+.modal-body{padding:20px}
+.modal-footer{padding:14px 20px;border-top:1px solid var(--border-light);display:flex;gap:8px;justify-content:flex-end}
+.close-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted);line-height:1}
+.hidden{display:none!important}
+.report-section{margin-bottom:18px}
+.report-section h3{font-size:14px;font-weight:800;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border-light)}
+/* 測驗施測 */
+.q-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px}
+.q-card .q-no{font-family:var(--font-mono);font-size:11px;color:var(--accent);font-weight:700;margin-bottom:5px}
+.q-card .q-txt{font-size:14px;font-weight:600;margin-bottom:10px}
+.q-opts{display:flex;gap:6px;flex-wrap:wrap}
+.q-opts label{flex:1;min-width:88px;text-align:center;border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 4px;font-size:12px;cursor:pointer;transition:all .12s;background:var(--bg-input)}
+.q-opts label:hover{border-color:var(--accent)}
+.q-opts input{display:none}
+.q-opts input:checked+span{color:var(--accent);font-weight:700}
+.q-opts label.sel{border-color:var(--accent);background:#fdf6ee;box-shadow:0 0 0 1px var(--accent)}
+.q-opts.sjt label{min-width:100%;text-align:left;padding:8px 12px}
+.progress-wrap{position:sticky;top:0;z-index:5;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius);padding:10px 16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.progress-bar{height:8px;background:var(--bg-input);border-radius:4px;overflow:hidden;margin-top:6px}
+.progress-bar div{height:100%;background:var(--accent);border-radius:4px;transition:width .2s}
+.consent-box{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:18px;font-size:13px;color:var(--text-secondary);line-height:1.9}
+/* 報告 */
+.radar-wrap{display:flex;justify-content:center}
+.facbar{display:grid;grid-template-columns:92px 1fr 44px;gap:10px;align-items:center;margin-bottom:9px;font-size:12.5px}
+.facbar .bar{height:9px;background:var(--bg-input);border-radius:4px;overflow:hidden}
+.facbar .bar div{height:100%;border-radius:4px}
+.match-band{font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap}
+.probe{display:flex;gap:9px;padding:8px 2px;border-bottom:1px dashed var(--border-light);font-size:13px;align-items:flex-start}
+.probe:last-child{border-bottom:none}
+.probe .dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex:none}
+.disclaim{font-size:11px;color:var(--text-muted);line-height:1.8;border-top:1px solid var(--border-light);margin-top:14px;padding-top:10px}
+@media(max-width:820px){.sidebar{display:none}.content{padding:16px 12px}}
+@media print{.sidebar,.header,.no-print{display:none!important}.content{max-width:none;padding:0}.card{box-shadow:none;border:1px solid #ccc}}
+</style>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="icon">🧠</div>
+    <div><div class="title">適才適所人才測評</div><div class="sub">Talent Fit Assessment</div></div>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <div class="nav-section-title">人資作業</div>
+    <div class="nav-item active" data-page="candidates"><span class="nav-icon">🗂️</span>候選人管理</div>
+    <div class="nav-item" data-page="take"><span class="nav-icon">📝</span>開始施測</div>
+    <div class="nav-section-title">體系說明</div>
+    <div class="nav-item" data-page="model"><span class="nav-icon">🎯</span>職務適配模型</div>
+    <div class="nav-item" data-page="guide"><span class="nav-icon">🛡️</span>施測規範與倫理</div>
+  </nav>
+  <div class="sidebar-version"><span id="sidebarVer">免費版 V1.0</span></div>
+  <div id="sidebarLicense" style="text-align:center;font-size:9px;color:#8b949e;padding:0 10px 6px;">erp-free.com</div>
+  <div class="sidebar-footer"><span>erp-free.com</span><span id="sidebarClock">--</span></div>
+</aside>
+
+<main class="main">
+  <header class="header">
+    <h1 id="pageTitle">候選人管理</h1>
+    <div class="header-actions"><div id="toolbarArea" style="display:flex;gap:8px;"></div><span class="header-date" id="headerDate"></span></div>
+  </header>
+  <div class="content" id="mainContent"></div>
+</main>
+
+<div class="modal-overlay hidden" id="modalOverlay"><div class="modal" id="modalBox"></div></div>
+
+<script>
+/* ═══════════════════════════════════════
+   適才適所人才測評系統 V1.0
+   五大人格（IPIP 框架）＋工作價值觀＋情境判斷＋誠信態度
+   ═══════════════════════════════════════ */
+const APP_VERSION = 'V1.0';
+const APP_NAME = '適才適所人才測評系統';
+const STATE = { currentPage:'candidates', editingId:null, license:null };
+
+/* ── 授權（與 ERP Suite 同體系：相容 ERP/HR 金鑰）── */
+const LICENSE_SECRET = "Taiwan…Claw";
+const PRODUCT_CODES = [1, 2];
+const TIER_NAMES = { 1:'免費版', 2:'專業版', 3:'企業版' };
+function isFree(){ return STATE.license && STATE.license.tier === 1; }
+function candLimit(){ return isFree() ? 20 : null; }
+
+async function verifyLicenseAsync(key, company) {
+  if (!key || !company) return { valid:false, reason:'請輸入金鑰與公司名稱' };
+  const parts = key.trim().split('-');
+  if (parts.length !== 4) return { valid:false, reason:'金鑰格式錯誤（XXXX-XXXX-XXXX-XXXX）' };
+  const h = (parts[0] + parts[1] + parts[2]).toUpperCase();
+  const expiry = parts[3];
+  for (const CODE of PRODUCT_CODES) {
+    for (let tier = 1; tier <= 3; tier++) {
+      const body = new TextEncoder().encode(`${CODE}|${tier}|${company}|${expiry}|${LICENSE_SECRET}`);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', body);
+      const hex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+      if (hex.startsWith(h)) {
+        if (expiry !== '999999') {
+          const ed = new Date(parseInt('20' + expiry.slice(0, 2)), parseInt(expiry.slice(2, 4)) - 1, parseInt(expiry.slice(4, 6)));
+          if (new Date() > ed) return { valid:false, reason:'授權已過期（' + ed.toLocaleDateString('zh-TW') + '）' };
+        }
+        return { valid:true, tier, tierName:TIER_NAMES[tier], company, key, expiry: expiry === '999999' ? '永久' : expiry };
+      }
+    }
+  }
+  return { valid:false, reason:'金鑰無效，請確認金鑰與公司名稱正確' };
+}
+
+/* ── IndexedDB ── */
+const DB_NAME = 'HR_ASSESS_DB', DB_VERSION = 1;
+const STORES = ['candidates','draft','license'];
+let _db = null;
+function openDB(){ return new Promise((res, rej) => { if (_db) return res(_db); const rq = indexedDB.open(DB_NAME, DB_VERSION); rq.onupgradeneeded = e => { const db = e.target.result; for (const s of STORES) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath:'id' }); }; rq.onsuccess = e => { _db = e.target.result; res(_db); }; rq.onerror = e => rej(e.target.error); }); }
+async function dbLoad(store){ const db = await openDB(); return new Promise(res => { const rq = db.transaction(store, 'readonly').objectStore(store).getAll(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => res([]); }); }
+async function dbSave(store, data){ const db = await openDB(); return new Promise(res => { const tx = db.transaction(store, 'readwrite'); const os = tx.objectStore(store); os.clear(); (data || []).forEach(d => os.put(d)); tx.oncomplete = () => res(); }); }
+async function load(k, f){ try { const d = await dbLoad(k); if (d && d.length > 0) return d; } catch (e) {} try { const v = localStorage.getItem('assess_' + k); if (v) { const d = JSON.parse(v); if (d && d.length > 0) { await dbSave(k, d); localStorage.removeItem('assess_' + k); return d; } } } catch (e) {} return f; }
+async function save(k, d){ try { await dbSave(k, d); } catch (e) {} }
+
+/* ═══════════ 題庫（58 題）═══════════
+   五大人格 30 題（IPIP 公眾領域框架改編，+ 表示同意即得 facets 分） */
+const LIKERT5 = ['非常不同意','不同意','普通','同意','非常同意'];
+const LIKERT4 = ['完全不同意','不同意','同意','完全同意'];
+const B5_ITEMS = [
+  {f:'O', pos:true,  txt:'我喜歡學習新的知識或技能。'},
+  {f:'O', pos:true,  txt:'面對沒做過的工作內容，我會覺得有趣而不是害怕。'},
+  {f:'O', pos:true,  txt:'我常有新的想法或做法來改進工作。'},
+  {f:'O', pos:false, txt:'我偏好用熟悉的方法做事，不太想嘗試新方法。'},
+  {f:'O', pos:true,  txt:'我會主動了解與工作相關的新趨勢。'},
+  {f:'O', pos:false, txt:'抽象或概念性的討論，我覺得對實際工作沒什麼幫助。'},
+  {f:'C', pos:true,  txt:'別人交代的事情，我一定會記下來並如期完成。'},
+  {f:'C', pos:true,  txt:'我的工作區域和文件總是保持整齊有序。'},
+  {f:'C', pos:false, txt:'我常拖到最後一刻才開始做事。'},
+  {f:'C', pos:true,  txt:'做任何工作我都會注意細節，避免出錯。'},
+  {f:'C', pos:false, txt:'我訂的計畫經常半途而廢。'},
+  {f:'C', pos:true,  txt:'上班我幾乎不遲到，與人的約定也都很準時。'},
+  {f:'E', pos:true,  txt:'在團體中，我常主動和大家交流。'},
+  {f:'E', pos:true,  txt:'和初次見面的人交談，我覺得自然而不緊張。'},
+  {f:'E', pos:false, txt:'我比較喜歡安靜、獨自作業的工作方式。'},
+  {f:'E', pos:true,  txt:'遇到新同事或新客戶，我通常會先開口打招呼。'},
+  {f:'E', pos:false, txt:'熱鬧的場合會讓我覺得累，想早點離開。'},
+  {f:'E', pos:true,  txt:'我樂於在會議或活動中表達自己的意見。'},
+  {f:'A', pos:true,  txt:'我願意幫忙分擔同事臨時多出來的工作。'},
+  {f:'A', pos:true,  txt:'別人的意見和我不同時，我仍願意聽聽看。'},
+  {f:'A', pos:false, txt:'我常覺得別人做事的品質很差、讓我不耐煩。'},
+  {f:'A', pos:true,  txt:'團隊目標比個人表現更重要。'},
+  {f:'A', pos:true,  txt:'與人意見相左時，我傾向先退一步想對方的立場。'},
+  {f:'A', pos:false, txt:'我說話很直，常不小心得罪人。'},
+  {f:'N', pos:true,  txt:'工作出錯被指正時，我能冷靜面對並改進。'},
+  {f:'N', pos:false, txt:'我常擔心事情會出錯，即使還沒發生。'},
+  {f:'N', pos:true,  txt:'壓力大的時候，我仍能保持平常心。'},
+  {f:'N', pos:false, txt:'小小的挫折會讓我難過好幾天。'},
+  {f:'N', pos:true,  txt:'我很少因為工作而失眠或煩心。'},
+  {f:'N', pos:false, txt:'別人批評我時，我會難過很久。'},
+];
+const VALUE_ITEMS = [
+  {v:'V1', txt:'一份工作的薪資與獎金水準，對我來說非常重要。'},
+  {v:'V1', txt:'加班費或獎金制度不清楚的工作，我會猶豫很久。'},
+  {v:'V2', txt:'我希望工作能不斷挑戰自己的能力極限。'},
+  {v:'V2', txt:'完成一件有難度的任務，會讓我特別有成就感。'},
+  {v:'V3', txt:'我希望工作與收入穩定，不喜歡經常變動。'},
+  {v:'V3', txt:'制度清楚、職責明確的工作型態讓我安心。'},
+  {v:'V4', txt:'我喜歡主管只給大方向、細節讓我自己發揮。'},
+  {v:'V4', txt:'被管得太細，會讓我難以發揮。'},
+  {v:'V5', txt:'能幫助別人的工作，讓我覺得特別有意義。'},
+  {v:'V5', txt:'看到服務對象滿意的回應，是我的工作動力來源之一。'},
+  {v:'V6', txt:'為了學到新東西，我可以接受起薪稍微低一點。'},
+  {v:'V6', txt:'有教育訓練與升遷管道的公司，對我特別有吸引力。'},
+];
+const VALUE_NAMES = { V1:'薪資報酬', V2:'成就挑戰', V3:'穩定安全', V4:'自主發揮', V5:'助人利他', V6:'學習成長' };
+const SJT_ITEMS = [
+  { q:'門市內一位顧客對商品品質大聲抱怨，影響其他客人選購。',
+    opts:['先誠懇道歉，請顧客到一旁了解細節，同時請同事支援現場','當場向顧客說明是使用不當，不是商品的問題','請顧客稍等，先把手邊結帳做完再處理','立刻答應退費，盡快結束糾紛'], scores:[2,0,0,1] },
+  { q:'同事認為你把比較好的班表排給自己，語氣不善地質問你。',
+    opts:['主動找時間私下說明排班依據，並表示下次願意調整','請主管出面主持公道，評評理','不理會，自己做事憑良心','直接把班讓給他，避免再起衝突'], scores:[2,0,1,0] },
+  { q:'下午同時有：報告要交、客戶來電、主管臨時要資料，你會怎麼做？',
+    opts:['先快速回覆客戶約定回電時間，再依急迫度排序逐項處理','依照事情發生的順序，一件一件慢慢做','全部先擱著，向主管表示做不完','加速草率完成報告，三件事都做'], scores:[2,1,0,0] },
+  { q:'結帳時你發現同事少算了一位客人的款項。',
+    opts:['立即向同事與主管反映，當場補正帳務','當作沒看到，那不是我的責任','私下提醒同事，處理與否由他自己決定','之後找機會再跟同事說'], scores:[2,0,1,1] },
+  { q:'主管交辦的做法，你認為會造成客戶困擾。',
+    opts:['先照做，出問題再說','向主管說明疑慮與建議做法；若仍指示照辦，就執行並回報結果','拒絕執行，依自己的做法做','先拖著不處理，看主管會不會忘記'], scores:[0,2,0,0] },
+  { q:'朋友私下打聽公司新產品的定價資訊。',
+    opts:['婉拒並說明公司規定不能透露','告訴他沒關係，反正是好朋友','含糊回應，透露大概的範圍','說自己不知道（其實知道），但堅持不說'], scores:[2,0,0,1] },
+  { q:'公司導入新系統，所有作業流程要重新學習。',
+    opts:['主動參加訓練，並利用空檔自己練習','等大家都學會之後再請教','被動參加訓練，能用多少算多少','抱怨新系統不好用，希望維持舊方式'], scores:[2,0,1,0] },
+  { q:'趕著出貨時，你發現貨物堆疊方式不符合安全規定。',
+    opts:['依安全規定重新整理，寧可稍微延後出貨','先出貨再說，不會那麼剛好出事','向主管反映，請主管決定','自己多小心一點就好，繼續照舊堆疊'], scores:[2,0,1,0] },
+];
+const ATT_ITEMS = [
+  {pos:true,  txt:'只要是分內的工作，不需要別人催，我也會把它做完。'},
+  {pos:true,  txt:'上班時間我會專注在工作上，不處理私事。'},
+  {pos:true,  txt:'規定就是規定，即使沒有人檢查我也會遵守。'},
+  {pos:false, txt:'公司的東西拿一點回家用，沒有什麼關係。'},
+  {pos:false, txt:'有時候遲到個幾分鐘，沒有什麼關係。'},
+  {pos:true,  txt:'答應別人的事，我一定會做到。'},
+  {pos:false, txt:'出勤紀錄漂亮一點沒關係，工作有做好就好。'},
+  {pos:true,  txt:'我會把公司的事當作自己的事來用心。'},
+];
+/* 一致性檢核對（0-based 索引）：題組反向對應，|a+b−6|≤1 為一致 */
+const CONSISTENCY_PAIRS = [[6,10],[12,16],[24,29]];
+
+/* ═══════════ 職務適配模型（8 職缺）═══════════ */
+const FACET_NAMES = { O:'開放學習', C:'盡責自律', E:'人際活力', A:'團隊親和', N:'情緒穩定' };
+const POSITIONS = [
+  { key:'sales',   name:'業務／銷售人員', desc:'開發客戶、洽談成交、業績導向',
+    fit:{E:{i:78,t:22,w:.30}, N:{i:72,t:25,w:.20}, C:{i:62,t:28,w:.20}, O:{i:62,t:30,w:.10}, A:{i:58,t:28,w:.20}} },
+  { key:'service', name:'門市／客服人員', desc:'門市營運、客戶服務與應對',
+    fit:{A:{i:80,t:22,w:.30}, E:{i:66,t:26,w:.25}, N:{i:70,t:26,w:.20}, C:{i:58,t:28,w:.15}, O:{i:52,t:30,w:.10}} },
+  { key:'admin',   name:'行政／助理', desc:'文書、排程、內部支援作業',
+    fit:{C:{i:82,t:20,w:.35}, A:{i:66,t:26,w:.20}, N:{i:66,t:26,w:.15}, O:{i:55,t:28,w:.15}, E:{i:48,t:26,w:.15}} },
+  { key:'finance', name:'會計／財務人員', desc:'帳務、成本、報表與資金管理',
+    fit:{C:{i:86,t:18,w:.35}, N:{i:78,t:22,w:.25}, E:{i:42,t:26,w:.10}, O:{i:55,t:28,w:.10}, A:{i:55,t:26,w:.20}} },
+  { key:'production', name:'生產／作業員', desc:'產線操作、品質與紀律',
+    fit:{C:{i:76,t:24,w:.30}, N:{i:70,t:26,w:.20}, A:{i:58,t:26,w:.20}, O:{i:48,t:28,w:.10}, E:{i:44,t:26,w:.20}} },
+  { key:'logistics', name:'倉庫／物流人員', desc:'進出貨、盤點、配送調度',
+    fit:{C:{i:74,t:24,w:.35}, N:{i:64,t:26,w:.15}, A:{i:58,t:26,w:.15}, O:{i:54,t:28,w:.10}, E:{i:48,t:26,w:.25}} },
+  { key:'tech',    name:'工程／技術人員', desc:'機台、設備、技術開發與維護',
+    fit:{O:{i:78,t:22,w:.30}, C:{i:70,t:24,w:.25}, E:{i:44,t:26,w:.15}, N:{i:60,t:26,w:.15}, A:{i:54,t:26,w:.15}} },
+  { key:'leader',  name:'門市店長／基層主管', desc:'帶班管理、目標達成、現場決策',
+    fit:{E:{i:76,t:24,w:.25}, C:{i:76,t:24,w:.25}, A:{i:64,t:26,w:.20}, N:{i:76,t:24,w:.15}, O:{i:60,t:28,w:.15}} },
+];
+
+/* ═══ 計分引擎 ═══ */
+function facetScores(b5) {
+  const raw = { O:0, C:0, E:0, A:0, N:0 };
+  B5_ITEMS.forEach((it, i) => {
+    const v = b5[i] || 3;
+    raw[it.f] += it.pos ? v : (6 - v);
+  });
+  const out = {};
+  for (const f of ['O','C','E','A','N']) out[f] = Math.round((raw[f] - 6) / 24 * 100);
+  return out;
+}
+function facetLevel(v){ return v >= 70 ? '高' : (v >= 40 ? '中' : '低'); }
+function facetColor(v){ return v >= 70 ? '#166534' : (v >= 40 ? '#b45309' : '#b91c1c'); }
+function valueScores(vals) {
+  const out = {};
+  for (const k of Object.keys(VALUE_NAMES)) out[k] = 0;
+  VALUE_ITEMS.forEach((it, i) => { out[it.v] += vals[i] || 3; });
+  return out;
+}
+function topValues(vals) {
+  const s = valueScores(vals);
+  return Object.entries(s).sort((a, b) => b[1] - a[1]).slice(0, 3)
+    .map(([k, v]) => VALUE_NAMES[k]);
+}
+function sjtScore(ans) {
+  let s = 0; const detail = [];
+  SJT_ITEMS.forEach((it, i) => {
+    const sc = it.scores[ans[i] ?? 0] ?? 0;
+    s += sc; detail.push({ q:i + 1, sc });
+  });
+  return { raw:s, pct: Math.round(s / 16 * 100), detail };
+}
+function attScore(ans) {
+  let s = 0;
+  ATT_ITEMS.forEach((it, i) => { const v = ans[i] || 2; s += it.pos ? v : (5 - v); });
+  return { raw:s, pct: Math.round((s - 8) / 24 * 100) };
+}
+function consistencyFlags(b5) {
+  const flags = [];
+  for (const [a, b] of CONSISTENCY_PAIRS) {
+    if (Math.abs((b5[a] || 3) + (b5[b] || 3) - 6) > 1) flags.push([a, b]);
+  }
+  return flags;
+}
+function matchPosition(facets, sjtPct, attPct, tpl) {
+  let s = 0, w = 0; const parts = {};
+  for (const f of ['O','C','E','A','N']) {
+    const p = tpl.fit[f];
+    const dev = Math.abs(facets[f] - p.i);
+    const sc = Math.max(0, Math.round(100 - dev / p.t * 50));
+    parts[f] = sc; s += sc * p.w; w += p.w;
+  }
+  let base = Math.round(s / w);
+  const pens = [];
+  if (sjtPct < 40) { base -= 10; pens.push('情境判斷偏低（−10）'); }
+  if (attPct < 40) { base -= 10; pens.push('工作態度偏低（−10）'); }
+  return { score: Math.max(0, Math.min(100, base)), parts, pens };
+}
+function matchAll(cand) {
+  return POSITIONS.map(tpl => ({ key:tpl.key, name:tpl.name, ...matchPosition(cand.facets, cand.sjtPct, cand.attPct, tpl) }))
+    .sort((a, b) => b.score - a.score);
+}
+function bandOf(sc) {
+  if (sc >= 75) return { t:'高適配', cls:'badge-success' };
+  if (sc >= 60) return { t:'可考慮', cls:'badge-info' };
+  if (sc >= 45) return { t:'謹慎評估', cls:'badge-warning' };
+  return { t:'不建議', cls:'badge-danger' };
+}
+function probeQuestions(cand, positionKey) {
+  const tpl = POSITIONS.find(p => p.key === positionKey) || POSITIONS[0];
+  const probes = [];
+  const bank = {
+    C_l:'請描述你同時處理多項任務時如何管理期限？舉上個月的實際例子。',
+    C_h:'你如何維持工作品質與細節？請分享你自我檢核的習慣。',
+    E_l:'這份職務需要主動與人接觸——你通常怎麼和初次見面的客戶或同事建立關係？',
+    E_h:'你如何拿取與人互動和安靜完成工作的平衡？',
+    A_l:'請舉一次和同事意見不同的經驗：你當時怎麼處理？結果如何？',
+    N_l:'上次工作出錯被指正時，你當下的反應是什麼？後來怎麼調適與改進？',
+    N_h:'工作壓力最大的時期，你靠什麼方式維持狀態？',
+    O_l:'最近三個月你學了什麼新事物？是怎麼學的？',
+    O_h:'請舉一個你提出新做法並被採用（或被退回）的例子。',
+    V:'你期望三五年後的工作樣貌是什麼？這份工作在你的規劃中扮演什麼角色？',
+    SJT:'（情境判斷待加強）針對測驗中處理不佳的情境，請應徵者現場模擬一次處理方式，觀察臨場反應。',
+    ATT:'（工作態度待確認）請舉例說明你對「沒人檢查也照規定做」的看法與實際經驗。',
+  };
+  const Devs = [];
+  for (const f of ['O','C','E','A','N']) {
+    const p = tpl.fit[f], dev = cand.facets[f] - p.i;
+    Devs.push({ f, dev, abs:Math.abs(dev) });
+  }
+  Devs.sort((a, b) => b.abs - a.abs).slice(0, 3).forEach(d => {
+    const hi = d.dev > 0;
+    const k = d.f + (hi ? '_h' : '_l');
+    const pp = tpl.fit[d.f];
+    if (bank[k]) probes.push({ color: facetColor(cand.facets[d.f]), text: `${FACET_NAMES[d.f]} ${cand.facets[d.f]}（理想 ${pp.i}）：` + bank[k] });
+  });
+  if (cand.sjtPct < 60) probes.push({ color:'#b91c1c', text: bank.SJT });
+  if (cand.attPct < 60) probes.push({ color:'#b91c1c', text: bank.ATT });
+  probes.push({ color:'#1d4ed8', text: bank.V });
+  return probes.slice(0, 5);
+}
+function redFlags(cand) {
+  const out = [];
+  if (cand.facets.N < 30) out.push({ color:'#b91c1c', text:'情緒穩定偏低：面談請多關懷壓力因應與近期狀態；此指標不可單獨作為排除依據。' });
+  if (cand.sjtPct < 40) out.push({ color:'#b91c1c', text:'情境判斷低於 40 分：建議增加實作或情境模擬面試再決定。' });
+  if (cand.attPct < 40) out.push({ color:'#b91c1c', text:'工作態度低於 40 分：誠信紀律向度請在面談與背書調查中再確認。' });
+  if (cand.consist.length >= 2) out.push({ color:'#92400e', text:'作答一致性待確認：有多組反向題回答矛盾，建議擇期重測或面談釐清。' });
+  return out;
+}
+
+/* ═══ 施測流程狀態 ═══ */
+let DRAFT = null;
+function blankDraft(){ return { id:'draft', step:0, name:'', position:'sales', date:new Date().toISOString().split('T')[0], consent:false, b5:Array(30).fill(0), vals:Array(12).fill(0), sjt:Array(8).fill(null), att:Array(8).fill(0) }; }
+async function saveDraft(){ DRAFT.id = 'draft'; await save('draft', [DRAFT]); }
+async function clearDraft(){ DRAFT = blankDraft(); await save('draft', [DRAFT]); }
+
+function finalizeCandidate(d) {
+  const facets = facetScores(d.b5);
+  const s = sjtScore(d.sjt), a = attScore(d.att);
+  const cand = {
+    id: genId(), name: d.name, position: d.position, date: d.date,
+    created: new Date().toISOString().slice(0, 10),
+    b5: d.b5.slice(), vals: d.vals.slice(), sjt: d.sjt.slice(), att: d.att.slice(),
+    facets, sjtPct: s.pct, attPct: a.pct, consist: consistencyFlags(d.b5),
+  };
+  const all = matchAll(cand);
+  cand.topMatch = all[0];
+  return cand;
+}
+
+/* ═══ 示範資料 ═══ */
+function genB5(t) {
+  // 依各構面目標分反推 6 題作答（貢獻和＝目標原始分），跨構面旋轉分配以產生作答變異
+  const out = Array(30).fill(3);
+  ['O','C','E','A','N'].forEach((f, fi) => {
+    const targetRaw = Math.round(6 + 0.24 * t[f]);
+    const per = Math.floor(targetRaw / 6), rem = targetRaw - per * 6;
+    const contribs = [per, per, per, per, per, per];
+    for (let k = 0; k < rem; k++) contribs[k]++;
+    for (let k = 0; k < fi; k++) contribs.push(contribs.shift()); // rotate by facet index
+    let n = 0;
+    B5_ITEMS.forEach((it, i) => {
+      if (it.f !== f) return;
+      const v = contribs[n];
+      out[i] = it.pos ? v : 6 - v;
+      n++;
+    });
+  });
+  return out;
+}
+function genVals(t) {
+  return VALUE_ITEMS.map((it, i) => Math.max(1, Math.min(5, Math.round(t[it.v] / 20) + [0, -1][i % 2])));
+}
+const DEMO = [
+  { name:'陳小明（示範）', position:'sales', b5t:{E:88,N:60,C:55,O:70,A:52}, vt:{V1:75,V2:85,V3:45,V4:65,V5:50,V6:60}, sjt:[0,2,0,0,0,0,2,0], att:[4,4,3,2,3,4,3,4] },
+  { name:'林美玲（示範）', position:'finance', b5t:{E:38,N:82,C:90,O:56,A:60}, vt:{V1:55,V2:70,V3:85,V4:40,V5:60,V6:65}, sjt:[0,0,0,0,1,0,0,2], att:[4,4,4,1,2,4,2,4] },
+  { name:'張志豪（示範）', position:'production', b5t:{E:48,N:52,C:58,O:42,A:72}, vt:{V1:60,V2:45,V3:80,V4:50,V5:70,V6:55}, sjt:[1,2,1,3,0,1,2,3], att:[3,3,3,3,3,3,3,3] },
+];
+function makeDemoCandidates() {
+  return DEMO.map(d => {
+    const dd = { id:genId(), name:d.name, position:d.position, date:'2026-09-23', created:'2026-09-23',
+      b5:genB5(d.b5t), vals:genVals(d.vt), sjt:d.sjt.slice(), att:d.att.slice() };
+    return finalizeCandidate(dd);
+  });
+}
+
+/* ═══ UI helpers ═══ */
+function fmtMoney(n){ return Number(n).toLocaleString('zh-TW'); }
+function genId(){ return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6); }
+function esc(s){ return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function posName(k){ const p = POSITIONS.find(x => x.key === k); return p ? p.name : '未指定'; }
+function radarSVG(facets, size) {
+  const keys = ['O','C','E','A','N'], labels = keys.map(k => FACET_NAMES[k]);
+  const W = size || 240, cx = W / 2, cy = W / 2 + 4, R = W / 2 - 34;
+  const ang = i => -Math.PI / 2 + i * (2 * Math.PI / 5);
+  const ring = k => keys.map((f, i) => `${(cx + R * k / 100 * Math.cos(ang(i))).toFixed(1)},${(cy + R * k / 100 * Math.sin(ang(i))).toFixed(1)}`).join(' ');
+  let s = `<svg viewBox="0 0 ${W} ${W + 6}" style="width:${W}px;max-width:100%;display:block;margin:0 auto;">`;
+  for (const k of [25, 50, 75, 100]) s += `<polygon points="${ring(k)}" fill="none" stroke="#e7e5e4"/>`;
+  keys.forEach((f, i) => { s += `<line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(ang(i))).toFixed(1)}" y2="${(cy + R * Math.sin(ang(i))).toFixed(1)}" stroke="#e7e5e4"/>`; });
+  const pts = keys.map((f, i) => { const r = R * facets[f] / 100; return `${(cx + r * Math.cos(ang(i))).toFixed(1)},${(cy + r * Math.sin(ang(i))).toFixed(1)}`; }).join(' ');
+  s += `<polygon points="${pts}" fill="rgba(180,83,9,0.18)" stroke="#b45309" stroke-width="2"/>`;
+  keys.forEach((f, i) => { const r = R * facets[f] / 100; s += `<circle cx="${(cx + r * Math.cos(ang(i))).toFixed(1)}" cy="${(cy + r * Math.sin(ang(i))).toFixed(1)}" r="3" fill="#b45309"/>`; });
+  keys.forEach((f, i) => {
+    const lx = cx + (R + 17) * Math.cos(ang(i)), ly = cy + (R + 17) * Math.sin(ang(i));
+    const anchor = Math.abs(Math.cos(ang(i))) < .3 ? 'middle' : (Math.cos(ang(i)) > 0 ? 'start' : 'end');
+    s += `<text x="${lx.toFixed(1)}" y="${(ly + 1).toFixed(1)}" text-anchor="${anchor}" font-size="11" font-weight="700" fill="#1c1917">${labels[i]} ${facets[f]}</text>`;
+  });
+  s += '</svg>';
+  return s;
+}
+function facetBars(facets) {
+  return ['O','C','E','A','N'].map(f => {
+    const v = facets[f];
+    return `<div class="facbar"><span>${FACET_NAMES[f]}</span>
+      <div class="bar"><div style="width:${v}%;background:${facetColor(v)};"></div></div>
+      <span class="num" style="color:${facetColor(v)};font-weight:700;">${v} ${facetLevel(v)}</span></div>`;
+  }).join('');
+}
+function expXLSX(data, fn) {
+  if (typeof XLSX === 'undefined') { alert('Excel 元件尚未載入（需網路載入 SheetJS）。'); return; }
+  if (!data || data.length === 0) { alert('無資料可匯出'); return; }
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+  XLSX.writeFile(wb, fn + '.xlsx');
+}
+
+/* ═══ 頁面 ═══ */
+let CANDS = [];
+const pageTitles = { candidates:'候選人管理', take:'開始施測', model:'職務適配模型', guide:'施測規範與倫理' };
+
+function renderPage() {
+  document.getElementById('pageTitle').textContent = pageTitles[STATE.currentPage] || '';
+  updateToolbar();
+  const c = document.getElementById('mainContent');
+  switch (STATE.currentPage) {
+    case 'take': c.innerHTML = renderTake(); break;
+    case 'model': c.innerHTML = renderModel(); break;
+    case 'guide': c.innerHTML = renderGuide(); break;
+    default: c.innerHTML = renderCandidates();
+  }
+  bindTake();
+}
+
+function updateToolbar() {
+  const t = document.getElementById('toolbarArea'); if (!t) return;
+  let h = '';
+  if (STATE.currentPage === 'candidates') {
+    h = '<button class="btn btn-outline btn-sm" onclick="exportCandidates()">📥 匯出總表</button>'
+      + '<button class="btn btn-primary btn-sm" onclick="nav(\'take\')">📝 開始施測</button>';
+  }
+  t.innerHTML = h;
+}
+function nav(p) { STATE.currentPage = p; document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === p)); renderPage(); window.scrollTo(0, 0); }
+
+function renderCandidates() {
+  let h = `<div class="card"><div class="card-header"><h2>候選人測評列表（${CANDS.length}）</h2>
+    <button class="btn btn-primary btn-sm" onclick="nav('take')">📝 開始施測</button></div><div class="card-body">`;
+  if (CANDS.length === 0) {
+    h += `<div class="empty-state"><div class="empty-icon">🗂️</div><p>尚無候選人資料<br>點「開始施測」建立第一位候選人測評（約 12～15 分鐘）</p></div>`;
+  } else {
+    h += `<table class="data-table"><thead><tr><th>姓名</th><th>應徵職位</th><th>施測日</th><th class="num">開放</th><th class="num">盡責</th><th class="num">人際</th><th class="num">親和</th><th class="num">情緒穩</th><th class="num">情境判斷</th><th class="num">態度</th><th>最適職位</th><th></th></tr></thead><tbody>`;
+    for (const c of [...CANDS].reverse()) {
+      const band = bandOf(c.topMatch.score);
+      h += `<tr><td><strong>${esc(c.name)}</strong>${c.consist.length >= 2 ? ' <span class="badge badge-warning" title="作答一致性待確認">⚠</span>' : ''}</td>
+        <td>${esc(posName(c.position))}</td><td>${esc(c.date)}</td>
+        <td class="num">${c.facets.O}</td><td class="num">${c.facets.C}</td><td class="num">${c.facets.E}</td><td class="num">${c.facets.A}</td><td class="num">${c.facets.N}</td>
+        <td class="num">${c.sjtPct}</td><td class="num">${c.attPct}</td>
+        <td><span class="badge ${band.cls}">${band.t}</span> ${esc(c.topMatch.name)} <span class="num" style="font-weight:700;">${c.topMatch.score}</span></td>
+        <td style="white-space:nowrap;text-align:right;">
+          <button class="btn btn-outline btn-xs" onclick="showReport('${c.id}')">報告</button>
+          <button class="btn btn-outline btn-xs" style="margin-left:4px;" onclick="printReport('${c.id}')">列印</button>
+          <button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteCand('${c.id}')">刪除</button>
+        </td></tr>`;
+    }
+    h += '</tbody></table>';
+    if (isFree()) h += `<div style="margin-top:10px;font-size:12px;color:var(--text-muted);">免費版最多儲存 ${candLimit()} 位候選人；專業版無限制。升級請聯絡 02-26293721｜erp-free.com</div>`;
+  }
+  h += '</div></div>';
+  return h;
+}
+
+function renderTake() {
+  const d = DRAFT;
+  if (!d.consent) {
+    return `<div class="card"><div class="card-header"><h2>施測前說明與知情同意</h2></div><div class="card-body">
+      <div class="consent-box">
+        <b>親愛的應徵者您好：</b><br>
+        本測驗為本公司招募流程中的<strong>輔助工具</strong>，目的是了解您的工作特質傾向，作為職務安排與面談討論的參考，讓您與公司找到最合適的位置。<br>
+        1. 共 58 題，約 <b>12～15 分鐘</b>，可隨時點「暫存」之後繼續。<br>
+        2. 題目沒有標準答案，請依<strong>平常真實的自己</strong>作答即可。<br>
+        3. 測驗結果僅供本公司招募評估使用，將依個人資料保護規定保管，<strong>不會用於心理疾病診斷</strong>，也不會提供第三人。<br>
+        4. 您有權利拒絕施測或隨時中止；拒絕不會影響應徵資格的審理。<br>
+        5. 若對結果有疑問，可向人事單位查詢或要求說明。
+      </div>
+      <div class="report-section" style="margin-top:16px;">
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div><label style="font-size:12px;font-weight:700;">姓名</label><input id="tkName" class="search-input" style="width:100%;" value="${esc(d.name)}" placeholder="應徵者姓名"></div>
+          <div><label style="font-size:12px;font-weight:700;">應徵職位</label><select id="tkPos" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;">${POSITIONS.map(p => `<option value="${p.key}" ${d.position === p.key ? 'selected' : ''}>${p.name}</option>`).join('')}</select></div>
+          <div><label style="font-size:12px;font-weight:700;">施測日期</label><input type="date" id="tkDate" class="search-input" style="width:100%;" value="${d.date}"></div>
+        </div>
+        <label style="display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:13px;cursor:pointer;">
+          <input type="checkbox" id="tkAgree" ${d.agree ? 'checked' : ''} style="margin-top:3px;">
+          <span>我已閱讀並理解上述說明，同意接受本測驗，並同意公司於招募目的範圍內使用測驗結果。</span></label>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;">
+        <button class="btn btn-primary" onclick="startTest()">開始作答</button>
+        ${d.b5.some(v => v > 0) ? '<button class="btn btn-outline" onclick="resumeTest()">繼續上次未完成的作答</button>' : ''}
+      </div>
+    </div></div>`;
+  }
+  return renderQuestion();
+}
+function startTest() {
+  const name = document.getElementById('tkName').value.trim();
+  if (!name) return alert('請填寫姓名');
+  if (!document.getElementById('tkAgree').checked) return alert('請先勾選知情同意');
+  DRAFT.name = name; DRAFT.position = document.getElementById('tkPos').value; DRAFT.date = document.getElementById('tkDate').value || new Date().toISOString().split('T')[0];
+  DRAFT.consent = true; DRAFT.b5 = Array(30).fill(0); DRAFT.vals = Array(12).fill(0); DRAFT.sjt = Array(8).fill(null); DRAFT.att = Array(8).fill(0);
+  saveDraft(); renderPage();
+}
+function resumeTest(){ DRAFT.consent = true; renderPage(); }
+
+function renderQuestion() {
+  const d = DRAFT;
+  const answered = d.b5.filter(v => v > 0).length + d.vals.filter(v => v > 0).length + d.sjt.filter(v => v !== null).length + d.att.filter(v => v > 0).length;
+  const total = 58, pct = Math.round(answered / total * 100);
+  let q = '', secTitle = '', idx = 0;
+  const sec = d._sec ?? 0;
+  const sections = [
+    { t:'第一部：人格特質（30 題）— 請依平常真實的自己作答', items: B5_ITEMS.map((it, i) => ({ i, kind:'b5', it })) },
+    { t:'第二部：工作價值觀（12 題）— 沒有對錯，依你的真實想法', items: VALUE_ITEMS.map((it, i) => ({ i, kind:'val', it })) },
+    { t:'第三部：職場情境判斷（8 題）— 選出你「最可能」的做法', items: SJT_ITEMS.map((it, i) => ({ i, kind:'sjt', it })) },
+    { t:'第四部：工作態度（8 題）', items: ATT_ITEMS.map((it, i) => ({ i, kind:'att', it })) },
+  ];
+  const S = sections[sec];
+  q = `<div class="progress-wrap"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);">
+      <span>${esc(d.name)}｜應徵：${esc(posName(d.position))}</span><span>${answered} / ${total} 題（${pct}%）</span></div>
+      <div class="progress-bar"><div style="width:${pct}%"></div></div></div>
+      <div class="card"><div class="card-body"><div class="report-section"><h3>${S.t}</h3></div>`;
+  for (const item of S.items) {
+    if (item.kind === 'b5') {
+      const v = d.b5[item.i];
+      q += `<div class="q-card"><div class="q-no">Q${item.i + 1}</div><div class="q-txt">${esc(item.it.txt)}</div>
+        <div class="q-opts">${LIKERT5.map((lb, k) => `<label class="${v === k + 1 ? 'sel' : ''}"><input type="radio" name="q${item.i}" ${v === k + 1 ? 'checked' : ''} onchange="ans(${item.i},${k + 1})"><span>${lb}</span></label>`).join('')}</div></div>`;
+    } else if (item.kind === 'val') {
+      const v = d.vals[item.i];
+      q += `<div class="q-card"><div class="q-no">Q${30 + item.i + 1}</div><div class="q-txt">${esc(item.it.txt)}</div>
+        <div class="q-opts">${LIKERT5.map((lb, k) => `<label class="${v === k + 1 ? 'sel' : ''}"><input type="radio" name="q${30 + item.i}" ${v === k + 1 ? 'checked' : ''} onchange="ansVal(${item.i},${k + 1})"><span>${lb}</span></label>`).join('')}</div></div>`;
+    } else if (item.kind === 'sjt') {
+      const v = d.sjt[item.i];
+      q += `<div class="q-card"><div class="q-no">情境 ${item.i + 1}</div><div class="q-txt">${esc(item.it.q)}</div>
+        <div class="q-opts sjt">${item.it.opts.map((op, k) => `<label class="${v === k ? 'sel' : ''}"><input type="radio" name="q${42 + item.i}" ${v === k ? 'checked' : ''} onchange="ansSjt(${item.i},${k})"><span>${String.fromCharCode(65 + k)}. ${esc(op)}</span></label>`).join('')}</div></div>`;
+    } else {
+      const v = d.att[item.i];
+      q += `<div class="q-card"><div class="q-no">Q${50 + item.i + 1}</div><div class="q-txt">${esc(item.it.txt)}</div>
+        <div class="q-opts">${LIKERT4.map((lb, k) => `<label class="${v === k + 1 ? 'sel' : ''}"><input type="radio" name="q${50 + item.i}" ${v === k + 1 ? 'checked' : ''} onchange="ansAtt(${item.i},${k + 1})"><span>${lb}</span></label>`).join('')}</div></div>`;
+    }
+  }
+  const isLast = sec === 3;
+  q += `<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:6px;" class="no-print">
+    ${sec > 0 ? `<button class="btn btn-outline" onclick="secNav(${sec - 1})">上一部</button>` : ''}
+    ${isLast
+      ? '<button class="btn btn-success" onclick="submitTest()">✓ 完成測驗並計分</button>'
+      : '<button class="btn btn-primary" onclick="secNav(' + (sec + 1) + ')">下一部</button>'}
+  </div></div></div>`;
+  return q;
+}
+async function ans(i, v){ DRAFT.b5[i] = v; saveDraft(); refreshQ(i, 'q' + i); }
+async function ansVal(i, v){ DRAFT.vals[i] = v; saveDraft(); refreshQ(i, 'q' + (30 + i)); }
+async function ansSjt(i, v){ DRAFT.sjt[i] = v; saveDraft(); refreshQ(i, 'q' + (42 + i)); }
+async function ansAtt(i, v){ DRAFT.att[i] = v; saveDraft(); refreshQ(i, 'q' + (50 + i)); }
+function refreshQ(idx, name) {
+  const card = document.querySelectorAll('.q-card')[idxInSec(idx)] || null;
+  const radios = document.querySelectorAll(`input[name="${name}"]`);
+  radios.forEach(r => { const lb = r.closest('label'); if (r.checked) lb.classList.add('sel'); else lb.classList.remove('sel'); });
+  const answered = DRAFT.b5.filter(v => v > 0).length + DRAFT.vals.filter(v => v > 0).length + DRAFT.sjt.filter(v => v !== null).length + DRAFT.att.filter(v => v > 0).length;
+  const pct = Math.round(answered / 58 * 100);
+  const pw = document.querySelector('.progress-wrap');
+  if (pw) pw.querySelector('span:last-child').textContent = `${answered} / 58 題（${pct}%）`;
+  const pb = document.querySelector('.progress-bar div'); if (pb) pb.style.width = pct + '%';
+}
+function idxInSec(i) { const sec = DRAFT._sec ?? 0; return i - (sec === 0 ? 0 : sec === 1 ? 30 : sec === 2 ? 42 : 50); }
+function secNav(s) { DRAFT._sec = s; saveDraft(); renderPage(); window.scrollTo(0, 0); }
+async function submitTest() {
+  const d = DRAFT;
+  if (d.b5.some(v => !v) || d.vals.some(v => !v) || d.sjt.some(v => v === null) || d.att.some(v => !v)) {
+    return alert('尚有未作答的題目，請檢查（可點各部檢視未答題）');
+  }
+  if (isFree() && CANDS.length >= candLimit()) {
+    return alert('免費版最多儲存 ' + candLimit() + ' 位候選人。\n請於人資後台刪除舊資料，或升級專業版（02-26293721）。');
+  }
+  const cand = finalizeCandidate(d);
+  CANDS.push(cand);
+  await save('candidates', CANDS);
+  await clearDraft();
+  alert('測驗完成！已產生適才適所報告。');
+  STATE.editingId = cand.id;
+  showReport(cand.id);
+  nav('candidates');
+}
+
+/* ═══ 報告 ═══ */
+function getCand(id){ return CANDS.find(c => c.id === id); }
+function showReport(id) {
+  const c = getCand(id); if (!c) return;
+  const matches = matchAll(c);
+  const band = bandOf(matches[0].score);
+  const applied = matches.find(m => m.key === c.position) || matches[0];
+  const probes = probeQuestions(c, c.position);
+  const flags = redFlags(c);
+  let h = `<div class="modal-header"><h3>適才適所測評報告 — ${esc(c.name)}</h3><button class="close-btn" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">`;
+  h += `<div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-label">應徵職位</div><div style="font-weight:800;font-size:14px;">${esc(posName(c.position))}</div><div style="font-size:11px;color:var(--text-muted);">施測日 ${esc(c.date)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">應徵職位適配度</div><div class="kpi-value" style="color:${matches.find(m=>m.key===c.position).score>=60?'var(--positive)':'var(--negative)'};">${applied.score}</div><span class="match-band ${bandOf(applied.score).cls}">${bandOf(applied.score).t}</span></div>
+    <div class="kpi-card"><div class="kpi-label">最適職位</div><div style="font-weight:800;font-size:14px;">${esc(matches[0].name)}</div><div class="kpi-value" style="font-size:18px;color:var(--positive);">${matches[0].score}</div></div>
+    <div class="kpi-card"><div class="kpi-label">情境判斷 / 工作態度</div><div class="kpi-value" style="font-size:18px;">${c.sjtPct} / ${c.attPct}</div><div style="font-size:11px;color:var(--text-muted);">${c.consist.length >= 2 ? '<span class="badge badge-warning">⚠ 一致性待確認</span>' : '<span class="badge badge-success">作答一致</span>'}</div></div>
+  </div>`;
+  h += `<div class="report-section"><h3>五大人格工作特質（IPIP 框架，0–100）</h3>
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:16px;align-items:center;">
+      <div class="radar-wrap">${radarSVG(c.facets, 240)}</div>
+      <div>${facetBars(c.facets)}
+      <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;">五大人格為公眾領域學術框架（Big Five / IPIP）。分數為傾向強度，非優劣評價。</div></div>
+    </div></div>`;
+  h += `<div class="report-section"><h3>工作動機（價值觀前三）</h3>
+    <div>${topValues(c.vals).map((v, i) => `<span class="badge ${i === 0 ? 'badge-success' : 'badge-info'}" style="margin-right:8px;padding:4px 12px;">${i + 1}. ${v}</span>`).join('')}
+    <span style="font-size:12px;color:var(--text-muted);margin-left:6px;">面談時可確認工作誘因是否與職務條件相符</span></div></div>`;
+  h += `<div class="report-section"><h3>八大職務適配排序</h3><table class="data-table">
+    <thead><tr><th>排名</th><th>職位</th><th class="num">適配分</th><th>評等</th><th>說明</th></tr></thead><tbody>`;
+  matches.forEach((m, i) => {
+    const b = bandOf(m.score);
+    h += `<tr${m.key === c.position ? ' style="background:#fdf6ee;"' : ''}><td class="num">${i + 1}${m.key === c.position ? ' ←應徵' : ''}</td><td>${esc(m.name)}</td>
+      <td class="num" style="font-weight:700;">${m.score}</td><td><span class="match-band ${b.cls}">${b.t}</span></td>
+      <td style="font-size:11.5px;color:var(--text-muted);">${esc(POSITIONS.find(p => p.key === m.key).desc)}</td></tr>`;
+  });
+  h += `</tbody></table></div>`;
+  h += `<div class="report-section"><h3>面談追問建議（依適配落差自動產生）</h3>
+    ${probes.map(p => `<div class="probe"><span class="dot" style="background:${p.color};"></span><span>${esc(p.text)}</span></div>`).join('')}</div>`;
+  if (flags.length) {
+    h += `<div class="report-section"><h3>注意事項</h3>${flags.map(f => `<div class="probe"><span class="dot" style="background:${f.color};"></span><span>${esc(f.text)}</span></div>`).join('')}</div>`;
+  }
+  h += `<div class="disclaim">本報告由「${APP_NAME}」自動產生，僅供招募輔助參考，不得作為錄用與否之唯一依據，不得用於心理疾病診斷。測驗結果涉及個人資料，請依個人資料保護相關規定保管，並於招募程序結束後依規定處理。就業服務法第 5 條禁止就業歧視——請以職務相關能力綜合評估。</div>`;
+  h += `<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;" class="no-print">
+    <button class="btn btn-outline" onclick="printReport('${c.id}')">🖨️ 列印報告</button>
+    <button class="btn btn-primary" onclick="closeModal()">關閉</button></div></div>`;
+  document.getElementById('modalBox').innerHTML = h;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.add('hidden'); STATE.editingId = null; }
+function printReport(id) {
+  const c = getCand(id); if (!c) return;
+  const matches = matchAll(c);
+  const w = window.open('', '_blank', 'width=900,height=900');
+  let h = '<html><head><meta charset="UTF-8"><title>測評報告 — ' + esc(c.name) + '</title><style>body{font-family:"Noto Sans TC",sans-serif;padding:24px;color:#111;font-size:13px;line-height:1.7}h2{color:#1c1917;border-bottom:2px solid #333;padding-bottom:6px}table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0}th,td{border:1px solid #999;padding:6px 9px}th{background:#f0ede9;text-align:left}td.n{text-align:right}.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #b45309;padding-bottom:10px;margin-bottom:6px}.hd .t{font-size:20px;font-weight:900}.hd .b{font-size:11px;color:#666}.sm{font-size:11px;color:#666}</style></head><body>';
+  h += '<div class="hd"><div><div class="t">適才適所測評報告</div><div class="b">' + esc(c.name) + '｜應徵：' + esc(posName(c.position)) + '｜施測日：' + esc(c.date) + '</div></div><div class="b">erp-free.com · 適才適所人才測評系統 V1.0</div></div>';
+  h += '<h2>五大人格工作特質</h2><table><tr><th>構面</th><th>分數</th><th>強度</th><th>說明</th></tr>';
+  for (const f of ['O','C','E','A','N']) h += `<tr><td>${FACET_NAMES[f]}</td><td class="n">${c.facets[f]}</td><td>${facetLevel(c.facets[f])}</td><td class="sm">${({O:'嘗試新方法與學習意願',C:'可靠性、紀律與細節',E:'人際互動與表達活力',A:'合作、體諒與衝突處理',N:'抗壓與情緒平穩'})[f]}</td></tr>`;
+  h += '</table>';
+  h += '<h2>輔助指標</h2><table><tr><th>項目</th><th class="n">分數</th><th>說明</th></tr>';
+  h += `<tr><td>情境判斷（SJT 8 題）</td><td class="n">${c.sjtPct}</td><td class="sm">實務判斷力：客訴、衝突、多工、誠信、保密、安全</td></tr>`;
+  h += `<tr><td>誠信與工作態度</td><td class="n">${c.attPct}</td><td class="sm">自律、守規、負責傾向</td></tr>`;
+  h += `<tr><td>主要工作動機</td><td class="n">—</td><td class="sm">${esc(topValues(c.vals).join('、'))}</td></tr>`;
+  h += `<tr><td>作答一致性</td><td class="n">${c.consist.length}</td><td class="sm">${c.consist.length >= 2 ? '多組反向題矛盾，建議重測或面談釐清' : '正常'}</td></tr></table>`;
+  h += '<h2>八大職務適配排序</h2><table><tr><th>職位</th><th class="n">適配分</th><th>評等</th></tr>';
+  matches.forEach(m => { h += `<tr><td>${esc(m.name)}${m.key === c.position ? '（應徵職位）' : ''}</td><td class="n">${m.score}</td><td>${bandOf(m.score).t}</td></tr>`; });
+  h += '</table>';
+  h += '<p class="sm">※ 本報告僅供招募輔助參考，不得作為錄用唯一依據；不得用於心理疾病診斷；請依個人資料保護規定保管。就業服務法第 5 條禁止就業歧視。</p>';
+  h += '</body></html>';
+  w.document.write(h);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
+}
+async function deleteCand(id) {
+  if (!confirm('確定刪除此候選人測評資料？')) return;
+  CANDS = CANDS.filter(c => c.id !== id);
+  await save('candidates', CANDS);
+  renderPage();
+}
+function exportCandidates() {
+  const d = CANDS.map(c => {
+    const all = matchAll(c);
+    return { 姓名:c.name, 應徵職位:posName(c.position), 施測日:c.date,
+      開放學習:c.facets.O, 盡責自律:c.facets.C, 人際活力:c.facets.E, 團隊親和:c.facets.A, 情緒穩定:c.facets.N,
+      情境判斷:c.sjtPct, 工作態度:c.attPct, 主要動機:topValues(c.vals).join('、'),
+      最適職位:all[0].name, 最適分數:all[0].score, 應徵職位適配:(all.find(m => m.key === c.position) || {}).score ?? '', 一致性:c.consist.length >= 2 ? '待確認' : '正常' };
+  });
+  expXLSX(d, '人才測評總表');
+}
+
+/* ═══ 模型與規範頁 ═══ */
+function renderModel() {
+  let h = `<div class="card"><div class="card-header"><h2>職務適配模型 — 8 類職缺理想輪廓</h2><span style="font-size:12px;color:var(--text-muted);">適配分＝各構面與理想值之加權貼近度（0-100）</span></div><div class="card-body">`;
+  h += `<p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">每一職位定義五大構面的「理想值／容許寬度／權重」。偏離理想值在容許寬度內扣 0～50 分、超過兩倍寬度計 0 分；情境判斷或工作態度低於 40 分另有減分。評等：<span class="match-band badge-success">高適配 ≥75</span> <span class="match-band badge-info">可考慮 60–74</span> <span class="match-band badge-warning">謹慎評估 45–59</span> <span class="match-band badge-danger">不建議 &lt;45</span></p>`;
+  h += `<table class="data-table"><thead><tr><th>職位</th><th class="num">開放學習</th><th class="num">盡責自律</th><th class="num">人際活力</th><th class="num">團隊親和</th><th class="num">情緒穩定</th><th>說明</th></tr></thead><tbody>`;
+  for (const p of POSITIONS) {
+    h += `<tr><td><strong>${p.name}</strong></td>`;
+    for (const f of ['O','C','E','A','N']) h += `<td class="num">${p.fit[f].i}</td>`;
+    h += `<td style="font-size:12px;color:var(--text-muted);">${p.desc}</td></tr>`;
+  }
+  h += `</tbody></table><p style="font-size:12px;color:var(--text-muted);margin-top:10px;">數值為理想輪廓中點（0-100），可依公司職缺實況微調（修改本檔 POSITIONS 設定即可）。輪廓訂定參考工作分析常見結論，非絕對標準。</p></div></div>`;
+  return h;
+}
+function renderGuide() {
+  return `<div class="card"><div class="card-header"><h2>施測規範與專業倫理</h2></div><div class="card-body">
+    <div class="report-section"><h3>施測流程建議</h3>
+      <div class="probe"><span class="dot" style="background:#b45309;"></span><span><b>1. 時機：</b>初篩通過後、第一次面談前或面談當日；避免在應徵者疲憊或趕時間時施測。</span></div>
+      <div class="probe"><span class="dot" style="background:#b45309;"></span><span><b>2. 環境：</b>安靜空間、桌上型或平板皆可；一次一人，避免互相討論。</span></div>
+      <div class="probe"><span class="dot" style="background:#b45309;"></span><span><b>3. 指導語：</b>由系統「知情同意」頁統一說明；提醒「沒有標準答案、依真實自己作答」。</span></div>
+      <div class="probe"><span class="dot" style="background:#b45309;"></span><span><b>4. 時間：</b>約 12～15 分鐘完成 58 題；不強制限時，但超過 25 分鐘應關注分心狀況。</span></div>
+      <div class="probe"><span class="dot" style="background:#b45309;"></span><span><b>5. 解讀：</b>搭配報告的「面談追問建議」於面談中驗證；避免只看分數做決定。</span></div>
+    </div>
+    <div class="report-section"><h3>專業倫理與法律遵循</h3>
+      <div class="probe"><span class="dot" style="background:#166534;"></span><span><b>輔助而非決定：</b>測驗結果僅供招募輔助，不得作為錄用與否之唯一依據。</span></div>
+      <div class="probe"><span class="dot" style="background:#166534;"></span><span><b>非臨床用途：</b>本測驗非心理疾病診斷工具；情緒穩定偏低者應給予關懷與面談釐清，不可單以此排除。</span></div>
+      <div class="probe"><span class="dot" style="background:#166534;"></span><span><b>知情同意：</b>施測前完成同意程序（系統內建）；應徵者有拒絕與中止的權利。</span></div>
+      <div class="probe"><span class="dot" style="background:#166534;"></span><span><b>就業歧視防制：</b>就業服務法第 5 條禁止對性別、年齡、身心障礙等之歧視；評估僅限職務相關特質。</span></div>
+      <div class="probe"><span class="dot" style="background:#166534;"></span><span><b>個資保護：</b>測驗結果屬個人資料——告知使用目的、限定招募人員接觸、未錄取者資料建議於招募程序後依個資法處理（刪除或停止利用）。</span></div>
+      <div class="probe"><span class="dot" style="background:#166534;"></span><span><b>公平性：</b>所有應徵同一職位者建議施測相同題組與流程；錄取與否應綜合筆試、面談、經歷查核。</span></div>
+    </div>
+    <div class="report-section"><h3>測驗體系組成</h3>
+      <table class="data-table"><thead><tr><th>部分</th><th>題數</th><th>理論依據</th><th>用途</th></tr></thead><tbody>
+        <tr><td>五大人格工作特質</td><td class="num">30</td><td>Big Five 五因素模型（IPIP 公眾領域題庫框架改編）</td><td>工作風格與團隊適性</td></tr>
+        <tr><td>工作價值觀</td><td class="num">12</td><td>工作價值觀研究（Super 傳統之簡化六向度）</td><td>動機與留任契合</td></tr>
+        <tr><td>職場情境判斷 SJT</td><td class="num">8</td><td>情境判斷測驗（Situational Judgment Test）技術</td><td>實務判斷力</td></tr>
+        <tr><td>誠信與工作態度</td><td class="num">8</td><td>誠實測驗（Integrity Test）明言題模式</td><td>紀律與責任感</td></tr>
+      </tbody></table>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">本系統為招募篩選用途之自編工具，題目透明可檢視；正式採用前建議先以在職優秀員工試測校準職務輪廓（效標關聯），並定期檢視題目表現。</p>
+    </div>
+  </div></div>`;
+}
+
+function bindTake(){}
+
+/* ═══ init ═══ */
+(async function init() {
+  try {
+    await openDB();
+    CANDS = await load('candidates', []);
+    if (CANDS.length === 0) { CANDS = makeDemoCandidates(); await save('candidates', CANDS); }
+    const saved = await load('license', []);
+    if (saved && saved.length > 0) {
+      const l = saved[0];
+      if (l.tier === 1 || (l.key && l.key.startsWith('FREE'))) STATE.license = { valid:true, tier:1, tierName:'免費版', company:l.company || '免費試用', expiry:'永久' };
+      else { const r = await verifyLicenseAsync(l.key, l.company); STATE.license = r.valid ? r : null; }
+    }
+  } catch (e) { CANDS = makeDemoCandidates(); }
+  DRAFT = blankDraft();
+  const ver = document.getElementById('sidebarVer');
+  if (ver) ver.textContent = `${STATE.license ? TIER_NAMES[STATE.license.tier] : '免費版'} ${APP_VERSION}`;
+  const lic = document.getElementById('sidebarLicense');
+  if (lic) lic.textContent = STATE.license ? (STATE.license.company || '') + '｜erp-free.com' : 'erp-free.com';
+  renderPage();
+})();
+
+document.getElementById('sidebarNav').addEventListener('click', e => {
+  const item = e.target.closest('.nav-item');
+  if (!item) return;
+  nav(item.dataset.page);
+});
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+setInterval(() => { const el = document.getElementById('sidebarClock'); if (el) el.textContent = new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' }); }, 1000);
+setInterval(() => { const el = document.getElementById('headerDate'); if (el) el.textContent = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'2-digit', day:'2-digit', weekday:'short' }); }, 1000);
+</script>
+</body>
+</html>
