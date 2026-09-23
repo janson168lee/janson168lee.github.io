@@ -830,6 +830,13 @@ function showReport(id) {
   document.getElementById('modalOverlay').classList.remove('hidden');
 }
 function closeModal(){ document.getElementById('modalOverlay').classList.add('hidden'); STATE.editingId = null; }
+function updateLicenseDisplay() {
+  const ver = document.getElementById('sidebarVer');
+  const lic = document.getElementById('sidebarLicense');
+  const tier = STATE.license ? STATE.license.tier : 1;
+  if (ver) ver.textContent = `${STATE.license ? TIER_NAMES[STATE.license.tier] : '免費版'} ${APP_VERSION}`;
+  if (lic) lic.textContent = PROFILE ? PROFILE.name + '｜erp-free.com' : 'erp-free.com';
+}
 function printReport(id) {
   const c = getCand(id); if (!c) return;
   const matches = matchAll(c);
