@@ -108,6 +108,12 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-primary)
 .disclaim{font-size:11px;color:var(--text-muted);line-height:1.8;border-top:1px solid var(--border-light);margin-top:14px;padding-top:10px}
 @media(max-width:820px){.sidebar{display:none}.content{padding:16px 12px}}
 @media print{.sidebar,.header,.no-print{display:none!important}.content{max-width:none;padding:0}.card{box-shadow:none;border:1px solid #ccc}}
+.reg-types{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px}
+.reg-type{border:2px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;text-align:center;transition:all .15s;background:var(--bg-input)}
+.reg-type:hover{border-color:var(--accent-light)}
+.reg-type.sel{border-color:var(--accent);background:#fdf6ee;box-shadow:0 0 0 1px var(--accent)}
+.reg-type .rt{font-weight:800;font-size:14px}
+.reg-type .rd{font-size:11.5px;color:var(--text-muted);margin-top:4px}
 </style>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
@@ -149,6 +155,8 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-primary)
 const APP_VERSION = 'V1.0';
 const APP_NAME = '適才適所人才測評系統';
 const STATE = { currentPage:'candidates', editingId:null, license:null };
+let PROFILE = null;   // 使用前註冊資料（公司或個人）；未註冊 = 全功能鎖定
+let REG_TYPE = 'company';
 
 /* ── 授權（與 ERP Suite 同體系：相容 ERP/HR 金鑰）── */
 const LICENSE_SECRET = "Taiwan…Claw";
@@ -182,7 +190,7 @@ async function verifyLicenseAsync(key, company) {
 
 /* ── IndexedDB ── */
 const DB_NAME = 'HR_ASSESS_DB', DB_VERSION = 1;
-const STORES = ['candidates','draft','license'];
+const STORES = ['candidates','draft','license','profile'];
 let _db = null;
 function openDB(){ return new Promise((res, rej) => { if (_db) return res(_db); const rq = indexedDB.open(DB_NAME, DB_VERSION); rq.onupgradeneeded = e => { const db = e.target.result; for (const s of STORES) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath:'id' }); }; rq.onsuccess = e => { _db = e.target.result; res(_db); }; rq.onerror = e => rej(e.target.error); }); }
 async function dbLoad(store){ const db = await openDB(); return new Promise(res => { const rq = db.transaction(store, 'readonly').objectStore(store).getAll(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => res([]); }); }
@@ -500,11 +508,88 @@ function expXLSX(data, fn) {
   XLSX.writeFile(wb, fn + '.xlsx');
 }
 
+/* ═══ 使用前註冊門檻 ═══ */
+function renderRegister() {
+  const isCo = REG_TYPE === 'company';
+  return `<div class="card"><div class="card-body" style="max-width:640px;margin:0 auto;padding:28px;">
+    <div style="text-align:center;margin-bottom:6px;"><div style="font-size:38px;">🧠</div>
+    <h2 style="font-size:20px;font-weight:900;color:#1c1917;">歡迎使用適才適所人才測評系統</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">五大人格＋情境判斷＋職務適配｜58 題約 12–15 分鐘</p></div>
+    <div class="report-section" style="margin-top:16px;"><h3>① 選擇您的身分</h3>
+      <div class="reg-types">
+        <div class="reg-type ${isCo?'sel':''}" onclick="REG_TYPE='company';renderPage();">
+          <div class="rt">🏢 公司／人資使用者</div>
+          <div class="rd">企業人資：安排招募施測、職務適配評估</div>
+        </div>
+        <div class="reg-type ${!isCo?'sel':''}" onclick="REG_TYPE='personal';renderPage();">
+          <div class="rt">👤 個人／求職者</div>
+          <div class="rd">個人自我探索：了解自己的工作特質與適配職位</div>
+        </div>
+      </div>
+    </div>
+    <div class="report-section"><h3>② ${isCo?'公司資料':'個人資料'}（皆為必填）</h3>
+      ${isCo ? `
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div><label style="font-size:12px;font-weight:700;">公司名稱 *</label><input id="rgName" class="search-input" style="width:100%;" placeholder="例：某某企業有限公司"></div>
+        <div><label style="font-size:12px;font-weight:700;">聯絡人 *</label><input id="rgContact" class="search-input" style="width:100%;" placeholder="例：王小姐"></div>
+      </div>
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <div><label style="font-size:12px;font-weight:700;">職稱（選填）</label><input id="rgTitle" class="search-input" style="width:100%;" placeholder="例：人資經理"></div>
+        <div><label style="font-size:12px;font-weight:700;">電話 *</label><input id="rgPhone" class="search-input" style="width:100%;" placeholder="例：02-12345678"></div>
+      </div>` : `
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div><label style="font-size:12px;font-weight:700;">姓名 *</label><input id="rgName" class="search-input" style="width:100%;" placeholder="您的姓名"></div>
+        <div><label style="font-size:12px;font-weight:700;">身分別（選填）</label><select id="rgTitle" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;"><option>求職者</option><option>在職者</option><option>學生</option><option>其他</option></select></div>
+      </div>
+      <div style="margin-top:10px;"><label style="font-size:12px;font-weight:700;">電話 *</label><input id="rgPhone" class="search-input" style="width:100%;" placeholder="例：0912-345-678"></div>`}
+      <div style="margin-top:10px;"><label style="font-size:12px;font-weight:700;">Email *</label><input id="rgEmail" class="search-input" style="width:100%;" placeholder="例：name@example.com"></div>
+    </div>
+    <div class="report-section"><h3>③ 個資告知與同意</h3>
+      <div class="consent-box" style="font-size:12.5px;">
+        您提供的資料僅用於：本系統使用身分識別、服務聯繫與使用統計。<br>
+        資料僅儲存於<strong>您的瀏覽器本機</strong>（不上傳雲端、不提供第三人），
+        依個人資料保護法規定處理；您可隨時於瀏覽器清除本機資料以刪除之。
+        <label style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;cursor:pointer;font-weight:600;">
+          <input type="checkbox" id="rgAgree" style="margin-top:3px;">
+          <span>我已閱讀並同意上述個資告知，同意提供資料以使用本系統。</span></label>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:6px;">
+      <button class="btn btn-primary" style="padding:11px 36px;font-size:14px;" onclick="registerSave()">註冊並開始使用 →</button>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">erp-free.com ｜ 李先生 02-26293721｜janson168@gmail.com</div>
+    </div>
+  </div></div>`;
+}
+async function registerSave() {
+  const name = document.getElementById('rgName').value.trim();
+  const phone = document.getElementById('rgPhone').value.trim();
+  const email = document.getElementById('rgEmail').value.trim();
+  const title = document.getElementById('rgTitle') ? document.getElementById('rgTitle').value.trim() : '';
+  if (!name) return alert('請填寫' + (REG_TYPE === 'company' ? '公司名稱' : '姓名'));
+  if (!phone) return alert('請填寫電話');
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return alert('請填寫有效的 Email');
+  if (!document.getElementById('rgAgree').checked) return alert('請先勾選個資告知同意');
+  PROFILE = { id:'profile', type:REG_TYPE, name,
+    contact: REG_TYPE === 'company' ? (document.getElementById('rgContact').value.trim() || name) : name,
+    title, phone, email, registered: new Date().toISOString().slice(0, 10) };
+  await save('profile', [PROFILE]);
+  updateLicenseDisplay();
+  alert('註冊完成，歡迎使用！');
+  nav('candidates');
+}
+
 /* ═══ 頁面 ═══ */
 let CANDS = [];
 const pageTitles = { candidates:'候選人管理', take:'開始施測', model:'職務適配模型', guide:'施測規範與倫理' };
 
 function renderPage() {
+  if (!PROFILE) {
+    document.getElementById('pageTitle').textContent = '使用註冊';
+    const tb = document.getElementById('toolbarArea'); if (tb) tb.innerHTML = '';
+    document.getElementById('mainContent').innerHTML = renderRegister();
+    bindTake();
+    return;
+  }
   document.getElementById('pageTitle').textContent = pageTitles[STATE.currentPage] || '';
   updateToolbar();
   const c = document.getElementById('mainContent');
@@ -728,7 +813,7 @@ function printReport(id) {
   const matches = matchAll(c);
   const w = window.open('', '_blank', 'width=900,height=900');
   let h = '<html><head><meta charset="UTF-8"><title>測評報告 — ' + esc(c.name) + '</title><style>body{font-family:"Noto Sans TC",sans-serif;padding:24px;color:#111;font-size:13px;line-height:1.7}h2{color:#1c1917;border-bottom:2px solid #333;padding-bottom:6px}table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0}th,td{border:1px solid #999;padding:6px 9px}th{background:#f0ede9;text-align:left}td.n{text-align:right}.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #b45309;padding-bottom:10px;margin-bottom:6px}.hd .t{font-size:20px;font-weight:900}.hd .b{font-size:11px;color:#666}.sm{font-size:11px;color:#666}</style></head><body>';
-  h += '<div class="hd"><div><div class="t">適才適所測評報告</div><div class="b">' + esc(c.name) + '｜應徵：' + esc(posName(c.position)) + '｜施測日：' + esc(c.date) + '</div></div><div class="b">erp-free.com · 適才適所人才測評系統 V1.0</div></div>';
+  h += '<div class="hd"><div><div class="t">適才適所測評報告</div><div class="b">' + esc(c.name) + '｜應徵：' + esc(posName(c.position)) + '｜施測日：' + esc(c.date) + (PROFILE ? '｜使用單位：' + esc(PROFILE.name) : '') + '</div></div><div class="b">erp-free.com · 適才適所人才測評系統 V1.0</div></div>';
   h += '<h2>五大人格工作特質</h2><table><tr><th>構面</th><th>分數</th><th>強度</th><th>說明</th></tr>';
   for (const f of ['O','C','E','A','N']) h += `<tr><td>${FACET_NAMES[f]}</td><td class="n">${c.facets[f]}</td><td>${facetLevel(c.facets[f])}</td><td class="sm">${({O:'嘗試新方法與學習意願',C:'可靠性、紀律與細節',E:'人際互動與表達活力',A:'合作、體諒與衝突處理',N:'抗壓與情緒平穩'})[f]}</td></tr>`;
   h += '</table>';
@@ -819,12 +904,14 @@ function bindTake(){}
       if (l.tier === 1 || (l.key && l.key.startsWith('FREE'))) STATE.license = { valid:true, tier:1, tierName:'免費版', company:l.company || '免費試用', expiry:'永久' };
       else { const r = await verifyLicenseAsync(l.key, l.company); STATE.license = r.valid ? r : null; }
     }
+    const pf = await load('profile', []);
+    PROFILE = (pf && pf.length > 0) ? pf[0] : null;
   } catch (e) { CANDS = makeDemoCandidates(); }
   DRAFT = blankDraft();
   const ver = document.getElementById('sidebarVer');
   if (ver) ver.textContent = `${STATE.license ? TIER_NAMES[STATE.license.tier] : '免費版'} ${APP_VERSION}`;
   const lic = document.getElementById('sidebarLicense');
-  if (lic) lic.textContent = STATE.license ? (STATE.license.company || '') + '｜erp-free.com' : 'erp-free.com';
+  if (lic) lic.textContent = PROFILE ? PROFILE.name + '｜erp-free.com' : 'erp-free.com';
   renderPage();
 })();
 
