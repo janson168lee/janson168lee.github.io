@@ -576,8 +576,9 @@ async function registerSave() {
     title, phone, email, registered: new Date().toISOString().slice(0, 10) };
   await save('profile', [PROFILE]);
   // 蒐集回傳：透過 FormSubmit 表單服務寄到公司信箱（離線或服務失敗不影響本地註冊）
+  let syncMsg = '';
   try {
-    fetch('https://formsubmit.co/ajax/' + COLLECT_EMAIL, {
+    const resp = await fetch('https://formsubmit.co/ajax/' + COLLECT_EMAIL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
@@ -593,10 +594,16 @@ async function registerSave() {
         註冊時間: new Date().toLocaleString('zh-TW'),
         來源: '人才測評系統 V1.0（erp-free.com）'
       })
-    }).catch(() => {});
-  } catch (e) {}
+    });
+    const jr = await resp.json().catch(() => ({}));
+    syncMsg = (jr && jr.success === 'true')
+      ? '✓ 資料已同步回傳公司信箱。'
+      : '⚠ 資料回傳尚未生效：公司信箱完成表單啟用後即正常（不影響本機註冊與使用）。';
+  } catch (e) {
+    syncMsg = '⚠ 目前離線或回傳服務未連上：資料已存本機，不影響使用。';
+  }
   updateLicenseDisplay();
-  alert('註冊完成，歡迎使用！');
+  alert('註冊完成，歡迎使用！\n' + syncMsg);
   nav('candidates');
 }
 
