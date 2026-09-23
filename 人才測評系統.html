@@ -154,6 +154,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-primary)
    ═══════════════════════════════════════ */
 const APP_VERSION = 'V1.0';
 const APP_NAME = '適才適所人才測評系統';
+const COLLECT_EMAIL = 'janson168@gmail.com';   // 註冊資料回傳信箱（FormSubmit 表單服務）
 const STATE = { currentPage:'candidates', editingId:null, license:null };
 let PROFILE = null;   // 使用前註冊資料（公司或個人）；未註冊 = 全功能鎖定
 let REG_TYPE = 'company';
@@ -546,9 +547,10 @@ function renderRegister() {
     </div>
     <div class="report-section"><h3>③ 個資告知與同意</h3>
       <div class="consent-box" style="font-size:12.5px;">
-        您提供的資料僅用於：本系統使用身分識別、服務聯繫與使用統計。<br>
-        資料僅儲存於<strong>您的瀏覽器本機</strong>（不上傳雲端、不提供第三人），
-        依個人資料保護法規定處理；您可隨時於瀏覽器清除本機資料以刪除之。
+        您提供的資料用於：本系統使用身分識別、服務聯繫，以及本公司後續服務與資訊提供。<br>
+        資料會儲存於<strong>您的瀏覽器本機</strong>，並透過表單服務傳送至本公司聯絡信箱（erp-free.com），
+        僅供本公司聯繫與服務使用、不提供其他第三人；依個人資料保護法處理。
+        您可來信要求刪除，或隨時清除瀏覽器本機資料。
         <label style="display:flex;gap:8px;align-items:flex-start;margin-top:10px;cursor:pointer;font-weight:600;">
           <input type="checkbox" id="rgAgree" style="margin-top:3px;">
           <span>我已閱讀並同意上述個資告知，同意提供資料以使用本系統。</span></label>
@@ -573,6 +575,26 @@ async function registerSave() {
     contact: REG_TYPE === 'company' ? (document.getElementById('rgContact').value.trim() || name) : name,
     title, phone, email, registered: new Date().toISOString().slice(0, 10) };
   await save('profile', [PROFILE]);
+  // 蒐集回傳：透過 FormSubmit 表單服務寄到公司信箱（離線或服務失敗不影響本地註冊）
+  try {
+    fetch('https://formsubmit.co/ajax/' + COLLECT_EMAIL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: '【人才測評註冊】' + (REG_TYPE === 'company' ? '公司：' + name : '個人：' + name),
+        _template: 'table',
+        _captcha: 'false',
+        身分: REG_TYPE === 'company' ? '公司／人資' : '個人',
+        名稱: name,
+        聯絡人: PROFILE.contact,
+        職稱: title || '—',
+        電話: phone,
+        Email: email,
+        註冊時間: new Date().toLocaleString('zh-TW'),
+        來源: '人才測評系統 V1.0（erp-free.com）'
+      })
+    }).catch(() => {});
+  } catch (e) {}
   updateLicenseDisplay();
   alert('註冊完成，歡迎使用！');
   nav('candidates');
