@@ -158,6 +158,7 @@ const COLLECT_EMAIL = 'janson168@gmail.com';   // 註冊資料回傳信箱（For
 const STATE = { currentPage:'candidates', editingId:null, license:null };
 let PROFILE = null;   // 使用前註冊資料（公司或個人）；未註冊 = 全功能鎖定
 let REG_TYPE = 'company';
+const SRC = (() => { try { return new URLSearchParams(location.search).get('src') || ''; } catch (e) { return ''; } })();  // 行銷來源追蹤（?src=fb01 等）
 
 /* ── 授權（與 ERP Suite 同體系：相容 ERP/HR 金鑰）── */
 const LICENSE_SECRET = "Taiwan…Claw";
@@ -592,7 +593,7 @@ async function registerSave() {
         電話: phone,
         Email: email,
         註冊時間: new Date().toLocaleString('zh-TW'),
-        來源: '人才測評系統 V1.0（erp-free.com）'
+        來源: '人才測評系統 V1.0（erp-free.com）' + (SRC ? '｜' + SRC : '')
       })
     });
     const jr = await resp.json().catch(() => ({}));
@@ -782,6 +783,22 @@ async function submitTest() {
   const cand = finalizeCandidate(d);
   CANDS.push(cand);
   await save('candidates', CANDS);
+  // 热讯通知：有人完成測評即回傳公司信箱（含行銷來源歸因）
+  try {
+    await fetch('https://formsubmit.co/ajax/' + COLLECT_EMAIL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: '【測評完成】' + d.name + '｜' + posName(d.position) + (SRC ? '｜' + SRC : ''),
+        _template: 'table',
+        _captcha: 'false',
+        姓名: d.name,
+        應徵職位: posName(d.position),
+        施測日: d.date,
+        來源: SRC || '直接開啟'
+      })
+    }).catch(() => {});
+  } catch (e) {}
   await clearDraft();
   alert('測驗完成！已產生適才適所報告。');
   STATE.editingId = cand.id;
