@@ -3532,6 +3532,21 @@ setInterval(() => {
   if (sc) sc.textContent = now.toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' });
 }, 1000);
 
+/* ── Visit counter（內部計數，訪客不可見）── */
+var VC_B = 'https://abacus.jasoncameron.dev/hit/erpfree/';
+function vcDate() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function vcHit(key) { try { fetch(VC_B + key).catch(function () {}); } catch (e) {} }
+(function () {
+  try {
+    var ds = vcDate(), T = 'erp';
+    vcHit(ds + '-' + T + '-pv'); vcHit(ds + '-pv'); vcHit('all-pv');
+    if (localStorage.getItem('vc' + ds) !== '1') {
+      localStorage.setItem('vc' + ds, '1');
+      vcHit(ds + '-' + T + '-uv'); vcHit(ds + '-uv'); vcHit('all-uv');
+    }
+  } catch (e) {}
+})();
+
 /* ── Init ── */
 (async function init() {
   try {

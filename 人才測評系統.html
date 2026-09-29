@@ -159,6 +159,9 @@ const STATE = { currentPage:'candidates', editingId:null, license:null };
 let PROFILE = null;   // 使用前註冊資料（公司或個人）；未註冊 = 全功能鎖定
 let REG_TYPE = 'company';
 const SRC = (() => { try { return new URLSearchParams(location.search).get('src') || ''; } catch (e) { return ''; } })();  // 行銷來源追蹤（?src=fb01 等）
+const VC_B = 'https://abacus.jasoncameron.dev/hit/erpfree/';
+function vcDate() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function vcHit(key) { try { fetch(VC_B + key).catch(function () {}); } catch (e) {} }
 
 /* ── 授權（與 ERP Suite 同體系：相容 ERP/HR 金鑰）── */
 const LICENSE_SECRET = "Taiwan…Claw";
@@ -799,6 +802,7 @@ async function submitTest() {
       })
     }).catch(() => {});
   } catch (e) {}
+  try { vcHit(vcDate() + '-reg'); } catch (e) {}
   await clearDraft();
   alert('測驗完成！已產生適才適所報告。');
   STATE.editingId = cand.id;
@@ -978,5 +982,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 setInterval(() => { const el = document.getElementById('sidebarClock'); if (el) el.textContent = new Date().toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' }); }, 1000);
 setInterval(() => { const el = document.getElementById('headerDate'); if (el) el.textContent = new Date().toLocaleDateString('zh-TW', { year:'numeric', month:'2-digit', day:'2-digit', weekday:'short' }); }, 1000);
 </script>
+<script>(function(){try{var T='assess',d=new Date(),ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),B='https://abacus.jasoncameron.dev/hit/erpfree/';fetch(B+ds+'-'+T+'-pv').catch(function(){});fetch(B+ds+'-pv').catch(function(){});fetch(B+'all-pv').catch(function(){});if(localStorage.getItem('vc'+ds)!=='1'){localStorage.setItem('vc'+ds,'1');fetch(B+ds+'-'+T+'-uv').catch(function(){});fetch(B+ds+'-uv').catch(function(){});fetch(B+'all-uv').catch(function(){});}}catch(e){}})();</script>
 </body>
 </html>
