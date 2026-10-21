@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "tw.erpfree.talentfit",
       "sha256_cert_fingerprints": [
-        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E"
+        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E",
+        "86:D9:39:94:8B:C4:3F:65:BD:A0:4A:11:CD:6D:94:8D:F7:C0:62:77:42:B1:DD:14:84:FF:90:5C:39:24:C2:41"
       ]
     }
   }
