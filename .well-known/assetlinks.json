@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "tw.erpfree.talentfit",
+      "sha256_cert_fingerprints": [
+        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E"
+      ]
+    }
+  }
+]

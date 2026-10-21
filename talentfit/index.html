@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b45309">
+<title>人才適性適所檢測 V2.1 — 個人職涯適性評估 Talent Fit Assessment | erp-free.com</title>
+<style>
+:root{
+  --bg:#f6f5f2; --bg-card:#ffffff; --bg-input:#faf9f7;
+  --text:#1c1917; --text2:#44403c; --muted:#8a8580;
+  --accent:#b45309; --accent2:#d97706; --accent-bg:#fdf6ee;
+  --pos:#166534; --neg:#b91c1c; --info:#1d4ed8; --warn:#92400e;
+  --border:#e7e5e4; --border-l:#efedeb;
+  --radius:12px; --radius-s:8px;
+  --sans:'Segoe UI','Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;
+  --mono:Consolas,'SF Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.06); --shadow-lg:0 8px 28px rgba(0,0,0,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;min-height:100vh}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#d6d3d1;border-radius:4px}
+.appbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,#0d1117,#1f2937);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:11px;box-shadow:var(--shadow)}
+.appbar .logo{width:38px;height:38px;background:var(--accent2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.appbar .t{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.appbar .s{font-size:10.5px;color:#9ca3af;margin-top:1px}
+.langbtn{margin-left:auto;background:rgba(217,119,6,.16);border:1px solid rgba(217,119,6,.45);color:#f0b25f;border-radius:10px;padding:4px 12px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.5px}
+.langbtn:hover{background:rgba(217,119,6,.3)}
+.appbar .ver{font-size:10px;color:#f0b25f;border:1px solid rgba(217,119,6,.4);border-radius:10px;padding:2px 9px;font-weight:700;white-space:nowrap;margin-left:8px}
+main{max-width:600px;margin:0 auto;padding:16px 14px calc(96px + env(safe-area-inset-bottom));width:100%}
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--bg-card);border-top:1px solid var(--border);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:none;background:none;cursor:pointer;font-family:inherit;border-radius:10px;color:var(--muted);font-size:10.5px;font-weight:600;transition:all .15s}
+.tab .ti{font-size:20px;line-height:1}
+.tab.active{color:var(--accent)}
+.tab.active .ti{transform:translateY(-1px)}
+.card{background:var(--bg-card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border-l);margin-bottom:14px;overflow:hidden}
+.card-h{padding:14px 16px;border-bottom:1px solid var(--border-l);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.card-h h2{font-size:15.5px;font-weight:800}
+.card-b{padding:16px}
+.btn{border:none;border-radius:var(--radius-s);cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;padding:11px 18px;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn-p{background:var(--accent);color:#fff}
+.btn-p:hover{background:#9a4508}
+.btn-o{background:var(--bg-card);border:1.5px solid var(--border);color:var(--text2)}
+.btn-o:hover{border-color:var(--accent);color:var(--accent)}
+.btn-g{background:var(--pos);color:#fff}
+.btn-d{background:#fee2e2;color:var(--neg)}
+.btn-sm{padding:6px 13px;font-size:12.5px;border-radius:7px}
+.btn-xl{width:100%;padding:14px;font-size:15.5px}
+.badge{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap}
+.b-s{background:#dcfce7;color:var(--pos)}
+.b-i{background:#dbeafe;color:var(--info)}
+.b-w{background:#fef3c7;color:var(--warn)}
+.b-d{background:#fee2e2;color:var(--neg)}
+.muted{color:var(--muted)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--text2);margin-bottom:5px}
+.field input,.field select{width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:var(--radius-s);font-size:15px;font-family:inherit;background:var(--bg-input);color:var(--text)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-card{border:2px solid var(--border);border-radius:var(--radius);padding:16px 14px;cursor:pointer;background:var(--bg-input);transition:all .15s;text-align:center}
+.mode-card:hover{border-color:var(--accent2)}
+.mode-card.sel{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 1.5px var(--accent)}
+.mode-card .mi{font-size:30px}
+.mode-card .mt{font-weight:800;font-size:14.5px;margin-top:6px}
+.mode-card .md{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+.consent{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-s);padding:15px;font-size:13px;color:var(--text2);line-height:1.85}
+.agree-row{display:flex;gap:9px;align-items:flex-start;margin-top:12px;font-size:13.5px;cursor:pointer;font-weight:600}
+.agree-row input{margin-top:4px;width:17px;height:17px;flex:none;accent-color:var(--accent)}
+.pgw{position:sticky;top:62px;z-index:40;background:var(--bg-card);border:1px solid var(--border-l);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;box-shadow:var(--shadow)}
+.pgw .row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.pbar{height:8px;background:var(--bg-input);border-radius:4px;overflow:hidden}
+.pbar div{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:4px;transition:width .25s}
+.sec-t{font-size:14px;font-weight:800;margin-bottom:4px}
+.sec-d{font-size:12px;color:var(--muted);margin-bottom:12px}
+.q-card{background:var(--bg-card);border:1px solid var(--border-l);border-radius:var(--radius);padding:14px 15px;margin-bottom:11px}
+.q-no{font-family:var(--mono);font-size:10.5px;color:var(--accent);font-weight:700;margin-bottom:3px}
+.q-txt{font-size:14.5px;font-weight:600;margin-bottom:10px;line-height:1.6}
+.likert{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.likert4{grid-template-columns:repeat(4,1fr)}
+.likert label,.opts label{border:1.5px solid var(--border);border-radius:var(--radius-s);padding:9px 2px;font-size:11px;cursor:pointer;text-align:center;transition:all .12s;background:var(--bg-input);line-height:1.3;display:block}
+.likert label:hover{border-color:var(--accent2)}
+.likert label.sel{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);font-weight:700;box-shadow:0 0 0 1px var(--accent)}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opts label{text-align:left;padding:11px 13px;font-size:13.5px;display:flex;gap:8px;align-items:flex-start}
+.opts label:hover{border-color:var(--accent2)}
+.opts label.sel{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 1px var(--accent);font-weight:600}
+.opts label.sel .ol{background:var(--accent);color:#fff;border-color:var(--accent)}
+.likert input,.opts input{display:none}
+.ol{flex:none;width:22px;height:22px;border:1.5px solid var(--border);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);background:var(--bg-input)}
+.navrow{display:flex;gap:10px;margin-top:14px}
+.navrow .btn{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--bg-card);border-radius:var(--radius);padding:13px;border:1px solid var(--border-l);box-shadow:var(--shadow)}
+.kpi .kl{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.kpi .kv{font-size:22px;font-weight:800;font-family:var(--mono);letter-spacing:-.5px;line-height:1.2}
+.kpi .kd{font-size:11.5px;color:var(--text2);font-weight:600;margin-top:2px}
+.radar-wrap{display:flex;justify-content:center;margin:6px 0 2px}
+.facbar{display:grid;grid-template-columns:88px 1fr 52px;gap:10px;align-items:center;margin-bottom:9px;font-size:12.5px}
+.facbar .bar{height:10px;background:var(--bg-input);border-radius:5px;overflow:hidden}
+.facbar .bar div{height:100%;border-radius:5px}
+.match-band{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap}
+.mb-s{background:#dcfce7;color:var(--pos)}
+.mb-i{background:#dbeafe;color:var(--info)}
+.mb-w{background:#fef3c7;color:var(--warn)}
+.mb-d{background:#fee2e2;color:var(--neg)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{background:var(--bg-input);font-weight:700;color:var(--text2);padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);white-space:nowrap}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--border-l);vertical-align:middle}
+.tbl tr.hl td{background:var(--accent-bg)}
+.tbl .num{text-align:right;font-family:var(--mono)}
+.guide-block{border-left:3.5px solid var(--accent2);background:var(--bg-input);border-radius:0 var(--radius-s) var(--radius-s) 0;padding:12px 14px;margin-bottom:11px}
+.guide-block .gt{font-weight:800;font-size:13.5px;margin-bottom:4px}
+.guide-block .gd{font-size:13px;color:var(--text2)}
+.guide-block .gl{font-size:11.5px;font-weight:700;color:var(--accent);margin-top:7px}
+.probe{display:flex;gap:9px;padding:8px 2px;border-bottom:1px dashed var(--border-l);font-size:13px;align-items:flex-start}
+.probe:last-child{border-bottom:none}
+.probe .dot{width:8px;height:8px;border-radius:50%;margin-top:8px;flex:none}
+.hist-item{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid var(--border-l)}
+.hist-item:last-child{border-bottom:none}
+.hist-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
+.hist-main{flex:1;min-width:0}
+.hist-main .n{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-main .m{font-size:11.5px;color:var(--muted);margin-top:1px}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty .ei{font-size:42px;margin-bottom:10px}
+.notice{font-size:11.5px;color:var(--muted);line-height:1.75;border-top:1px solid var(--border-l);margin-top:14px;padding-top:10px}
+.chip{display:inline-block;background:var(--accent-bg);color:var(--accent);border:1px solid rgba(180,83,9,.25);border-radius:10px;padding:2px 11px;font-size:11.5px;font-weight:700;margin:0 6px 6px 0}
+.hero{text-align:center;padding:26px 18px 20px}
+.hero .hi{font-size:46px}
+.hero h1{font-size:20px;font-weight:900;margin-top:8px;letter-spacing:-.4px}
+.hero p{font-size:13px;color:var(--muted);margin-top:5px}
+.hero .tags{margin-top:12px}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat3 .s{background:var(--bg-input);border:1px solid var(--border-l);border-radius:10px;padding:9px 4px;text-align:center}
+.stat3 .sv{font-size:19px;font-weight:800;font-family:var(--mono);color:var(--accent)}
+.stat3 .sl{font-size:10px;color:var(--muted);font-weight:600}
+@media print{.appbar,.tabbar,.no-print{display:none!important}main{padding:0;max-width:none}body{background:#fff}}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="logo">🧭</div>
+  <div><div class="t" id="abTitle">人才適性適所檢測</div><div class="s" id="abSub">Talent Fit Assessment · erp-free.com</div></div>
+  <button class="langbtn" onclick="toggleLang()" id="langBtn">EN</button>
+  <div class="ver" id="verBadge">V2.1</div>
+</header>
+
+<main id="main"></main>
+
+<nav class="tabbar">
+  <button class="tab active" data-page="home" onclick="nav('home')"><span class="ti">🏠</span><span id="tl0">首頁</span></button>
+  <button class="tab" data-page="take" onclick="nav('take')"><span class="ti">📝</span><span id="tl1">開始檢測</span></button>
+  <button class="tab" data-page="history" onclick="nav('history')"><span class="ti">📊</span><span id="tl2">我的報告</span></button>
+  <button class="tab" data-page="about" onclick="nav('about')"><span class="ti">💡</span><span id="tl3">關於</span></button>
+</nav>
+<script>
+function applyStaticLang(){
+  var en = isEN();
+  var t = document.getElementById('abTitle'); if (t) t.textContent = en ? 'Talent Fit Assessment' : '人才適性適所檢測';
+  var s = document.getElementById('abSub'); if (s) s.textContent = en ? '人才適性適所檢測 · erp-free.com' : 'Talent Fit Assessment · erp-free.com';
+  var tabs = en ? ['Home','Take Test','My Reports','About'] : ['首頁','開始檢測','我的報告','關於'];
+  for (var i = 0; i < 4; i++) { var el = document.getElementById('tl' + i); if (el) el.textContent = tabs[i]; }
+  var lb = document.getElementById('langBtn'); if (lb) lb.textContent = en ? '中文' : 'EN';
+  var vb = document.getElementById('verBadge'); if (vb) vb.textContent = APP_VERSION;
+}
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════
+   人才適性適所檢測 V2.0
+   五大人格（IPIP 框架）＋工作價值觀＋情境判斷＋誠信態度
+   個人自我評估為主 ＋ 企業人資施測雙模式 · 全離線 · 資料僅存本機
+   ═══════════════════════════════════════════════ */
+const APP_VERSION = 'V2.1';
+const APP_NAME = '人才適性適所檢測';
+const CONTACT = 'erp-free.com ｜ 李先生 02-26293721 ｜ janson168@gmail.com';
+
+/* ── 語言切換（zh 預設 / en）── */
+let LANG = 'zh';
+try { LANG = localStorage.getItem('tf_lang') || 'zh'; } catch (e) {}
+function isEN(){ return LANG === 'en'; }
+function L(zh, en){ return isEN() ? en : zh; }
+function toggleLang(){ LANG = isEN() ? 'zh' : 'en'; try { localStorage.setItem('tf_lang', LANG); } catch (e) {} applyStaticLang(); renderPage(); }
+
+const LIKERT5 = ['非常不同意','不同意','普通','同意','非常同意'];
+const LIKERT4 = ['完全不同意','不同意','同意','完全同意'];
+
+/* ── 五大人格 30 題（IPIP 公眾領域框架改編）── */
+const B5_ITEMS = [
+  {f:'O', pos:true,  txt:'我喜歡學習新的知識或技能。'},
+  {f:'O', pos:true,  txt:'面對沒做過的工作內容，我會覺得有趣而不是害怕。'},
+  {f:'O', pos:true,  txt:'我常有新的想法或做法來改進工作。'},
+  {f:'O', pos:false, txt:'我偏好用熟悉的方法做事，不太想嘗試新方法。'},
+  {f:'O', pos:true,  txt:'我會主動了解與工作相關的新趨勢。'},
+  {f:'O', pos:false, txt:'抽象或概念性的討論，我覺得對實際工作沒什麼幫助。'},
+  {f:'C', pos:true,  txt:'別人交代的事情，我一定會記下來並如期完成。'},
+  {f:'C', pos:true,  txt:'我的工作區域和文件總是保持整齊有序。'},
+  {f:'C', pos:false, txt:'我常拖到最後一刻才開始做事。'},
+  {f:'C', pos:true,  txt:'做任何工作我都會注意細節，避免出錯。'},
+  {f:'C', pos:false, txt:'我訂的計畫經常半途而廢。'},
+  {f:'C', pos:true,  txt:'上班我幾乎不遲到，與人的約定也都很準時。'},
+  {f:'E', pos:true,  txt:'在團體中，我常主動和大家交流。'},
+  {f:'E', pos:true,  txt:'和初次見面的人交談，我覺得自然而不緊張。'},
+  {f:'E', pos:false, txt:'我比較喜歡安靜、獨自作業的工作方式。'},
+  {f:'E', pos:true,  txt:'遇到新同事或新客戶，我通常會先開口打招呼。'},
+  {f:'E', pos:false, txt:'熱鬧的場合會讓我覺得累，想早點離開。'},
+  {f:'E', pos:true,  txt:'我樂於在會議或活動中表達自己的意見。'},
+  {f:'A', pos:true,  txt:'我願意幫忙分擔同事臨時多出來的工作。'},
+  {f:'A', pos:true,  txt:'別人的意見和我不同時，我仍願意聽聽看。'},
+  {f:'A', pos:false, txt:'我常覺得別人做事的品質很差、讓我不耐煩。'},
+  {f:'A', pos:true,  txt:'團隊目標比個人表現更重要。'},
+  {f:'A', pos:true,  txt:'與人意見相左時，我傾向先退一步想對方的立場。'},
+  {f:'A', pos:false, txt:'我說話很直，常不小心得罪人。'},
+  {f:'N', pos:true,  txt:'工作出錯被指正時，我能冷靜面對並改進。'},
+  {f:'N', pos:false, txt:'我常擔心事情會出錯，即使還沒發生。'},
+  {f:'N', pos:true,  txt:'壓力大的時候，我仍能保持平常心。'},
+  {f:'N', pos:false, txt:'小小的挫折會讓我難過好幾天。'},
+  {f:'N', pos:true,  txt:'我很少因為工作而失眠或煩心。'},
+  {f:'N', pos:false, txt:'別人批評我時，我會難過很久。'},
+];
+
+/* ── 工作價值觀 12 題（六向度）── */
+const VALUE_ITEMS = [
+  {v:'V1', txt:'一份工作的薪資與獎金水準，對我來說非常重要。'},
+  {v:'V1', txt:'加班費或獎金制度不清楚的工作，我會猶豫很久。'},
+  {v:'V2', txt:'我希望工作能不斷挑戰自己的能力極限。'},
+  {v:'V2', txt:'完成一件有難度的任務，會讓我特別有成就感。'},
+  {v:'V3', txt:'我希望工作與收入穩定，不喜歡經常變動。'},
+  {v:'V3', txt:'制度清楚、職責明確的工作型態讓我安心。'},
+  {v:'V4', txt:'我喜歡主管只給大方向、細節讓我自己發揮。'},
+  {v:'V4', txt:'被管得太細，會讓我難以發揮。'},
+  {v:'V5', txt:'能幫助別人的工作，讓我覺得特別有意義。'},
+  {v:'V5', txt:'看到服務對象滿意的回應，是我的工作動力來源之一。'},
+  {v:'V6', txt:'為了學到新東西，我可以接受起薪稍微低一點。'},
+  {v:'V6', txt:'有教育訓練與升遷管道的公司，對我特別有吸引力。'},
+];
+const VALUE_NAMES = { V1:'薪資報酬', V2:'成就挑戰', V3:'穩定安全', V4:'自主發揮', V5:'助人利他', V6:'學習成長' };
+const VALUE_GUIDE = {
+  V1:'金錢誘因對你很重要。談職缺時把薪獎結構問清楚（本薪、獎金、加班費制度），選擇「給付透明」的公司，避免落入用熱情抵薪資的消耗。',
+  V2:'你需要「征服感」才有動力。選擇有明確目標與成長空間的職務；太安逸的環境反而容易讓你倦怠、想離開。',
+  V3:'確定性是你的能量來源。制度清楚、職責明確的公司能讓你長期穩定發揮；高變動、常改規則的環境要先評估自己的承受度。',
+  V4:'你需要發揮空間。面試時留意主管的管理風格——「目標明確、方法授權」的環境最適合你；被管太細會讓你窒息。',
+  V5:'「幫到人」是你的意義感來源。服務、教育、照護、客戶成功類型的工作，能讓你做得久、做得暖。',
+  V6:'你願意用短期薪資換長期能力。挑選有訓練體系與升遷管道的公司，並每年盤點「這一年我學到了什麼」，確保自己在成長軌道上。',
+};
+
+/* ── 職場情境判斷 SJT 8 題 ── */
+const SJT_ITEMS = [
+  { q:'門市內一位顧客對商品品質大聲抱怨，影響其他客人選購。',
+    opts:['先誠懇道歉，請顧客到一旁了解細節，同時請同事支援現場','當場向顧客說明是使用不當，不是商品的問題','請顧客稍等，先把手邊結帳做完再處理','立刻答應退費，盡快結束糾紛'], scores:[2,0,0,1] },
+  { q:'同事認為你把比較好的班表排給自己，語氣不善地質問你。',
+    opts:['主動找時間私下說明排班依據，並表示下次願意調整','請主管出面主持公道，評評理','不理會，自己做事憑良心','直接把班讓給他，避免再起衝突'], scores:[2,0,1,0] },
+  { q:'下午同時有：報告要交、客戶來電、主管臨時要資料，你會怎麼做？',
+    opts:['先快速回覆客戶約定回電時間，再依急迫度排序逐項處理','依照事情發生的順序，一件一件慢慢做','全部先擱著，向主管表示做不完','加速草率完成報告，三件事都做'], scores:[2,1,0,0] },
+  { q:'結帳時你發現同事少算了一位客人的款項。',
+    opts:['立即向同事與主管反映，當場補正帳務','當作沒看到，那不是我的責任','私下提醒同事，處理與否由他自己決定','之後找機會再跟同事說'], scores:[2,0,1,1] },
+  { q:'主管交辦的做法，你認為會造成客戶困擾。',
+    opts:['先照做，出問題再說','向主管說明疑慮與建議做法；若仍指示照辦，就執行並回報結果','拒絕執行，依自己的做法做','先拖著不處理，看主管會不會忘記'], scores:[0,2,0,0] },
+  { q:'朋友私下打聽公司新產品的定價資訊。',
+    opts:['婉拒並說明公司規定不能透露','告訴他沒關係，反正是好朋友','含糊回應，透露大概的範圍','說自己不知道（其實知道），但堅持不說'], scores:[2,0,0,1] },
+  { q:'公司導入新系統，所有作業流程要重新學習。',
+    opts:['主動參加訓練，並利用空檔自己練習','等大家都學會之後再請教','被動參加訓練，能用多少算多少','抱怨新系統不好用，希望維持舊方式'], scores:[2,0,1,0] },
+  { q:'趕著出貨時，你發現貨物堆疊方式不符合安全規定。',
+    opts:['依安全規定重新整理，寧可稍微延後出貨','先出貨再說，不會那麼剛好出事','向主管反映，請主管決定','自己多小心一點就好，繼續照舊堆疊'], scores:[2,0,1,0] },
+];
+
+/* ── 誠信與工作態度 8 題 ── */
+const ATT_ITEMS = [
+  {pos:true,  txt:'只要是分內的工作，不需要別人催，我也會把它做完。'},
+  {pos:true,  txt:'上班時間我會專注在工作上，不處理私事。'},
+  {pos:true,  txt:'規定就是規定，即使沒有人檢查我也會遵守。'},
+  {pos:false, txt:'公司的東西拿一點回家用，沒有什麼關係。'},
+  {pos:false, txt:'有時候遲到個幾分鐘，沒有什麼關係。'},
+  {pos:true,  txt:'答應別人的事，我一定會做到。'},
+  {pos:false, txt:'出勤紀錄漂亮一點沒關係，工作有做好就好。'},
+  {pos:true,  txt:'我會把公司的事當作自己的事來用心。'},
+];
+/* 一致性檢核對（0-based 索引） */
+const CONSISTENCY_PAIRS = [[6,10],[12,16],[24,29]];
+
+/* ── 職務適配模型（8 職缺）── */
+const FACET_NAMES = { O:'開放學習', C:'盡責自律', E:'人際活力', A:'團隊親和', N:'情緒穩定' };
+const POSITIONS = [
+  { key:'sales',   name:'業務／銷售人員', nameEn:'Sales / Business Development', desc:'開發客戶、洽談成交、業績導向', descEn:'Client acquisition, negotiation, results-driven',
+    fit:{E:{i:78,t:22,w:.30}, N:{i:72,t:25,w:.20}, C:{i:62,t:28,w:.20}, O:{i:62,t:30,w:.10}, A:{i:58,t:28,w:.20}} },
+  { key:'service', name:'門市／客服人員', nameEn:'Retail / Customer Service', desc:'門市營運、客戶服務與應對', descEn:'Store operations, customer care and service',
+    fit:{A:{i:80,t:22,w:.30}, E:{i:66,t:26,w:.25}, N:{i:70,t:26,w:.20}, C:{i:58,t:28,w:.15}, O:{i:52,t:30,w:.10}} },
+  { key:'admin',   name:'行政／助理', nameEn:'Administration / Assistant', desc:'文書、排程、內部支援作業', descEn:'Paperwork, scheduling, internal support',
+    fit:{C:{i:82,t:20,w:.35}, A:{i:66,t:26,w:.20}, N:{i:66,t:26,w:.15}, O:{i:55,t:28,w:.15}, E:{i:48,t:26,w:.15}} },
+  { key:'finance', name:'會計／財務人員', nameEn:'Accounting / Finance', desc:'帳務、成本、報表與資金管理', descEn:'Bookkeeping, costs, reporting and treasury',
+    fit:{C:{i:86,t:18,w:.35}, N:{i:78,t:22,w:.25}, E:{i:42,t:26,w:.10}, O:{i:55,t:28,w:.10}, A:{i:55,t:26,w:.20}} },
+  { key:'production', name:'生產／作業員', nameEn:'Production / Operator', desc:'產線操作、品質與紀律', descEn:'Line operation, quality and discipline',
+    fit:{C:{i:76,t:24,w:.30}, N:{i:70,t:26,w:.20}, A:{i:58,t:26,w:.20}, O:{i:48,t:28,w:.10}, E:{i:44,t:26,w:.20}} },
+  { key:'logistics', name:'倉庫／物流人員', nameEn:'Warehouse / Logistics', desc:'進出貨、盤點、配送調度', descEn:'Receiving, inventory, dispatch and routing',
+    fit:{C:{i:74,t:24,w:.35}, N:{i:64,t:26,w:.15}, A:{i:58,t:26,w:.15}, O:{i:54,t:28,w:.10}, E:{i:48,t:26,w:.25}} },
+  { key:'tech',    name:'工程／技術人員', nameEn:'Engineering / Technical', desc:'機台、設備、技術開發與維護', descEn:'Machines, equipment, development and maintenance',
+    fit:{O:{i:78,t:22,w:.30}, C:{i:70,t:24,w:.25}, E:{i:44,t:26,w:.15}, N:{i:60,t:26,w:.15}, A:{i:54,t:26,w:.15}} },
+  { key:'leader',  name:'門市店長／基層主管', nameEn:'Store Manager / Team Lead', desc:'帶班管理、目標達成、現場決策', descEn:'Team management, targets, on-site decisions',
+    fit:{E:{i:76,t:24,w:.25}, C:{i:76,t:24,w:.25}, A:{i:64,t:26,w:.20}, N:{i:76,t:24,w:.15}, O:{i:60,t:28,w:.15}} },
+];
+
+/* ── 個人版職涯解讀（五大構面 高/中/低）── */
+const FACET_GUIDE = {
+  O: {
+    high:{t:'好奇探索者', s:'你對新知識、新方法有強烈好奇，願意離開舒適圈嘗試沒做過的事——學得快、能因應變動是你的招牌。', w:'想法很多時容易分散投入，記得把新點子落進清單與日程，不然會變成「想一堆、做一半」。', g:'把好奇心變成可展示的成果：證照、作品、側專案。學習紀錄就是你的履歷亮點。'},
+    mid:{t:'務實學習者', s:'你願意學新東西，但偏好「有用才深入」，學習節奏穩健、不盲目追逐流行。', w:'遇到全新領域時起步較慢，需要一點推力才會跨出去。', g:'設定「每季一個小技能」目標，用小步驟維持成長；選有導師或教材的環境會學更快。'},
+    low:{t:'穩定執行者', s:'你偏好熟悉的方法與明確流程，重視穩定勝過嘗新，執行一致性高。', w:'環境快速變動時會覺得吃力，對「又要改流程」容易煩躁。', g:'從小改變練起：換一種工具、試一個新流程，累積對新事物的適應感，不必一次大翻轉。'}},
+  C: {
+    high:{t:'自律可靠者', s:'你重視承諾與紀律：事情會記下來、如期完成、注意細節，是團隊裡讓人安心的角色。', w:'完美傾向可能讓你過度投入細節，或什麼都想自己抓著不放。', g:'練習「夠好就交付」的標準與授權，把時間花在影響最大的事上。'},
+    mid:{t:'彈性實踐者', s:'你大致守時守信，偶爾拖延，但關鍵任務仍會收尾，在彈性與可靠之間取得平衡。', w:'多工時容易漏掉小事，靠記憶不如靠系統。', g:'用單一待辦系統（一個 App 或一本筆記）把所有承諾固定下來，先守住「準時交件」。'},
+    low:{t:'自由應變者', s:'你喜歡自由彈性的節奏，不喜歡被計畫與細節綁住，應變靈活。', w:'期限與細節是你最容易失分的地方，緊急時容易被追著跑。', g:'把大任務切小、設中期檢查點，找人互相盯進度；先讓「如期」變成習慣。'}},
+  E: {
+    high:{t:'人群連結者', s:'你在人群中自在，主動開口、樂於表達，社交互動讓你有能量。', w:'熱鬧之餘別忽略安靜的深度工作時間；能量分散太廣會失焦。', g:'把外向能量轉成有價值的連結：客戶關係、跨部門協作、對外代表團隊發言。'},
+    mid:{t:'情境溝通者', s:'你能在需要時與人互動，也享受獨處工作，依場合調整自己的溝通模式。', w:'太忙時容易縮回自己的世界，讓合作夥伴覺得疏遠。', g:'為重要關係保留固定互動節奏（每週一次同步），關係不會自然保鮮。'},
+    low:{t:'深度專注者', s:'你偏好在安靜中獨立作業，社交消耗能量，專注力與深度思考是你的強項。', w:'需要大量對外接觸的職務會讓你疲乏，長期硬撐會耗損。', g:'選深度優先的角色；必要社交可以事前準備問題與腳本，把負擔降到可控。'}},
+  A: {
+    high:{t:'團隊黏著劑', s:'你重視和諧與合作，願意幫忙、能站在對方立場想，客戶緣與同事緣都好。', w:'太怕衝突，該說的話容易吞回去，累久了對團隊和自己都不健康。', g:'練習「溫和而堅定」表達異議：先肯定、再說事實、最後提方案。合作不等於退讓。'},
+    mid:{t:'理性合作者', s:'你願意合作，也能表達立場，多數時候能在關係與任務之間平衡。', w:'在高度競爭或高度和諧的團隊之間擺盪時，先確認自己最重視什麼。', g:'在關鍵場合（會議、談判）刻意練習明確表態，讓人意見被聽見。'},
+    low:{t:'直率就事者', s:'你直話直說、就事論事，不易被情緒干擾，決策果斷。', w:'無心的直率可能影響關係，別人可能覺得你難親近。', g:'先接住對方的感受、再說事實；把「聽完再回應」變成習慣，說服力會提升。'}},
+  N: {
+    high:{t:'抗壓定錨者', s:'你抗壓性佳，被指正能冷靜面對，不易被焦慮綁架，是變動環境裡的穩定力量。', w:'太「沒事」時，也留意一下身邊夥伴的狀態——你的穩可以照顧別人。', g:'危機時站出來主持節奏，把冷靜變成團隊資源；這是主管最看重的特質之一。'},
+    mid:{t:'穩定均衡者', s:'你多數時候情緒平穩，但壓力累積時會影響狀態與睡眠。', w:'連續趕工或衝突期是你最脆弱的時候，通常恢復得比別人慢。', g:'建立固定的恢復習慣：運動、睡眠、找信任的人傾訴，別等到燃燒殆盡。'},
+    low:{t:'細膩感受者', s:'你感受細膩，對批評與不確定較敏感，同理心強、能察覺風險與他人情緒。', w:'高壓、頻繁被評價的環境會放大焦慮，影響表現與健康。', g:'用結構化方法降低不確定（清單、事前演練）；選支持性強的團隊，必要時尋求專業資源。'}},
+};
+
+/* ── 個人版：八大職務發展建議 ── */
+const CAREER_ADVICE = {
+  sales:'想往業務發展：重點補強「被拒絕後的復原力」與產品知識深度，把人際活力轉成「聆聽需求」的技巧，業績會跟著來。',
+  service:'想往門市／客服發展：在標準服務流程之外，累積「把抱怨變回頭客」的實際案例，這是你面試時最有說服力的故事。',
+  admin:'想往行政發展：強化工具力（Excel、文件管理、流程工具），你的細心與穩定度會很快被主管看見、成為團隊後勤核心。',
+  finance:'想往會計／財務發展：先補基礎會計知識與記帳士等證照方向、Excel 實戰，並養成追蹤法規更新的習慣，紀律是你的本錢。',
+  production:'想往生產製造發展：熟記安全規範、建立品質意識；準時出勤與穩定輸出的紀錄，本身就是你的名片。',
+  logistics:'想往倉儲物流發展：學會盤點系統與倉儲管理工具（WMS），空間規劃與配送路線的邏輯是加分項。',
+  tech:'想往工程技術發展：持續投資專業技能與作品集；同時練習把技術語言翻譯成同事聽得懂的話，會讓你更快被重用。',
+  leader:'想往店長／基層主管發展：先練排班與目標拆解、給回饋的技巧，以及「前線做事」與「帶人做事」的角色切換。',
+};
+const BAND_TIP = {
+  0:'這類職務與你的特質高度契合，做起來相對順手、容易有成就感，建議列為求職或轉職的優先選項。',
+  1:'有基本契合度，多數面向能發揮；面試時針對落差較大的構面，確認工作條件與公司支援是否足夠。',
+  2:'契合度有限——不是不能做，但需要較多調整與支持；建議搭配具體職務內容與團隊文化再評估。',
+  3:'與你的核心特質落差較大，長期做容易耗損。把它當作認識自己的參考，把精力放在更契合的路線上。',
+};
+
+/* ═══ 計分引擎 ═══ */
+function facetScores(b5) {
+  const raw = { O:0, C:0, E:0, A:0, N:0 };
+  B5_ITEMS.forEach((it, i) => { const v = b5[i] || 3; raw[it.f] += it.pos ? v : (6 - v); });
+  const out = {};
+  for (const f of ['O','C','E','A','N']) out[f] = Math.round((raw[f] - 6) / 24 * 100);
+  return out;
+}
+function facetLevel(v){ return v >= 70 ? 'high' : (v >= 40 ? 'mid' : 'low'); }
+function facetLvName(v){ return v >= 70 ? L('高','High') : (v >= 40 ? L('中','Mid') : L('低','Low')); }
+function facetColor(v){ return v >= 70 ? '#166534' : (v >= 40 ? '#b45309' : '#b91c1c'); }
+function valueScores(vals) { const out = {}; for (const k of Object.keys(VALUE_NAMES)) out[k] = 0; VALUE_ITEMS.forEach((it, i) => { out[it.v] += vals[i] || 3; }); return out; }
+function topValues(vals) { return Object.entries(valueScores(vals)).sort((a,b) => b[1]-a[1]).slice(0,3).map(([k]) => k); }
+function sjtScore(ans) { let s = 0; SJT_ITEMS.forEach((it,i) => { s += it.scores[ans[i] ?? 0] ?? 0; }); return { raw:s, pct: Math.round(s/16*100) }; }
+function attScore(ans) { let s = 0; ATT_ITEMS.forEach((it,i) => { const v = ans[i] || 2; s += it.pos ? v : (5 - v); }); return { raw:s, pct: Math.round((s-8)/24*100) }; }
+function consistencyFlags(b5) { const f = []; for (const [a,b] of CONSISTENCY_PAIRS) if (Math.abs((b5[a]||3)+(b5[b]||3)-6) > 1) f.push([a,b]); return f; }
+function matchPosition(facets, sjtPct, attPct, tpl) {
+  let s = 0, w = 0; const parts = {};
+  for (const f of ['O','C','E','A','N']) {
+    const p = tpl.fit[f], dev = Math.abs(facets[f] - p.i);
+    const sc = Math.max(0, Math.round(100 - dev / p.t * 50));
+    parts[f] = sc; s += sc * p.w; w += p.w;
+  }
+  let base = Math.round(s / w);
+  const pens = [];
+  if (sjtPct < 40) { base -= 10; pens.push('情境判斷偏低（−10）'); }
+  if (attPct < 40) { base -= 10; pens.push('工作態度偏低（−10）'); }
+  return { score: Math.max(0, Math.min(100, base)), parts, pens };
+}
+function matchAll(c) {
+  return POSITIONS.map(tpl => ({ key:tpl.key, name:PNAME(tpl), desc:PDESC(tpl), ...matchPosition(c.facets, c.sjtPct, c.attPct, tpl) }))
+    .sort((a,b) => b.score - a.score);
+}
+function bandIdx(sc){ return sc >= 75 ? 0 : sc >= 60 ? 1 : sc >= 45 ? 2 : 3; }
+function bandOf(sc){ return BANDS()[bandIdx(sc)]; }
+function bandBadge(sc){ return isEN()
+  ? [{t:'Strong fit', cls:'b-s'},{t:'Possible', cls:'b-i'},{t:'Caution', cls:'b-w'},{t:'Not advised', cls:'b-d'}][bandIdx(sc)]
+  : [{t:'高適配', cls:'b-s'},{t:'可考慮', cls:'b-i'},{t:'謹慎評估', cls:'b-w'},{t:'不建議', cls:'b-d'}][bandIdx(sc)]; }
+
+/* 個人職涯畫像 */
+function buildPersonal(c) {
+  const matches = matchAll(c);
+  const strengths = [], watches = [], grows = [];
+  for (const f of ['O','C','E','A','N']) {
+    const v = c.facets[f], lv = facetLevel(v), g = FACET_GUIDE[f][lv];
+    const item = { f, v, lv, t:g.t, s:g.s, w:g.w, gr:g.g };
+    if (lv === 'high') strengths.push(item);
+    if (lv === 'low') watches.push(item);
+    grows.push(item);
+  }
+  const top = matches[0];
+  const devList = ['O','C','E','A','N'].map(f => {
+    const p = top ? POSITIONS.find(x => x.key === top.key).fit[f] : null;
+    return p ? { f, dev: c.facets[f] - p.i, ideal: p.i } : null;
+  }).filter(Boolean).sort((a,b) => Math.abs(b.dev) - Math.abs(a.dev)).slice(0, 2);
+  const vals = topValues(c.vals);
+  return { matches, strengths, watches, devList, vals, top };
+}
+function probeQuestions(c) {
+  const tpl = POSITIONS.find(p => p.key === c.position) || POSITIONS[0];
+  const bank = {
+    C_l: L('請描述你同時處理多項任務時如何管理期限？舉上個月的實際例子。','Describe how you manage deadlines when handling multiple tasks at once. Give a real example from last month.'),
+    C_h: L('你如何維持工作品質與細節？請分享你自我檢核的習慣。','How do you maintain quality and details in your work? Share your self-check habits.'),
+    E_l: L('這份職務需要主動與人接觸——你通常怎麼和初次見面的客戶或同事建立關係？','This role needs proactive contact with people — how do you usually build rapport with new clients or colleagues?'),
+    E_h: L('你如何拿取與人互動和安靜完成工作的平衡？','How do you balance interacting with people and getting quiet, focused work done?'),
+    A_l: L('請舉一次和同事意見不同的經驗：你當時怎麼處理？結果如何？','Describe a time you disagreed with a colleague: how did you handle it, and what was the result?'),
+    N_l: L('上次工作出錯被指正時，你當下的反應是什麼？後來怎麼調適與改進？','When your mistake was pointed out last time, how did you react? How did you adjust and improve afterwards?'),
+    N_h: L('工作壓力最大的時期，你靠什麼方式維持狀態？','During your most stressful work periods, what keeps you in shape?'),
+    O_l: L('最近三個月你學了什麼新事物？是怎麼學的？','What new things have you learned in the past three months? How did you learn them?'),
+    O_h: L('請舉一個你提出新做法並被採用（或被退回）的例子。','Give an example of a new approach you proposed that was adopted (or rejected).'),
+    V: L('你期望三五年後的工作樣貌是什麼？這份工作在你的規劃中扮演什麼角色？','What do you want your work to look like in three to five years? What role does this job play in that plan?'),
+    SJT: L('（情境判斷待加強）針對測驗中處理不佳的情境，請受測者現場模擬一次處理方式，觀察臨場反應。','(SJT below bar) For the situations handled poorly in the test, ask the candidate to role-play the handling on the spot and observe their response.'),
+    ATT: L('（工作態度待確認）請舉例說明受測者對「沒人檢查也照規定做」的看法與實際經驗。','(Work attitude to confirm) Ask for the candidate’s view and real experience on “following rules even when nobody checks”.'),
+  };
+  const probes = [];
+  const devs = ['O','C','E','A','N'].map(f => ({ f, dev: c.facets[f] - tpl.fit[f].i })).sort((a,b) => Math.abs(b.dev) - Math.abs(a.dev)).slice(0,3);
+  devs.forEach(d => { const k = d.f + (d.dev > 0 ? '_h' : '_l'); if (bank[k]) probes.push({ color: facetColor(c.facets[d.f]), text: FNAME(d.f) + ' ' + c.facets[d.f] + L('（理想 ',' (ideal ') + tpl.fit[d.f].i + L('）：','): ') + bank[k] }); });
+  if (c.sjtPct < 60) probes.push({ color:'#b91c1c', text: bank.SJT });
+  if (c.attPct < 60) probes.push({ color:'#b91c1c', text: bank.ATT });
+  probes.push({ color:'#1d4ed8', text: bank.V });
+  return probes.slice(0, 5);
+}
+function redFlags(c) {
+  const out = [];
+  if (c.facets.N < 30) out.push({ color:'#b91c1c', text: L('情緒穩定偏低：面談請多關懷壓力因應與近期狀態；此指標不可單獨作為排除依據。','Emotional stability is low: in the interview, show care about stress coping and recent state; this indicator must not be used alone for rejection.') });
+  if (c.sjtPct < 40) out.push({ color:'#b91c1c', text: L('情境判斷低於 40 分：建議增加實作或情境模擬面試再決定。','SJT below 40: add hands-on or situational simulation interviews before deciding.') });
+  if (c.attPct < 40) out.push({ color:'#b91c1c', text: L('工作態度低於 40 分：誠信紀律向度請在面談與背書調查中再確認。','Work attitude below 40: reconfirm integrity and discipline in interviews and reference checks.') });
+  if (c.consist.length >= 2) out.push({ color:'#92400e', text: L('作答一致性待確認：有多組反向題回答矛盾，建議擇期重測或面談釐清。','Answer consistency warning: multiple reverse-item contradictions; consider a retest or clarify in the interview.') });
+  return out;
+}
+function radarSVG(facets, size) {
+  const keys = ['O','C','E','A','N'], labels = keys.map(k => FNAME(k));
+  const W = size || 250, cx = W/2, cy = W/2 + 6, R = W/2 - 40;
+  const ang = i => -Math.PI/2 + i*(2*Math.PI/5);
+  const ring = k => keys.map((f,i) => (cx + R*k/100*Math.cos(ang(i))).toFixed(1)+','+(cy + R*k/100*Math.sin(ang(i))).toFixed(1)).join(' ');
+  let s = '<svg viewBox="0 0 '+W+' '+(W+10)+'" style="width:'+W+'px;max-width:100%;display:block;margin:0 auto;">';
+  for (const k of [25,50,75,100]) s += '<polygon points="'+ring(k)+'" fill="none" stroke="#e7e5e4"/>';
+  keys.forEach((f,i) => { s += '<line x1="'+cx+'" y1="'+cy+'" x2="'+(cx + R*Math.cos(ang(i))).toFixed(1)+'" y2="'+(cy + R*Math.sin(ang(i))).toFixed(1)+'" stroke="#e7e5e4"/>'; });
+  const pts = keys.map((f,i) => { const r = R*facets[f]/100; return (cx + r*Math.cos(ang(i))).toFixed(1)+','+(cy + r*Math.sin(ang(i))).toFixed(1); }).join(' ');
+  s += '<polygon points="'+pts+'" fill="rgba(180,83,9,0.18)" stroke="#b45309" stroke-width="2"/>';
+  keys.forEach((f,i) => { const r = R*facets[f]/100; s += '<circle cx="'+(cx + r*Math.cos(ang(i))).toFixed(1)+'" cy="'+(cy + r*Math.sin(ang(i))).toFixed(1)+'" r="3" fill="#b45309"/>'; });
+  keys.forEach((f,i) => {
+    const lx = cx + (R+20)*Math.cos(ang(i)), ly = cy + (R+18)*Math.sin(ang(i));
+    const anchor = Math.abs(Math.cos(ang(i))) < .3 ? 'middle' : (Math.cos(ang(i)) > 0 ? 'start' : 'end');
+    s += '<text x="'+lx.toFixed(1)+'" y="'+(ly+4).toFixed(1)+'" text-anchor="'+anchor+'" font-size="11.5" font-weight="700" fill="#1c1917">'+labels[i]+' '+facets[f]+'</text>';
+  });
+  return s + '</svg>';
+}
+function facetBars(facets) {
+  return ['O','C','E','A','N'].map(f => {
+    const v = facets[f];
+    return '<div class="facbar"><span>'+FNAME(f)+'</span><div class="bar"><div style="width:'+v+'%;background:'+facetColor(v)+';"></div></div><span class="num" style="color:'+facetColor(v)+';font-weight:700;">'+v+' '+facetLvName(v)+'</span></div>';
+  }).join('');
+}
+
+/* ═══ 儲存（IndexedDB，全本機）═══ */
+const DB_NAME = 'TALENTFIT_DB', DB_VERSION = 1, STORES = ['records','draft'];
+let _db = null;
+function openDB(){ return new Promise((res, rej) => { if (_db) return res(_db); const rq = indexedDB.open(DB_NAME, DB_VERSION); rq.onupgradeneeded = e => { const db = e.target.result; for (const s of STORES) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, { keyPath:'id' }); }; rq.onsuccess = e => { _db = e.target.result; res(_db); }; rq.onerror = e => rej(e.target.error); }); }
+async function dbLoad(store){ const db = await openDB(); return new Promise(res => { const rq = db.transaction(store,'readonly').objectStore(store).getAll(); rq.onsuccess = () => res(rq.result || []); rq.onerror = () => res([]); }); }
+async function dbSave(store, data){ const db = await openDB(); return new Promise(res => { const tx = db.transaction(store,'readwrite'); const os = tx.objectStore(store); os.clear(); (data||[]).forEach(d => os.put(d)); tx.oncomplete = () => res(); }); }
+async function load(k, f){ try { const d = await dbLoad(k); if (d && d.length > 0) return d; } catch(e) {} try { const v = localStorage.getItem('tf_' + k); if (v) { const d = JSON.parse(v); if (d && d.length > 0) { await dbSave(k, d); localStorage.removeItem('tf_' + k); return d; } } } catch(e) {} return f; }
+async function save(k, d){ try { await dbSave(k, d); } catch(e) {} }
+function genId(){ return 'r_' + Date.now() + '_' + Math.random().toString(36).slice(2,6); }
+function esc(s){ return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function posName(k){ if (k === 'best') return L('由系統推薦','Recommended by app'); const p = POSITIONS.find(x => x.key === k); return p ? PNAME(p) : L('由系統推薦','Recommended by app'); }
+function recTopName(c){ return c.topMatch ? posName(c.topMatch.key) : ''; }
+
+function finalizeRecord(d) {
+  const facets = facetScores(d.b5);
+  const s = sjtScore(d.sjt), a = attScore(d.att);
+  const rec = { id: genId(), mode: d.mode || 'self', name: d.name, position: d.position, date: d.date,
+    created: new Date().toISOString().slice(0,10), b5: d.b5.slice(), vals: d.vals.slice(), sjt: d.sjt.slice(), att: d.att.slice(),
+    facets, sjtPct: s.pct, attPct: a.pct, consist: consistencyFlags(d.b5) };
+  rec.topMatch = matchAll(rec)[0];
+  return rec;
+}
+
+/* 示範資料（首次啟動） */
+function genB5(t) {
+  const out = Array(30).fill(3);
+  ['O','C','E','A','N'].forEach((f, fi) => {
+    const targetRaw = Math.round(6 + 0.24 * t[f]);
+    const per = Math.floor(targetRaw/6), rem = targetRaw - per*6;
+    const contribs = [per,per,per,per,per,per];
+    for (let k = 0; k < rem; k++) contribs[k]++;
+    for (let k = 0; k < fi; k++) contribs.push(contribs.shift());
+    let n = 0;
+    B5_ITEMS.forEach((it, i) => { if (it.f !== f) return; out[i] = it.pos ? contribs[n] : 6 - contribs[n]; n++; });
+  });
+  return out;
+}
+function genVals(t){ return VALUE_ITEMS.map((it,i) => Math.max(1, Math.min(5, Math.round(t[it.v]/20) + [0,-1][i%2]))); }
+function makeDemo() {
+  const d = { id:'demo', mode:'self', name: L('示範報告（可刪除）','Sample report (deletable)'), position:'sales', date:'2026-10-20', created:'2026-10-20',
+    b5: genB5({E:80,N:65,C:72,O:78,A:62}), vals: genVals({V1:55,V2:85,V3:40,V4:75,V5:50,V6:80}), sjt:[0,0,0,0,1,0,0,0], att:[4,4,3,2,3,4,3,4] };
+  return finalizeRecord(d);
+}
+
+/* CSV 匯出（含 BOM，Excel 可直接開） */
+function exportCSV() {
+  if (!RECORDS.length) return alert(L('尚無資料可匯出','No records to export'));
+  const rows = [[L('紀錄模式','Mode'), L('姓名／稱呼','Name'), L('目標或應徵職務','Target / Position'), L('施測日','Date'), L('開放學習','Openness'), L('盡責自律','Conscientious'), L('人際活力','Extraversion'), L('團隊親和','Agreeableness'), L('情緒穩定','Stability'), L('情境判斷','SJT'), L('工作態度','Attitude'), L('主要動機','Motives'), L('最適職務','Best fit'), L('最適分數','Fit score'), L('一致性','Consistency')]];
+  for (const c of RECORDS) {
+    const all = matchAll(c);
+    rows.push([ c.mode === 'hr' ? L('企業施測','Recruiter') : L('自我評估','Self'), c.name, posName(c.position), c.date,
+      c.facets.O, c.facets.C, c.facets.E, c.facets.A, c.facets.N, c.sjtPct, c.attPct,
+      topValues(c.vals).map(k => VNAME(k)).join(isEN() ? ', ' : '、'), all[0].name, all[0].score, c.consist.length >= 2 ? L('待確認','Warning') : L('正常','Normal') ]);
+  }
+  const csv = '\ufeff' + rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\r\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = isEN() ? 'TalentFit_Records.csv' : '人才適性適所檢測_紀錄總表.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* 文字摘要分享 */
+function shareText(c) {
+  const all = matchAll(c);
+  const lines = [];
+  lines.push('【' + APPNAME() + ' ' + APP_VERSION + '】');
+  lines.push(L('受測：','Taken by: ') + c.name + '｜' + (c.mode === 'hr' ? L('應徵職務：','Position: ') : L('目標職務：','Target job: ')) + posName(c.position) + '｜' + c.date);
+  lines.push('');
+  lines.push(L('五大人格：','Big Five: ') + ['O','C','E','A','N'].map(f => FNAME(f) + ' ' + c.facets[f] + facetLvName(c.facets[f])).join(L('／',' / ')));
+  lines.push(L('情境判斷 ','SJT ') + c.sjtPct + L(' 分｜工作態度 ',' pts | Attitude ') + c.attPct + L(' 分｜主要動機：',' pts | Motives: ') + topValues(c.vals).map(k => VNAME(k)).join(L('、',', ')));
+  lines.push('');
+  lines.push(L('職務適配前五名：','Top 5 job fits:'));
+  all.slice(0,5).forEach((m,i) => lines.push((i+1) + '. ' + m.name + ' — ' + m.score + L(' 分（',' (') + bandOf(m.score).t + L('）',')')));
+  lines.push('');
+  lines.push(L('※ 本結果僅供自我探索與招募輔助參考，非心理疾病診斷。','* For self-exploration and hiring support only; not a clinical diagnosis.'));
+  const txt = lines.join('\n');
+  if (navigator.share) { navigator.share({ title: APPNAME(), text: txt }).catch(() => {}); return; }
+  if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(() => alert(L('報告摘要已複製到剪貼簿，可貼到 LINE／Email 分享。','Summary copied to clipboard — paste it into LINE / Email to share.'))).catch(() => showCopyFallback(txt)); }
+  else showCopyFallback(txt);
+}
+function showCopyFallback(txt) {
+  const w = window.open('', '_blank'); if (!w) return alert(txt);
+  w.document.write('<pre style="white-space:pre-wrap;font-family:sans-serif;padding:16px;">' + esc(txt) + '</pre>'); w.document.close();
+}
+
+/* 列印／存 PDF */
+function printReport(c) {
+  const all = matchAll(c);
+  const per = buildPersonal(c);
+  const T = (zh, en) => L(zh, en);
+  let h = '<html><head><meta charset="UTF-8"><title>' + T('適性適所檢測報告 — ','Talent Fit Report — ') + esc(c.name) + '</title><style>body{font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif;padding:24px;color:#111;font-size:13px;line-height:1.7}h2{border-bottom:2px solid #b45309;padding-bottom:5px;font-size:15px;margin:18px 0 8px}table{border-collapse:collapse;width:100%;font-size:12px;margin:6px 0}th,td{border:1px solid #999;padding:5px 9px}th{background:#f0ede9;text-align:left}td.n{text-align:right}.hd{border-bottom:3px solid #b45309;padding-bottom:10px;margin-bottom:6px}.hd .t{font-size:20px;font-weight:900}.hd .b{font-size:11px;color:#666}.sm{font-size:11px;color:#666}</style></head><body>';
+  h += '<div class="hd"><div class="t">' + T('人才適性適所檢測報告','Talent Fit Assessment Report') + '</div><div class="b">' + esc(c.name) + '｜' + (c.mode === 'hr' ? T('應徵職務：','Position: ') : T('自我評估｜目標職務：','Self-assessment | Target job: ')) + esc(posName(c.position)) + '｜' + T('施測日：','Date: ') + esc(c.date) + '</div></div>';
+  h += '<h2>' + T('五大人格工作特質（0–100）','Big Five Work Traits (0–100)') + '</h2><table><tr><th>' + T('構面','Facet') + '</th><th class="n">' + T('分數','Score') + '</th><th>' + T('強度','Level') + '</th><th>' + T('取向','Orientation') + '</th></tr>';
+  for (const f of ['O','C','E','A','N']) h += '<tr><td>' + FNAME(f) + '</td><td class="n">' + c.facets[f] + '</td><td>' + facetLvName(c.facets[f]) + '</td><td class="sm">' + FACET_GUIDE[f][facetLevel(c.facets[f])].t + '</td></tr>';
+  h += '</table>';
+  h += '<h2>' + T('輔助指標','Auxiliary indicators') + '</h2><table><tr><th>' + T('項目','Item') + '</th><th class="n">' + T('分數','Score') + '</th><th>' + T('說明','Notes') + '</th></tr>';
+  h += '<tr><td>' + T('情境判斷（SJT 8 題）','Situational judgment (SJT, 8 items)') + '</td><td class="n">' + c.sjtPct + '</td><td class="sm">' + T('實務判斷力：客訴、衝突、多工、誠信、保密、安全','Practical judgment: complaints, conflict, multitasking, integrity, confidentiality, safety') + '</td></tr>';
+  h += '<tr><td>' + T('誠信與工作態度','Integrity & work attitude') + '</td><td class="n">' + c.attPct + '</td><td class="sm">' + T('自律、守規、負責傾向','Self-discipline, rule-following, responsibility') + '</td></tr>';
+  h += '<tr><td>' + T('主要工作動機','Key work motives') + '</td><td class="n">—</td><td class="sm">' + esc(topValues(c.vals).map(k => VNAME(k)).join(isEN() ? ', ' : '、')) + '</td></tr>';
+  h += '<tr><td>' + T('作答一致性','Answer consistency') + '</td><td class="n">' + c.consist.length + '</td><td class="sm">' + (c.consist.length >= 2 ? T('多組反向題矛盾，建議重測或面談釐清','Multiple reverse-item contradictions; retest or clarify in an interview') : T('正常','Normal')) + '</td></tr></table>';
+  h += '<h2>' + T('八大職務適配排序','Job fit ranking (8 types)') + '</h2><table><tr><th>' + T('職務','Job type') + '</th><th class="n">' + T('適配分','Fit') + '</th><th>' + T('評等','Band') + '</th></tr>';
+  all.forEach(m => { h += '<tr><td>' + esc(m.name) + (m.key === c.position ? T('（目標職務）',' (target job)') : '') + '</td><td class="n">' + m.score + '</td><td>' + bandOf(m.score).t + '</td></tr>'; });
+  h += '</table>';
+  if (c.mode !== 'hr') {
+    h += '<h2>' + T('個人職涯重點','Personal career highlights') + '</h2>';
+    h += '<p><b>' + T('優勢構面：','Strengths: ') + '</b>' + (per.strengths.length ? per.strengths.map(x => FNAME(x.f) + T('（',' (') + x.t + T('）',')')).join(isEN() ? ', ' : '、') : T('各構面均衡','Balanced across facets')) + '</p>';
+    h += '<p><b>' + T('發展焦點：','Development focus: ') + '</b>' + per.devList.map(d => FNAME(d.f) + T('（現況 ',' (now ') + c.facets[d.f] + T(' → 理想 ',' → ideal ') + d.ideal + T('）',')')).join(isEN() ? ', ' : '、') + '</p>';
+  }
+  h += '<p class="sm">※ ' + T('本報告由「' + APPNAME() + ' ' + APP_VERSION + '」自動產生，僅供自我探索與招募輔助參考，不得作為錄用與否之唯一依據，不得用於心理疾病診斷。測驗結果涉及個人資料，請依個人資料保護相關規定保管。就業服務法第 5 條禁止就業歧視。','Generated by “Talent Fit Assessment ' + APP_VERSION + '” for self-exploration and hiring support only; not the sole basis for hiring decisions; not a clinical diagnosis. Handle results per personal-data protection rules. Employment discrimination is prohibited by law (e.g., Taiwan Employment Service Act Art. 5).') + '</p>';
+  h += '
+<script>if('serviceWorker' in navigator && location.protocol === 'https:'){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){})});}</script>
+</body></html>';
+  const w = window.open('', '_blank');
+  if (!w) { alert(L('瀏覽器阻擋了新視窗；可改用「分享摘要」功能。','The browser blocked the new window; use “Share summary” instead.')); return; }
+  w.document.write(h); w.document.close();
+  setTimeout(() => { try { w.print(); } catch(e) {} }, 500);
+}
+
+/* ═══════════ 英文資料層（V2.1）═══════════ */
+const FACET_NAMES_EN = { O:'Openness', C:'Conscientious', E:'Extraversion', A:'Agreeableness', N:'Stability' };
+const VALUE_NAMES_EN = { V1:'Pay & Rewards', V2:'Achievement', V3:'Stability', V4:'Autonomy', V5:'Helping Others', V6:'Growth' };
+function FNAME(f){ return isEN() ? FACET_NAMES_EN[f] : FACET_NAMES[f]; }
+function PNAME(p){ return (isEN() && p.nameEn) ? p.nameEn : p.name; }
+function PDESC(p){ return (isEN() && p.descEn) ? p.descEn : p.desc; }
+function L5(){ return isEN() ? ['Strongly disagree','Disagree','Neutral','Agree','Strongly agree'] : LIKERT5; }
+function L4(){ return isEN() ? ['Strongly disagree','Disagree','Agree','Strongly agree'] : LIKERT4; }
+function BANDS(){ return isEN()
+  ? [{t:'Strong fit', cls:'mb-s'},{t:'Possible', cls:'mb-i'},{t:'Caution', cls:'mb-w'},{t:'Not advised', cls:'mb-d'}]
+  : [{t:'高適配', cls:'mb-s'},{t:'可考慮', cls:'mb-i'},{t:'謹慎評估', cls:'mb-w'},{t:'不建議', cls:'mb-d'}]; }
+const B5_EN = [
+  'I enjoy learning new knowledge or skills.',
+  'Facing work I have never done before feels interesting rather than scary.',
+  'I often come up with new ideas or better ways of doing things.',
+  'I prefer familiar methods and rarely try new ones.',
+  'I proactively follow new trends related to my work.',
+  'Abstract or conceptual discussions feel useless for practical work.',
+  'When someone asks me for something, I always note it down and finish on time.',
+  'My workspace and documents are always neat and organized.',
+  'I often leave things until the last minute.',
+  'I pay attention to details in everything I do, to avoid mistakes.',
+  'The plans I make often fizzle out halfway.',
+  'I am almost never late, and I keep my appointments punctually.',
+  'In a group, I often take the initiative to connect with others.',
+  'Talking with someone I just met feels natural, not nerve-racking.',
+  'I prefer quiet work I can do on my own.',
+  'When I meet new colleagues or customers, I usually say hello first.',
+  'Lively gatherings drain me and make me want to leave early.',
+  'I enjoy speaking up in meetings and activities.',
+  'I am willing to help with a colleague’s sudden extra workload.',
+  'Even when others disagree with me, I am willing to hear them out.',
+  'I often feel impatient about the poor quality of other people’s work.',
+  'Team goals matter more than personal performance.',
+  'When opinions clash, I tend to step back and consider the other side first.',
+  'I speak very directly and often offend people without meaning to.',
+  'When corrected for a mistake, I can stay calm and improve.',
+  'I often worry something will go wrong, even before it happens.',
+  'Under heavy pressure, I can still keep my composure.',
+  'A small setback can upset me for days.',
+  'I rarely lose sleep or worry over work.',
+  'When criticized, I stay upset for a long time.',
+];
+const VAL_EN = [
+  'The salary and bonus level of a job is very important to me.',
+  'Jobs with unclear overtime pay or bonus rules make me hesitate.',
+  'I want work that constantly pushes my limits.',
+  'Completing a difficult task gives me special satisfaction.',
+  'I want stable work and income, and dislike frequent changes.',
+  'Clear systems and well-defined responsibilities put me at ease.',
+  'I like managers who set the direction but let me handle the details my way.',
+  'Being micromanaged makes it hard for me to perform.',
+  'Work that helps others feels especially meaningful to me.',
+  'Seeing satisfied responses from the people I serve is one of my motivators.',
+  'To learn something new, I can accept a slightly lower starting salary.',
+  'Companies with training programs and clear career paths attract me strongly.',
+];
+const SJT_EN = [
+  { q:'A customer in the store is loudly complaining about product quality, disturbing other shoppers.',
+    opts:['Apologize sincerely, move the customer aside to understand the details, and ask a coworker to support the floor','Explain on the spot that it was misuse, not a product problem','Ask the customer to wait while I finish checkout first','Agree to a refund immediately to end the conflict fast'] },
+  { q:'A coworker accuses you, in a harsh tone, of keeping the better shifts for yourself.',
+    opts:['Find time to explain the scheduling rationale privately and offer to adjust next time','Ask the supervisor to step in and settle it','Ignore it; I do my job with a clear conscience','Just give the shift away to avoid further conflict'] },
+  { q:'In one afternoon you must: hand in a report, answer a client call, and fetch urgent data for your manager. What do you do?',
+    opts:['Quickly agree on a callback time with the client, then handle tasks by urgency','Do things one by one in the order they happened','Put everything aside and tell my manager I cannot finish','Rush a sloppy report and half-do all three'] },
+  { q:'At checkout you notice a coworker undercharged a customer.',
+    opts:['Tell the coworker and the supervisor right away and correct the bill','Pretend not to see it; it is not my responsibility','Mention it privately and let the coworker decide','Tell the coworker later when there is a chance'] },
+  { q:'Your manager assigns a method you believe will trouble clients.',
+    opts:['Just do it and deal with problems later','Explain my concerns and suggest an alternative; if instructed to proceed, execute and report the results','Refuse and do it my own way','Delay it and hope the manager forgets'] },
+  { q:'A friend privately asks about your company’s new product pricing.',
+    opts:['Politely decline; company policy forbids sharing it','Tell them; they are a close friend','Give a vague hint of the rough range','Say I do not know (though I do), and keep quiet'] },
+  { q:'The company adopts a new system and all workflows must be relearned.',
+    opts:['Join the training proactively and practice in my spare time','Wait until everyone else learns it, then ask them','Attend passively and make do','Complain that the new system is worse and hope to keep the old way'] },
+  { q:'Rushing a shipment, you notice goods are stacked against safety rules.',
+    opts:['Restack per safety rules, even if shipping is slightly delayed','Ship first; nothing will go wrong','Tell the supervisor and let them decide','Just be careful myself and keep stacking the old way'] },
+];
+const ATT_EN = [
+  'When work is my duty, I finish it without being reminded.',
+  'During work hours I focus on work, not personal matters.',
+  'Rules are rules; I follow them even when nobody checks.',
+  'Taking a few company supplies home is no big deal.',
+  'Being a few minutes late sometimes is no big deal.',
+  'If I promise something, I will do it.',
+  'A prettier attendance record is fine as long as the work gets done.',
+  'I treat the company’s business as my own, with care.',
+];
+function b5txt(i){ return isEN() ? B5_EN[i] : B5_ITEMS[i].txt; }
+function vtxt(i){ return isEN() ? VAL_EN[i] : VALUE_ITEMS[i].txt; }
+function sqt(i){ return isEN() ? SJT_EN[i].q : SJT_ITEMS[i].q; }
+function sopt(i,k){ return isEN() ? SJT_EN[i].opts[k] : SJT_ITEMS[i].opts[k]; }
+function attxt(i){ return isEN() ? ATT_EN[i] : ATT_ITEMS[i].txt; }
+function VNAME(k){ return isEN() ? VALUE_NAMES_EN[k] : VALUE_NAMES[k]; }
+
+const VALUE_GUIDE_EN = {
+  V1:'Money incentives matter to you. When evaluating offers, clarify the pay structure (base, bonus, overtime rules) and choose companies with transparent compensation — avoid burning out on passion alone.',
+  V2:'You need a sense of conquest to stay motivated. Choose roles with clear goals and room to grow; overly comfortable environments make you restless.',
+  V3:'Certainty fuels you. Companies with clear systems and responsibilities let you perform steadily for the long run; in fast-changing environments, assess your tolerance first.',
+  V4:'You need room to maneuver. Watch the manager’s style in interviews — “clear goals, delegated methods” fits you best; micromanagement suffocates you.',
+  V5:'Helping people is your source of meaning. Service, education, care, and customer-success roles keep you engaged for the long run.',
+  V6:'You trade short-term pay for long-term capability. Pick companies with training systems and promotion paths, and review yearly “what did I learn” to stay on a growth track.',
+};
+function vg(k){ return isEN() ? VALUE_GUIDE_EN[k] : VALUE_GUIDE[k]; }
+const CAREER_ADVICE_EN = {
+  sales:'Toward sales: build rejection resilience and deeper product knowledge; turn your social energy into “listening for needs” — results will follow.',
+  service:'Toward retail/service: beyond standard service flows, accumulate real stories of turning complaints into repeat customers — your most persuasive interview material.',
+  admin:'Toward administration: strengthen tool skills (Excel, document management, workflow tools); your care and steadiness will be noticed fast.',
+  finance:'Toward accounting/finance: build basic accounting knowledge and certifications (bookkeeper direction), Excel practice, and a habit of tracking regulation updates — discipline is your capital.',
+  production:'Toward production: master safety rules and build quality awareness; punctuality and a stable output record are your business card.',
+  logistics:'Toward warehouse/logistics: learn inventory systems and WMS tools; spatial planning and routing logic are plus points.',
+  tech:'Toward engineering: keep investing in skills and a portfolio; also practice translating tech language for non-tech colleagues — it gets you noticed faster.',
+  leader:'Toward store manager/team lead: practice scheduling and goal breakdown, giving feedback, and switching between “doing frontline work” and “leading people”.',
+};
+function ca(key){ return isEN() ? CAREER_ADVICE_EN[key] : CAREER_ADVICE[key]; }
+const BAND_TIP_EN = [
+  'This job type fits your traits closely — work will feel smoother and more rewarding. Put it at the top of your job list.',
+  'There is a basic fit and most aspects can shine. In interviews, check working conditions and support for the facets with larger gaps.',
+  'Limited fit — not impossible, but it needs more adjustment and support. Evaluate together with the concrete job content and team culture.',
+  'A large gap from your core traits; staying long-term may drain you. Take it as self-knowledge, and put your energy into better-fitting paths.',
+];
+function bt(i){ return isEN() ? BAND_TIP_EN[i] : BAND_TIP[i]; }
+const FACET_GUIDE_EN = {
+  O: {
+    high:{t:'Curious Explorer', s:'You have strong curiosity for new knowledge and methods, and you are willing to step out of your comfort zone — learning fast and adapting to change is your trademark.', w:'With many ideas, focus can scatter; put new ideas into lists and schedules, or they become half-done thoughts.', g:'Turn curiosity into visible proof: certifications, portfolio pieces, side projects. A track record of learning is your resume highlight.'},
+    mid:{t:'Pragmatic Learner', s:'You are willing to learn new things, but prefer to go deep only when it is useful — a steady learning rhythm without chasing fads.', w:'You are slow to start in brand-new fields and may need a push to step in.', g:'Set a “one small skill per quarter” goal; small steps keep growth alive, and environments with mentors or good materials help you learn faster.'},
+    low:{t:'Steady Executor', s:'You prefer familiar methods and clear procedures, valuing stability over novelty, with highly consistent execution.', w:'Fast-changing environments feel taxing, and “changing the process again” can be irritating.', g:'Start small: try one new tool or one new workflow, and gradually build tolerance for the new — no need for a total overhaul.'}},
+  C: {
+    high:{t:'Reliable Professional', s:'You value commitments and discipline: you note things down, deliver on time, and mind the details — the person the team can count on.', w:'Perfectionist tendencies can trap you in details or make you reluctant to let go of tasks.', g:'Practice “good enough to ship” standards and delegation; spend your time on the highest-impact work.'},
+    mid:{t:'Flexible Doer', s:'You are generally punctual and dependable, occasionally procrastinate, but still close out critical tasks — balancing flexibility and reliability.', w:'When multitasking, small things slip; memory is weaker than a system.', g:'Fix every commitment in one to-do system (one app or one notebook), and first defend “deliver on time”.'},
+    low:{t:'Free Adapter', s:'You like a free, flexible rhythm and dislike being bound by plans and details; you adapt quickly.', w:'Deadlines and details are where you lose the most points; you can get chased by urgency.', g:'Split big tasks into small ones with mid checkpoints; find a partner to track progress together; make “on time” a habit first.'}},
+  E: {
+    high:{t:'People Connector', s:'You feel at ease in crowds, speak up proactively, and social interaction energizes you.', w:'Amid the buzz, do not skip quiet deep-work time; spreading energy too wide causes loss of focus.', g:'Convert social energy into valuable connections: client relationships, cross-team collaboration, representing the team outward.'},
+    mid:{t:'Situational Communicator', s:'You engage with people when needed and enjoy solo work too, adjusting your mode to the occasion.', w:'When busy you may retreat into your shell, and collaborators may feel you are distant.', g:'Keep a fixed rhythm for key relationships (a weekly sync); relationships do not stay fresh by themselves.'},
+    low:{t:'Deep Focus Worker', s:'You prefer quiet, independent work; socializing drains energy, while focus and deep thinking are your strengths.', w:'Roles with heavy external contact will exhaust you; forcing it long-term burns you out.', g:'Choose depth-first roles; for necessary social events, prepare questions and scripts in advance to keep the burden manageable.'}},
+  A: {
+    high:{t:'Team Glue', s:'You value harmony and cooperation, are willing to help, and can see from the other side — well liked by colleagues and customers.', w:'Fear of conflict may keep necessary words unsaid, which hurts the team and you over time.', g:'Practice expressing disagreement “gently but firmly”: acknowledge first, state facts, then propose options. Cooperation is not the same as yielding.'},
+    mid:{t:'Rational Collaborator', s:'You cooperate willingly yet can state your position, balancing relationships and tasks most of the time.', w:'When swinging between highly competitive and highly harmonious teams, clarify what you value most first.', g:'Deliberately practice taking a clear stance in key settings (meetings, negotiations) so your views are heard.'},
+    low:{t:'Blunt Pragmatist', s:'You speak plainly and stick to facts, are rarely swayed by emotions, and decide decisively.', w:'Unintended bluntness can strain relationships; some may find you hard to approach.', g:'Acknowledge feelings before stating facts; make “listen fully before replying” a habit and your persuasion will rise.'}},
+  N: {
+    high:{t:'Steady Anchor', s:'You handle pressure well, face criticism calmly, and are rarely hijacked by anxiety — a stabilizing force amid change.', w:'When you feel “fine”, also watch for your teammates’ states — your steadiness can take care of others.', g:'Step up in a crisis to run the rhythm; turn calm into a team resource — one of the traits managers value most.'},
+    mid:{t:'Balanced Steady', s:'You are emotionally stable most of the time, but accumulated pressure affects your state and sleep.', w:'Consecutive crunch or conflict periods are when you are most vulnerable, and recovery is slower than average.', g:'Build fixed recovery habits: exercise, sleep, talking to someone you trust — before burnout, not after.'},
+    low:{t:'Sensitive Perceiver', s:'You feel deeply and are sensitive to criticism and uncertainty, with strong empathy and an eye for risks and other people’s emotions.', w:'High-pressure, frequently judged environments amplify anxiety, affecting performance and health.', g:'Use structured methods to reduce uncertainty (checklists, rehearsals); choose supportive teams; seek professional resources when needed.'}},
+};
+function fg(f, lv){ return isEN() ? FACET_GUIDE_EN[f][lv] : FACET_GUIDE[f][lv]; }
+
+/* ═══ 狀態與導航 ═══ */
+let RECORDS = [];
+let DRAFT = null;
+const STATE = { page:'home', viewId:null };
+function blankDraft(){ return { id:'draft', stage:'mode', mode:'self', name:'', position:'best', date:new Date().toISOString().split('T')[0], consent:false, b5:Array(30).fill(0), vals:Array(12).fill(0), sjt:Array(8).fill(null), att:Array(8).fill(0), _sec:0 }; }
+async function saveDraft(){ DRAFT.id = 'draft'; await save('draft', [DRAFT]); }
+async function clearDraft(){ DRAFT = blankDraft(); await save('draft', [DRAFT]); }
+function nav(p){
+  STATE.page = p;
+  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.page === p || (p === 'report' && el.dataset.page === 'history')));
+  window.scrollTo(0, 0);
+  renderPage();
+}
+function renderPage() {
+  const m = document.getElementById('main');
+  switch (STATE.page) {
+    case 'take': m.innerHTML = renderTake(); break;
+    case 'history': m.innerHTML = renderHistory(); break;
+    case 'about': m.innerHTML = renderAbout(); break;
+    case 'report': m.innerHTML = renderReport(); break;
+    default: m.innerHTML = renderHome();
+  }
+}
+
+/* ═══ 首頁 ═══ */
+function renderHome() {
+  const last = RECORDS.filter(r => r.mode === 'self').sort((a,b) => (b.created + b.id) > (a.created + a.id) ? 1 : -1)[0];
+  let h = '';
+  h += '<div class="card"><div class="hero"><div class="hi">🧭</div><h1>' + L('找到你的適性適所','Find Where You Fit Best') + '</h1>'
+    + '<p>' + L('五大人格 × 工作價值觀 × 情境判斷 × 誠信態度<br>58 題專業量表，約 12–15 分鐘，測出你與八大職務的適配度','Big Five × Work Values × Situational Judgment × Integrity<br>58 professionally designed questions in 12–15 minutes, matched against 8 job types') + '</p>'
+    + '<div class="tags"><span class="chip">' + L('個人自我評估','Personal self-assessment') + '</span><span class="chip">' + L('企業招募施測','For recruiters') + '</span><span class="chip">' + L('全離線·資料只存本機','Offline · data stays on device') + '</span></div>'
+    + '<div class="stat3"><div class="s"><div class="sv">58</div><div class="sl">' + L('專業題目','questions') + '</div></div><div class="s"><div class="sv">8</div><div class="sl">' + L('適配職務','job types') + '</div></div><div class="s"><div class="sv">5+6</div><div class="sl">' + L('人格×動機構面','traits × motives') + '</div></div></div>'
+    + '<button class="btn btn-p btn-xl" style="margin-top:16px;" onclick="startFresh()">📝 ' + L('開始我的檢測','Start my assessment') + '</button></div></div>';
+  if (last) {
+    const b = bandBadge(last.topMatch.score);
+    h += '<div class="card"><div class="card-h"><h2>' + L('上次檢測結果','Last assessment') + '</h2><span class="muted" style="font-size:11.5px;">' + esc(last.date) + '</span></div><div class="card-b">'
+      + '<div style="display:flex;align-items:center;gap:12px;"><div style="font-size:34px;">🎯</div>'
+      + '<div style="flex:1;"><div style="font-weight:800;">' + esc(last.name) + '</div>'
+      + '<div style="font-size:12.5px;color:var(--muted);">' + L('最適職務：','Best fit: ') + '<b style="color:var(--accent);">' + esc(posName(last.topMatch.key)) + '</b> <span class="match-band ' + b.cls + '">' + b.t + '</span></div></div>'
+      + '<div style="font-size:26px;font-weight:800;font-family:var(--mono);color:var(--accent);">' + last.topMatch.score + '</div></div>'
+      + '<button class="btn btn-o btn-sm" style="margin-top:12px;width:100%;" onclick="openReport(\'' + last.id + '\')">' + L('查看完整報告 →','View full report →') + '</button></div></div>';
+  }
+  h += '<div class="card"><div class="card-h"><h2>' + L('兩種使用方式','Two ways to use') + '</h2></div><div class="card-b">'
+    + '<div class="guide-block"><div class="gt">👤 ' + L('個人自我評估','Personal self-assessment') + '</div><div class="gd">' + L('求職定向、轉職探索、了解自己的工作特質。匿名可用、不需註冊，報告附個人職涯解讀與發展建議。','Career direction, job changes, self-understanding. Anonymous and registration-free; the report includes a personal career profile with development advice.') + '</div></div>'
+    + '<div class="guide-block" style="border-left-color:#1d4ed8;"><div class="gt">🏢 ' + L('企業人資施測','Recruiter mode') + '</div><div class="gd">' + L('為應徵者施測並管理紀錄：職務適配報告、面談追問建議、總表匯出（CSV）。免費版可存 20 筆企業施測紀錄。','Test candidates and manage records: job-fit reports, interview probe suggestions, CSV export. Free version stores up to 20 recruiter records.') + '</div></div>'
+    + '</div></div>';
+  h += '<div class="card"><div class="card-b"><div class="notice" style="margin-top:0;border-top:none;padding-top:0;">'
+    + L('本檢測為職涯探索與招募輔助工具，非心理疾病診斷工具；結果請搭配面談與實務經驗綜合判讀。所有作答與報告僅儲存於您的裝置本機，App 不會上傳或蒐集任何個人資料。','This assessment is a career-exploration and hiring support tool, not a clinical diagnostic tool; interpret results together with interviews and practical experience. All answers and reports are stored only on your device — the app uploads and collects nothing.') + '</div></div></div>';
+  return h;
+}
+function startFresh(){ DRAFT = blankDraft(); saveDraft(); nav('take'); }
+
+/* ═══ 檢測流程 ═══ */
+function renderTake() {
+  const d = DRAFT;
+  if (!d.consent) {
+    const isHr = d.mode === 'hr';
+    let h = '<div class="card"><div class="card-h"><h2>' + L('① 選擇檢測模式','① Choose test mode') + '</h2></div><div class="card-b">'
+      + '<div class="grid2">'
+      + '<div class="mode-card ' + (d.mode === 'self' ? 'sel' : '') + '" onclick="setMode(\'self\')"><div class="mi">👤</div><div class="mt">' + L('個人自我評估','Self-assessment') + '</div><div class="md">' + L('匿名可用<br>測出自己的職務適性','Anonymous ok<br>discover your job fit') + '</div></div>'
+      + '<div class="mode-card ' + (isHr ? 'sel' : '') + '" onclick="setMode(\'hr\')"><div class="mi">🏢</div><div class="mt">' + L('為他人施測（HR）','Test a candidate (HR)') + '</div><div class="md">' + L('應徵者姓名＋職務<br>產生招募評估報告','Candidate name + position<br>hiring evaluation report') + '</div></div>'
+      + '</div></div></div>';
+    h += '<div class="card"><div class="card-h"><h2>' + L('② 基本資料','② Basic info') + '</h2></div><div class="card-b">';
+    if (isHr) {
+      h += '<div class="field"><label>' + L('受測者姓名 *','Test taker name *') + '</label><input id="tkName" placeholder="' + L('應徵者姓名','Candidate name') + '" value="' + esc(d.name) + '"></div>'
+        + '<div class="field"><label>' + L('應徵職務','Position applied') + '</label><select id="tkPos">' + POSITIONS.map(p => '<option value="' + p.key + '"' + (d.position === p.key ? ' selected' : '') + '>' + esc(PNAME(p)) + '</option>').join('') + '</select></div>'
+        + '<div class="field"><label>' + L('施測日期','Test date') + '</label><input type="date" id="tkDate" value="' + esc(d.date) + '"></div>';
+    } else {
+      h += '<div class="field"><label>' + L('稱呼（選填，可匿名）','Name (optional, anonymous ok)') + '</label><input id="tkName" placeholder="' + L('例：小明／留空以「匿測者」記錄','e.g., Alex; leave blank to record as “Anonymous”') + '" value="' + esc(d.name) + '"></div>'
+        + '<div class="field"><label>' + L('目前目標職務（選填）','Target job (optional)') + '</label><select id="tkPos"><option value="best"' + (d.position === 'best' ? ' selected' : '') + '>' + L('由系統推薦最適職務','Let the app recommend') + '</option>'
+        + POSITIONS.map(p => '<option value="' + p.key + '"' + (d.position === p.key ? ' selected' : '') + '>' + esc(PNAME(p)) + '</option>').join('') + '</select></div>';
+    }
+    h += '</div></div>';
+    h += '<div class="card"><div class="card-h"><h2>' + L('③ 檢測前說明','③ Before you start') + '</h2></div><div class="card-b"><div class="consent">'
+      + (isHr
+        ? L('<b>親愛的應徵者您好：</b><br>本測驗為招募流程中的<strong>輔助工具</strong>，目的是了解您的工作特質傾向，作為職務安排與面談討論的參考。<br>1. 共 58 題，約 <b>12～15 分鐘</b>，可隨時暫存之後繼續。<br>2. 題目沒有標準答案，請依<strong>平常真實的自己</strong>作答。<br>3. 結果僅供招募評估使用，將依個人資料保護規定保管於施測裝置本機，<strong>不用於心理疾病診斷</strong>。<br>4. 您有權利拒絕施測或隨時中止；拒絕不會影響應徵資格的審理。<br>5. 對結果有疑問，可向人事單位查詢或要求說明。',
+           '<b>Dear candidate,</b><br>This test is an <strong>auxiliary tool</strong> in the hiring process, meant to understand your work-trait tendencies as a reference for job placement and interview discussion.<br>1. 58 questions, about <b>12–15 minutes</b>; you can pause and resume anytime.<br>2. There are no right or wrong answers — respond as <strong>your everyday true self</strong>.<br>3. Results are for hiring evaluation only, kept on the test device under personal-data protection rules, and <strong>not used for clinical diagnosis</strong>.<br>4. You have the right to refuse or stop at any time; refusing does not affect the review of your application.<br>5. If you have questions about the results, ask the HR department or request an explanation.')
+        : L('<b>檢測說明：</b><br>1. 共 58 題，約 <b>12～15 分鐘</b>，可隨時暫存之後繼續。<br>2. 題目沒有標準答案，請依<strong>平常真實的自己</strong>作答，結果才會準確。<br>3. 結果呈現你的特質「傾向」而非優劣評價——每種特質都有適合發揮的位置。<br>4. 所有作答與報告只存在<strong>你的裝置本機</strong>，App 不會上傳任何資料；你可隨時在「我的報告」刪除。<br>5. 本檢測非心理疾病診斷工具；結果供職涯探索參考。',
+           '<b>How it works:</b><br>1. 58 questions, about <b>12–15 minutes</b>; pause and resume anytime.<br>2. There are no right or wrong answers — respond as <strong>your everyday true self</strong> for accurate results.<br>3. Results show your trait “tendencies”, not good or bad — every trait mix has a place where it shines.<br>4. All answers and reports stay <strong>on your device only</strong>; the app uploads nothing, and you can delete records anytime in “My Reports”.<br>5. This is not a clinical diagnostic tool; results are for career exploration.'))
+      + '</div>'
+      + '<label class="agree-row"><input type="checkbox" id="tkAgree"><span>' + L('我已閱讀並理解上述說明，同意進行本檢測。','I have read and understood the above and agree to take this assessment.') + '</span></label>'
+      + '<div class="navrow"><button class="btn btn-p btn-xl" onclick="beginQuiz()">' + L('開始作答 →','Start →') + '</button></div>'
+      + (d.b5.some(v => v > 0) || d.vals.some(v => v > 0) || d.sjt.some(v => v !== null) ? '<button class="btn btn-o btn-sm" style="margin-top:10px;width:100%;" onclick="resumeDraft()">↑ ' + L('繼續上次未完成的作答','Resume unfinished test') + '</button>' : '')
+      + '</div></div>';
+    return h;
+  }
+  return renderQuiz();
+}
+function setMode(m){ DRAFT.mode = m; if (m === 'self') DRAFT.position = 'best'; saveDraft(); renderPage(); }
+function beginQuiz() {
+  const nameEl = document.getElementById('tkName');
+  const name = nameEl ? nameEl.value.trim() : '';
+  if (DRAFT.mode === 'hr' && !name) return alert(L('請填寫受測者姓名','Please enter the test taker’s name'));
+  DRAFT.name = name || L('匿測者','Anonymous');
+  const posEl = document.getElementById('tkPos'); if (posEl) DRAFT.position = posEl.value;
+  const dateEl = document.getElementById('tkDate'); if (dateEl && dateEl.value) DRAFT.date = dateEl.value;
+  if (!document.getElementById('tkAgree').checked) return alert(L('請先勾選同意檢測說明','Please check the consent box first'));
+  DRAFT.consent = true; saveDraft(); renderPage(); window.scrollTo(0, 0);
+}
+function resumeDraft(){ DRAFT.consent = true; saveDraft(); renderPage(); window.scrollTo(0, 0); }
+
+function APPNAME(){ return isEN() ? 'Talent Fit Assessment' : APP_NAME; }
+function QUIZ_SECTIONS(){ return [
+  { t: L('第一部：人格特質（30 題）','Part 1: Personality Traits (30)'), d: L('請依平常真實的自己作答','Answer as your everyday true self'), items: B5_ITEMS.map((it,i) => ({ i, kind:'b5', it })) },
+  { t: L('第二部：工作價值觀（12 題）','Part 2: Work Values (12)'), d: L('沒有對錯，依你的真實想法','No right or wrong — answer with your true thoughts'), items: VALUE_ITEMS.map((it,i) => ({ i, kind:'val', it })) },
+  { t: L('第三部：職場情境判斷（8 題）','Part 3: Situational Judgment (8)'), d: L('選出你「最可能」的做法','Pick what you would “most likely” do'), items: SJT_ITEMS.map((it,i) => ({ i, kind:'sjt', it })) },
+  { t: L('第四部：工作態度（8 題）','Part 4: Work Attitude (8)'), d: L('依你的實際狀況作答','Answer per your actual habits'), items: ATT_ITEMS.map((it,i) => ({ i, kind:'att', it })) },
+]; }
+function answeredCount(d){ return d.b5.filter(v => v > 0).length + d.vals.filter(v => v > 0).length + d.sjt.filter(v => v !== null).length + d.att.filter(v => v > 0).length; }
+function renderQuiz() {
+  const d = DRAFT, sec = d._sec ?? 0, S = QUIZ_SECTIONS()[sec], total = 58, done = answeredCount(d), pct = Math.round(done/total*100);
+  let h = '<div class="pgw"><div class="row"><span>' + esc(d.name) + '｜' + (d.mode === 'hr' ? L('應徵：','Position: ') : L('目標：','Target: ')) + esc(posName(d.position)) + '</span><span style="display:flex;gap:10px;align-items:center;"><span id="pgCnt">' + done + ' / ' + total + L(' 題（',' (') + pct + '%）</span><a onclick="restartQuiz()" style="color:var(--accent);cursor:pointer;font-weight:700;">' + L('↺ 重測','↺ Restart') + '</a></span></div><div class="pbar"><div style="width:' + pct + '%"></div></div></div>';
+  h += '<div class="card"><div class="card-b"><div class="sec-t">' + S.t + '</div><div class="sec-d">' + S.d + '</div>';
+  for (const item of S.items) {
+    if (item.kind === 'b5') {
+      const v = d.b5[item.i];
+      h += '<div class="q-card"><div class="q-no">Q' + (item.i+1) + '</div><div class="q-txt">' + esc(b5txt(item.i)) + '</div><div class="likert">'
+        + L5().map((lb,k) => '<label class="' + (v === k+1 ? 'sel' : '') + '"><input type="radio" name="q' + item.i + '"' + (v === k+1 ? ' checked' : '') + ' onchange="ans(' + item.i + ',' + (k+1) + ')">' + lb + '</label>').join('') + '</div></div>';
+    } else if (item.kind === 'val') {
+      const v = d.vals[item.i];
+      h += '<div class="q-card"><div class="q-no">Q' + (30 + item.i + 1) + '</div><div class="q-txt">' + esc(vtxt(item.i)) + '</div><div class="likert">'
+        + L5().map((lb,k) => '<label class="' + (v === k+1 ? 'sel' : '') + '"><input type="radio" name="q' + (30+item.i) + '"' + (v === k+1 ? ' checked' : '') + ' onchange="ansVal(' + item.i + ',' + (k+1) + ')">' + lb + '</label>').join('') + '</div></div>';
+    } else if (item.kind === 'sjt') {
+      const v = d.sjt[item.i];
+      h += '<div class="q-card"><div class="q-no">' + L('情境 ','Scenario ') + (item.i+1) + '</div><div class="q-txt">' + esc(sqt(item.i)) + '</div><div class="opts">'
+        + item.it.opts.map((op,k) => '<label class="' + (v === k ? 'sel' : '') + '"><input type="radio" name="q' + (42+item.i) + '"' + (v === k ? ' checked' : '') + ' onchange="ansSjt(' + item.i + ',' + k + ')"><span class="ol">' + String.fromCharCode(65+k) + '</span><span>' + esc(sopt(item.i,k)) + '</span></label>').join('') + '</div></div>';
+    } else {
+      const v = d.att[item.i];
+      h += '<div class="q-card"><div class="q-no">Q' + (50 + item.i + 1) + '</div><div class="q-txt">' + esc(attxt(item.i)) + '</div><div class="likert likert4">'
+        + L4().map((lb,k) => '<label class="' + (v === k+1 ? 'sel' : '') + '"><input type="radio" name="q' + (50+item.i) + '"' + (v === k+1 ? ' checked' : '') + ' onchange="ansAtt(' + item.i + ',' + (k+1) + ')">' + lb + '</label>').join('') + '</div></div>';
+    }
+  }
+  const isLast = sec === 3;
+  h += '<div class="navrow">' + (sec > 0 ? '<button class="btn btn-o" onclick="secNav(' + (sec-1) + ')">' + L('← 上一部','← Back') + '</button>' : '<button class="btn btn-o" onclick="quitQuiz()">' + L('暫存離開','Save & exit') + '</button>')
+    + (isLast ? '<button class="btn btn-g" onclick="submitQuiz()">✓ ' + L('完成並計分','Finish & score') + '</button>' : '<button class="btn btn-p" onclick="secNav(' + (sec+1) + ')">' + L('下一部 →','Next →') + '</button>') + '</div>';
+  h += '</div></div>';
+  return h;
+}
+function secNav(s){ DRAFT._sec = Math.max(0, Math.min(3, s)); saveDraft(); renderPage(); window.scrollTo(0, 0); }
+function quitQuiz(){ nav('home'); }
+function secOffset(sec){ return sec === 0 ? 0 : sec === 1 ? 30 : sec === 2 ? 42 : 50; }
+function idxInSec(i){ return i - secOffset(DRAFT._sec ?? 0); }
+async function ans(i, v){ DRAFT.b5[i] = v; saveDraft(); refreshSel('q' + i); }
+async function ansVal(i, v){ DRAFT.vals[i] = v; saveDraft(); refreshSel('q' + (30+i)); }
+async function ansSjt(i, v){ DRAFT.sjt[i] = v; saveDraft(); refreshSel('q' + (42+i)); }
+async function ansAtt(i, v){ DRAFT.att[i] = v; saveDraft(); refreshSel('q' + (50+i)); }
+function refreshSel(name) {
+  document.querySelectorAll('input[name="' + name + '"]').forEach(r => { const lb = r.closest('label'); if (lb) lb.classList.toggle('sel', r.checked); });
+  const done = answeredCount(DRAFT), pct = Math.round(done/58*100);
+  const cnt = document.getElementById('pgCnt');
+  if (cnt) cnt.textContent = done + ' / 58 題（' + pct + '%）';
+  const bar = document.querySelector('.pbar div'); if (bar) bar.style.width = pct + '%';
+}
+async function restartQuiz() {
+  if (!confirm(L('重新開始會清除目前作答進度，確定嗎？','Restarting clears your current progress. Continue?'))) return;
+  const keep = { mode: DRAFT.mode, name: DRAFT.name, position: DRAFT.position, date: DRAFT.date, consent: true };
+  DRAFT = Object.assign(blankDraft(), keep);
+  await saveDraft(); renderPage(); window.scrollTo(0, 0);
+}
+async function submitQuiz() {
+  const d = DRAFT;
+  if (d.b5.some(v => !v) || d.vals.some(v => !v) || d.sjt.some(v => v === null) || d.att.some(v => !v)) {
+    const parts = [L('第一部','Part 1'), L('第二部','Part 2'), L('第三部','Part 3'), L('第四部','Part 4')];
+    const miss = [];
+    if (d.b5.some(v => !v)) miss.push(parts[0]);
+    if (d.vals.some(v => !v)) miss.push(parts[1]);
+    if (d.sjt.some(v => v === null)) miss.push(parts[2]);
+    if (d.att.some(v => !v)) miss.push(parts[3]);
+    return alert(L('「' + miss.join('、') + '」尚有未作答的題目，請用「上一部／下一部」檢查未答題。','“' + miss.join(', ') + '” still have unanswered questions. Use Back / Next to check them.'));
+  }
+  if (d.mode === 'hr' && RECORDS.filter(r => r.mode === 'hr').length >= 20) {
+    return alert(L('免費版最多儲存 20 筆企業施測紀錄。\n請於「我的報告」刪除舊紀錄，或聯絡企業版：','The free version stores up to 20 recruiter records.\nDelete old records in “My Reports”, or contact us for the business edition: ') + CONTACT);
+  }
+  const rec = finalizeRecord(d);
+  RECORDS.push(rec); await save('records', RECORDS);
+  await clearDraft();
+  STATE.viewId = rec.id;
+  nav('report');
+}
+
+/* ═══ 報告頁 ═══ */
+function getRec(id){ return RECORDS.find(r => r.id === id); }
+function openReport(id){ STATE.viewId = id; nav('report'); }
+function renderReport() {
+  const c = getRec(STATE.viewId);
+  if (!c) return '<div class="card"><div class="card-b"><div class="empty"><div class="ei">🔍</div>' + L('找不到這份報告。','Report not found.') + '<br><button class="btn btn-p btn-sm" style="margin-top:12px;" onclick="nav(\'history\')">' + L('回到我的報告','Back to my reports') + '</button></div></div></div>';
+  const per = buildPersonal(c);
+  const isHr = c.mode === 'hr';
+  const applied = per.matches.find(m => m.key === c.position);
+  const band = bandBadge(per.top.score);
+  let h = '<div class="card" style="background:linear-gradient(135deg,#0d1117,#292524);color:#fff;border:none;"><div class="card-b">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">'
+    + '<div><div style="font-size:12px;color:#d6d3d1;">' + (isHr ? L('🏢 企業施測報告','🏢 Recruiter report') : L('👤 個人職涯報告','👤 Personal career report')) + '</div>'
+    + '<div style="font-size:19px;font-weight:900;margin-top:2px;">' + esc(c.name) + '</div>'
+    + '<div style="font-size:12px;color:#a8a29e;margin-top:3px;">' + (isHr ? L('應徵職務：','Position: ') : L('目標職務：','Target job: ')) + esc(posName(c.position)) + '｜' + esc(c.date) + '</div></div>'
+    + '<span class="badge ' + (c.consist.length >= 2 ? 'b-w' : 'b-s') + '">' + (c.consist.length >= 2 ? L('⚠ 一致性待確認','⚠ Consistency warning') : L('✓ 作答一致','✓ Consistent')) + '</span></div>'
+    + '<div style="display:flex;align-items:baseline;gap:8px;margin-top:14px;"><div style="font-size:12px;color:#d6d3d1;">' + L('最適職務','Best fit') + '</div>'
+    + '<div style="font-size:17px;font-weight:800;">' + esc(per.top.name) + '</div>'
+    + '<span class="match-band ' + band.cls + '">' + band.t + '</span>'
+    + '<div style="margin-left:auto;font-size:34px;font-weight:800;font-family:var(--mono);color:#f0b25f;">' + per.top.score + '</div></div>'
+    + '</div></div>';
+  h += '<div class="kpis">'
+    + '<div class="kpi"><div class="kl">' + (isHr ? L('應徵職務適配度','Position fit') : L('目標職務適配度','Target job fit')) + '</div><div class="kv" style="color:' + (applied && applied.score >= 60 ? 'var(--pos)' : 'var(--accent)') + ';">' + (applied ? applied.score : '—') + '</div><div class="kd">' + esc(posName(c.position)) + '</div></div>'
+    + '<div class="kpi"><div class="kl">' + L('情境判斷／工作態度','SJT / Attitude') + '</div><div class="kv">' + c.sjtPct + ' / ' + c.attPct + '</div><div class="kd">' + L('實務判斷力·誠信紀律','Practical judgment · integrity') + '</div></div>'
+    + '</div>';
+  h += '<div class="card"><div class="card-h"><h2>' + L('五大人格工作特質','Big Five work traits') + '</h2><span class="muted" style="font-size:11px;">0–100 ' + L('傾向強度','tendency strength') + '</span></div><div class="card-b">'
+    + '<div class="radar-wrap">' + radarSVG(c.facets, 250) + '</div><div style="margin-top:10px;">' + facetBars(c.facets) + '</div>'
+    + '<div class="notice">' + L('五大人格為學術界公認的工作特質框架（Big Five / IPIP）。分數代表傾向強度，<b>沒有好壞</b>——每種特質組合都有適合發揮的職務。','The Big Five is the academically established work-trait framework (Big Five / IPIP). Scores show tendency strength — <b>not good or bad</b> — every trait mix has jobs where it shines.') + '</div></div></div>';
+  if (!isHr) {
+    h += '<div class="card"><div class="card-h"><h2>' + L('你的職涯畫像','Your career profile') + '</h2></div><div class="card-b">';
+    h += '<div class="guide-block"><div class="gt">🎯 ' + L('整體方向','Overall direction') + '</div><div class="gd">' + L('你目前與「','You currently match ') + '<b>' + esc(per.top.name) + '</b>' + L('」（','”) best (') + per.top.score + L(' 分，',' pts, ') + band.t + L('）最契合。','). ') + bt(bandIdx(per.top.score)) + '</div>'
+      + '<div class="gl">💡 ' + esc(ca(per.top.key)) + '</div></div>';
+    if (per.strengths.length) {
+      h += '<div class="sec-t" style="margin-top:14px;">' + L('你的優勢構面','Your strengths') + '</div>';
+      per.strengths.forEach(x => { h += '<div class="guide-block" style="border-left-color:#166534;"><div class="gt">' + FNAME(x.f) + ' ' + x.v + ' — ' + esc(x.t) + '</div><div class="gd">' + esc(x.s) + '</div></div>'; });
+    }
+    if (per.watches.length) {
+      h += '<div class="sec-t" style="margin-top:14px;">' + L('多加留意的構面','Facets to watch') + '</div>';
+      per.watches.forEach(x => { h += '<div class="guide-block" style="border-left-color:#b91c1c;"><div class="gt">' + FNAME(x.f) + ' ' + x.v + '</div><div class="gd">' + esc(x.w) + '</div><div class="gl">🌱 ' + L('發展建議：','Growth tip: ') + esc(x.gr) + '</div></div>'; });
+    }
+    h += '<div class="sec-t" style="margin-top:14px;">' + L('離「最適職務」還差哪一步','Closing the gap to your best-fit job') + '</div><div class="gd" style="font-size:13px;color:var(--text2);margin-bottom:8px;">' + L('與「' + per.top.name + '」理想輪廓落差最大的構面——補強它們，適配分會明顯上升：','The facets with the largest gap from the “' + per.top.name + '” ideal profile — improving these will clearly raise your fit score:') + '</div>';
+    per.devList.forEach(dv => {
+      const below = dv.dev < 0;
+      h += '<div class="guide-block"><div class="gt">' + FNAME(dv.f) + L('：目前 ',': now ') + c.facets[dv.f] + L(' → 理想 ',' → ideal ') + dv.ideal + ' <span class="badge ' + (below ? 'b-w' : 'b-i') + '">' + (below ? L('尚待補強','To strengthen') : L('已超出需求','Above requirement')) + '</span></div><div class="gd">' + esc(fg(dv.f, below ? 'mid' : 'high').g) + '</div></div>';
+    });
+    h += '<div class="sec-t" style="margin-top:14px;">' + L('工作動機：什麼讓你有動力','Work motivation: what drives you') + '</div>';
+    per.vals.forEach((k, i) => { h += '<div class="guide-block" style="border-left-color:' + (i === 0 ? '#b45309' : '#1d4ed8') + ';"><div class="gt">' + (i+1) + '. ' + VNAME(k) + '</div><div class="gd">' + esc(vg(k)) + '</div></div>'; });
+    h += '</div></div>';
+  } else {
+    const probes = probeQuestions(c), flags = redFlags(c);
+    h += '<div class="card"><div class="card-h"><h2>' + L('面談追問建議','Interview probe suggestions') + '</h2><span class="muted" style="font-size:11px;">' + L('依適配落差自動產生','auto-generated from fit gaps') + '</span></div><div class="card-b">'
+      + probes.map(p => '<div class="probe"><span class="dot" style="background:' + p.color + ';"></span><span>' + esc(p.text) + '</span></div>').join('') + '</div></div>';
+    if (flags.length) h += '<div class="card"><div class="card-h"><h2>' + L('注意事項','Flags') + '</h2></div><div class="card-b">'
+      + flags.map(f => '<div class="probe"><span class="dot" style="background:' + f.color + ';"></span><span>' + esc(f.text) + '</span></div>').join('') + '</div></div>';
+  }
+  h += '<div class="card"><div class="card-h"><h2>' + L('八大職務適配排序','Job fit ranking (8 types)') + '</h2></div><div class="card-b" style="padding:0;overflow-x:auto;"><table class="tbl"><thead><tr><th>#</th><th>' + L('職務','Job type') + '</th><th class="num">' + L('適配分','Fit') + '</th><th>' + L('評等','Band') + '</th></tr></thead><tbody>';
+  per.matches.forEach((m, i) => {
+    const b = bandOf(m.score);
+    h += '<tr class="' + (m.key === c.position ? 'hl' : '') + '"><td class="num">' + (i+1) + '</td><td><b>' + esc(m.name) + '</b>' + (m.key === c.position ? ' <span class="badge b-i">' + L('目標','Target') + '</span>' : '') + '<div style="font-size:11px;color:var(--muted);">' + esc(m.desc) + '</div></td><td class="num" style="font-weight:700;">' + m.score + '</td><td><span class="match-band ' + b.cls + '">' + b.t + '</span></td></tr>';
+  });
+  h += '</tbody></table><div class="notice" style="margin:10px 16px 14px;">' + L('評等說明：<b style="color:var(--pos);">高適配 ≥75</b>｜可考慮 60–74｜謹慎評估 45–59｜<b style="color:var(--neg);">不建議 &lt;45</b>。適配分＝五大特質與職務理想輪廓的加權貼近度，並納入情境判斷與工作態度調整。','Bands: <b style="color:var(--pos);">Strong fit ≥75</b> | Possible 60–74 | Caution 45–59 | <b style="color:var(--neg);">Not advised &lt;45</b>. Fit score = weighted closeness of the Big Five to the job’s ideal profile, adjusted by SJT and attitude.') + '</div></div></div>';
+  h += '<div class="card no-print"><div class="card-b"><div class="navrow" style="margin-top:0;">'
+    + '<button class="btn btn-o" onclick="shareText(RECORDS.find(r => r.id === \'' + c.id + '\'))">' + L('📤 分享摘要','📤 Share summary') + '</button>'
+    + '<button class="btn btn-o" onclick="printReport(RECORDS.find(r => r.id === \'' + c.id + '\'))">' + L('🖨️ 列印／PDF','🖨️ Print / PDF') + '</button></div>'
+    + '<div class="navrow"><button class="btn btn-o" onclick="nav(\'history\')">← ' + L('我的報告列表','My reports') + '</button>'
+    + '<button class="btn btn-d" onclick="deleteRec(\'' + c.id + '\')">🗑️ ' + L('刪除此紀錄','Delete record') + '</button></div></div></div>';
+  h += '<div class="card"><div class="card-b"><div class="notice" style="margin-top:0;border-top:none;padding-top:0;">' + L('本報告由「' + APPNAME() + ' ' + APP_VERSION + '」自動產生，僅供自我探索與招募輔助參考，不得作為錄用與否之唯一依據，不得用於心理疾病診斷。就業服務法第 5 條禁止就業歧視。','Generated by “Talent Fit Assessment ' + APP_VERSION + '” for self-exploration and hiring support only; not the sole basis for hiring decisions; not a clinical diagnosis. Employment discrimination is prohibited by law (e.g., Taiwan Employment Service Act Art. 5).') + '</div></div></div>';
+  return h;
+}
+async function deleteRec(id) {
+  const c = getRec(id); if (!c) return;
+  if (!confirm(L('確定刪除「' + c.name + '」的檢測紀錄？此動作無法復原。','Delete the record for “' + c.name + '”? This cannot be undone.'))) return;
+  RECORDS = RECORDS.filter(r => r.id !== id);
+  await save('records', RECORDS);
+  nav('history');
+}
+
+/* ═══ 我的報告（歷程）═══ */
+function renderHistory() {
+  let h = '<div class="card"><div class="card-h"><h2>' + L('檢測紀錄（','Records (') + RECORDS.length + '）</h2><button class="btn btn-o btn-sm" onclick="exportCSV()">' + L('📥 匯出 CSV','📥 Export CSV') + '</button></div><div class="card-b" style="padding:6px 16px;">';
+  if (!RECORDS.length) {
+    h += '<div class="empty"><div class="ei">📊</div>' + L('還沒有檢測紀錄<br>完成第一次檢測後，報告會保存在這裡','No records yet<br>Your reports will be saved here after your first assessment') + '</div>';
+  } else {
+    const sorted = [...RECORDS].sort((a,b) => (b.created + b.id) > (a.created + a.id) ? 1 : -1);
+    for (const c of sorted) {
+      const b = bandBadge(c.topMatch.score);
+      h += '<div class="hist-item">'
+        + '<div class="hist-ico" style="background:' + (c.mode === 'hr' ? '#dbeafe' : 'var(--accent-bg)') + ';">' + (c.mode === 'hr' ? '🏢' : '👤') + '</div>'
+        + '<div class="hist-main" onclick="openReport(\'' + c.id + '\')"><div class="n">' + esc(c.name) + (c.consist.length >= 2 ? ' <span class="badge b-w" title="consistency">⚠</span>' : '') + '</div>'
+        + '<div class="m">' + (c.mode === 'hr' ? L('應徵：','Position: ') : '') + esc(posName(c.position)) + '｜' + esc(c.date) + '</div>'
+        + '<div class="m" style="margin-top:3px;">' + L('最適：','Best fit: ') + '<b style="color:var(--accent);">' + esc(posName(c.topMatch.key)) + '</b> <span class="match-band ' + b.cls + '">' + b.t + '</span> <b>' + c.topMatch.score + '</b></div></div>'
+        + '<button class="btn btn-o btn-sm" onclick="openReport(\'' + c.id + '\')">' + L('查看','View') + '</button></div>';
+    }
+    const hrCount = RECORDS.filter(r => r.mode === 'hr').length;
+    if (hrCount >= 20) h += '<div style="font-size:12px;color:var(--warn);padding:10px 0;">' + L('企業施測紀錄已達免費版上限 20 筆。企業版無限制，歡迎聯絡：','Recruiter records reached the free cap of 20. The business edition is unlimited — contact: ') + esc(CONTACT) + '</div>';
+  }
+  h += '</div></div>';
+  h += '<div class="card"><div class="card-b"><div class="notice" style="margin-top:0;border-top:none;padding-top:0;">' + L('紀錄僅儲存於本裝置；清除 App 資料或瀏覽器資料會一併移除。需要長期保存請用「匯出 CSV」或報告的「列印／PDF」。','Records are stored on this device only; clearing app or browser data removes them. For long-term storage use “Export CSV” or the report’s “Print / PDF”.') + '</div></div></div>';
+  return h;
+}
+
+/* ═══ 關於 ═══ */
+function renderAbout() {
+  let h = '<div class="card"><div class="card-h"><h2>' + L('測驗體系（58 題）','Assessment system (58 questions)') + '</h2></div><div class="card-b" style="padding:0 16px 14px;"><table class="tbl"><thead><tr><th>' + L('部分','Part') + '</th><th class="num">' + L('題數','Items') + '</th><th>' + L('理論依據','Framework') + '</th><th>' + L('用途','Purpose') + '</th></tr></thead><tbody>'
+    + '<tr><td>' + L('五大人格','Big Five') + '</td><td class="num">30</td><td>' + L('Big Five 五因素（IPIP 公眾領域框架改編）','Five-Factor Model (IPIP public-domain framework, adapted)') + '</td><td>' + L('工作風格與團隊適性','Work style & team fit') + '</td></tr>'
+    + '<tr><td>' + L('工作價值觀','Work values') + '</td><td class="num">12</td><td>' + L('工作價值觀研究（Super 架構簡化六向度）','Work-values research (simplified six factors after Super)') + '</td><td>' + L('動機與留任契合','Motivation & retention fit') + '</td></tr>'
+    + '<tr><td>' + L('情境判斷 SJT','Situational judgment (SJT)') + '</td><td class="num">8</td><td>' + L('情境判斷測驗技術','Situational Judgment Test methodology') + '</td><td>' + L('實務判斷力','Practical judgment') + '</td></tr>'
+    + '<tr><td>' + L('誠信與工作態度','Integrity & attitude') + '</td><td class="num">8</td><td>' + L('誠實測驗（明言題模式）','Integrity test (overt format)') + '</td><td>' + L('紀律與責任感','Discipline & responsibility') + '</td></tr>'
+    + '</tbody></table><div class="notice">' + L('職務理想輪廓參考工作分析常見結論訂定；正式用於招募決策前，建議先以在職優秀員工試測校準。','Ideal job profiles are based on common job-analysis conclusions; before using for real hiring decisions, calibrate with your own top performers.') + '</div></div></div>';
+  h += '<div class="card"><div class="card-h"><h2>' + L('施測規範與倫理','Testing standards & ethics') + '</h2></div><div class="card-b">'
+    + '<div class="guide-block"><div class="gt">' + L('輔助而非決定','Support, not decide') + '</div><div class="gd">' + L('測驗結果僅供招募輔助與自我探索，不得作為錄用與否的唯一依據。','Results support hiring and self-exploration; they must not be the sole basis for hiring decisions.') + '</div></div>'
+    + '<div class="guide-block"><div class="gt">' + L('非臨床用途','Not clinical') + '</div><div class="gd">' + L('本檢測非心理疾病診斷工具；情緒穩定偏低者應給予關懷與釐清，不可單以此排除。','This is not a clinical diagnostic tool; for low emotional stability, show care and clarify — never exclude on this alone.') + '</div></div>'
+    + '<div class="guide-block"><div class="gt">' + L('知情同意','Informed consent') + '</div><div class="gd">' + L('施測前完成同意程序（App 內建）；受測者有拒絕與中止的權利。','Consent is built into the app before testing; test takers may refuse or stop at any time.') + '</div></div>'
+    + '<div class="guide-block"><div class="gt">' + L('就業歧視防制','Anti-discrimination') + '</div><div class="gd">' + L('就業服務法第 5 條禁止就業歧視；評估僅限職務相關特質，並綜合筆試、面談與經歷查核。','Employment discrimination is prohibited (e.g., Taiwan Employment Service Act Art. 5); assess only job-related traits, combined with written tests, interviews and reference checks.') + '</div></div>'
+    + '<div class="guide-block"><div class="gt">' + L('個資保護','Privacy') + '</div><div class="gd">' + L('所有作答與報告僅存於裝置本機（IndexedDB），App 不上傳、不蒐集、無第三方追蹤；可隨時自行刪除。','All answers and reports stay on-device (IndexedDB); the app uploads nothing, collects nothing, and has no third-party tracking; delete anytime.') + '</div></div>'
+    + '</div></div>';
+  h += '<div class="card"><div class="card-h"><h2>' + L('版本與聯絡','Version & contact') + '</h2></div><div class="card-b">'
+    + '<div style="font-size:13.5px;"><b>' + APPNAME() + ' ' + APP_VERSION + '</b>（Talent Fit Assessment）</div>'
+    + '<div class="notice" style="margin-top:8px;">' + L('職務適配模型與 ERP 人資系統同體系，相容互通。','The job-fit model shares the same system as the ERP HR suite.') + '<br>' + esc(CONTACT) + '<br>' + L('官網：','Website: ') + '<b>erp-free.com</b></div></div></div>';
+  return h;
+}
+
+/* ═══ 初始化 ═══ */
+(async function init() {
+  try {
+    await openDB();
+    RECORDS = await load('records', []);
+    if (!RECORDS.length) { RECORDS = [makeDemo()]; await save('records', RECORDS); }
+    const d = await load('draft', []);
+    DRAFT = (d && d.length > 0 && (d[0].b5 || []).some(v => v > 0) || (d && d[0] && d[0].consent)) ? d[0] : blankDraft();
+  } catch (e) { RECORDS = [makeDemo()]; DRAFT = blankDraft(); }
+  applyStaticLang();
+  renderPage();
+})();
+</script>
+</body>
+</html>
