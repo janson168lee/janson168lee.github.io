@@ -1,0 +1,17 @@
+{
+  "name": "人力資源薪資系統",
+  "short_name": "人資系統",
+  "description": "員工資料、組織架構、出勤請假、薪資結構、每月薪資計算與薪資明細，一站式人資管理。資料只存本機，完全離線可用。",
+  "lang": "zh-Hant",
+  "start_url": "/hr/?source=pwa",
+  "scope": "/hr/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#d4820a",
+  "background_color": "#0a0e14",
+  "icons": [
+    { "src": "/hr/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/hr/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/hr/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
