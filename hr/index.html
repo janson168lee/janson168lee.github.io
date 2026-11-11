@@ -376,13 +376,6 @@ let employees, salaryStructures, attendances, leaves, overtimes, payrollRecords,
     }
   }
   STATE.playSub = localStorage.getItem('hr_playsub')==='1';
-  checkPlaySubscription().then(v=>{
-    STATE.playSub=v; localStorage.setItem('hr_playsub',v?'1':'0');
-    updateSidebarLicense();
-    const vb=document.getElementById('sidebarVer');
-    if(vb){ vb.textContent=isPro()?(STATE.playSub?'訂閱版 V2.0':'專業版 V2.0'):'免費版 V2.0'; vb.style.color=isPro()?'#1b7d46':'#d4820a'; }
-    if(typeof employees!=='undefined'&&employees){ renderPage(); }
-  });
   const ver = document.getElementById('sidebarVer');
   if(ver && STATE.license){ ver.textContent = isPro() ? '專業版 V2.0' : '免費版 V2.0'; ver.style.color = isPro() ? '#1b7d46' : '#d4820a'; }
   employees = await load('employees', DEFAULT_EMPLOYEES);
@@ -393,6 +386,15 @@ let employees, salaryStructures, attendances, leaves, overtimes, payrollRecords,
   payrollRecords = await load('payrollRecords', []);
   shiftPresets = await load('shiftPresets', DEFAULT_SHIFTS);
   schedules = await load('schedules', []);
+  // Play 訂閱檢查（資料載入完成後；離線時沿用快取授權）
+  checkPlaySubscription().then(v=>{
+    const changed = (v!==STATE.playSub);
+    STATE.playSub=v; localStorage.setItem('hr_playsub',v?'1':'0');
+    updateSidebarLicense();
+    const vb=document.getElementById('sidebarVer');
+    if(vb){ vb.textContent=isPro()?(STATE.playSub?'訂閱版 V2.0':'專業版 V2.0'):'免費版 V2.0'; vb.style.color=isPro()?'#1b7d46':'#d4820a'; }
+    if(changed) renderPage();
+  });
 
     if(!isPro()){
     STATE.currentUser = { id:'free', username:'訪客', role:'免費版' };
@@ -445,7 +447,7 @@ function renderPage(){
   if(isFree()){
     const limits=getLimits();
     const names={employees:'員工',attendances:'出勤記錄',payroll:'薪資月份'};
-    const counts={employees:employees.length,attendances:attendances.length,payroll:payrollRecords.length};
+    const counts={employees:(employees||[]).length,attendances:(attendances||[]).length,payroll:(payrollRecords||[]).length};
     for(const[k,v] of Object.entries(limits)){
       if(counts[k]>v){
         const mc=document.getElementById('mainContent');
