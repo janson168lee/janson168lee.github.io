@@ -381,7 +381,7 @@ let employees, salaryStructures, attendances, leaves, overtimes, payrollRecords,
     updateSidebarLicense();
     const vb=document.getElementById('sidebarVer');
     if(vb){ vb.textContent=isPro()?(STATE.playSub?'訂閱版 V2.0':'專業版 V2.0'):'免費版 V2.0'; vb.style.color=isPro()?'#1b7d46':'#d4820a'; }
-    renderPage();
+    if(typeof employees!=='undefined'&&employees){ renderPage(); }
   });
   const ver = document.getElementById('sidebarVer');
   if(ver && STATE.license){ ver.textContent = isPro() ? '專業版 V2.0' : '免費版 V2.0'; ver.style.color = isPro() ? '#1b7d46' : '#d4820a'; }
