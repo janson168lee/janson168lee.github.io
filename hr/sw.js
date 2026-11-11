@@ -1,6 +1,6 @@
-// 人力資源薪資系統 Service Worker v1.0.0 (2026-11-09)
+// 人力資源薪資系統 Service Worker v2.0.0 (2026-11-11)
 // 部署於 /hr/ 子路徑：全部使用相對路徑，導航 network-first＋離線快取
-const CACHE = 'hr-v1.0.0-20261109';
+const CACHE = 'hr-v2.0.0-20261111';
 const SHELL = [
   './',
   './index.html',

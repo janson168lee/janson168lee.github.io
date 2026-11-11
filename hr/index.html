@@ -119,6 +119,14 @@ select.filter-select { padding:7px 10px; border:1px solid var(--border); border-
 .pay-slip h2 { text-align:center; margin-bottom:16px; }
 .pay-slip table { width:100%; }
 .pay-slip .divider td { border-top:2px solid var(--text-primary); }
+.clock-btn{font-size:18px;padding:22px 36px;border-radius:14px;font-weight:800;min-width:150px;}
+.sched-tbl td{padding:2px;text-align:center;font-size:11px;cursor:pointer;}
+.sched-tbl th{padding:4px 2px;text-align:center;font-size:10px;white-space:nowrap;}
+.sched-chip{display:inline-block;min-width:22px;height:22px;line-height:22px;border-radius:6px;color:#fff;font-weight:700;font-size:11px;padding:0 4px;}
+.plan-card{border:2px solid var(--border);border-radius:12px;padding:20px;text-align:center;flex:1;min-width:220px;background:var(--bg-card);}
+.plan-card.featured{border-color:var(--accent);background:#fffdf7;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;transition:all .25s;background:#1a1a18;color:#fff;padding:10px 22px;border-radius:8px;z-index:300;font-size:13px;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 <script src="./vendor/xlsx.full.min.js"></script>
 </head>
@@ -133,7 +141,9 @@ select.filter-select { padding:7px 10px; border:1px solid var(--border); border-
   <nav class="sidebar-nav" id="sidebarNav">
     <div class="nav-section">
       <div class="nav-section-title">人力資源</div>
-      <div class="nav-item active" data-page="employees"><span class="nav-icon">👤</span>員工基本資料</div>
+      <div class="nav-item active" data-page="clockin"><span class="nav-icon">⏱️</span>打卡機</div>
+      <div class="nav-item" data-page="schedule"><span class="nav-icon">🗓️</span>排班表</div>
+      <div class="nav-item" data-page="employees"><span class="nav-icon">👤</span>員工基本資料</div>
       <div class="nav-item" data-page="org-chart"><span class="nav-icon">🏛️</span>組織架構</div>
       <div class="nav-item" data-page="attendance"><span class="nav-icon">📅</span>出勤管理</div>
       <div class="nav-item" data-page="leave"><span class="nav-icon">🏖️</span>請假管理</div>
@@ -146,6 +156,11 @@ select.filter-select { padding:7px 10px; border:1px solid var(--border); border-
       <div class="nav-item" data-page="payslip"><span class="nav-icon">📄</span>薪資明細查詢</div>
       <div class="nav-item" data-page="annual-summary"><span class="nav-icon">📊</span>年度薪資彙總</div>
     </div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">帳戶</div>
+    <div class="nav-item" data-page="subscription"><span class="nav-icon">⭐</span>訂閱方案</div>
+  </div>
   </nav>
   <div class="sidebar-footer"><div id="sidebarVer" style="font-size:10px;color:var(--accent);font-weight:700;margin-bottom:4px;">專業版 V2.0</div><div id="sidebarLicense" style="font-size:9px;color:var(--text-sidebar);margin-top:2px;">授權：未啟用</div><span>台灣中小企業適用</span><span id="sidebarClock">--</span></div>
 </aside>
@@ -166,14 +181,14 @@ select.filter-select { padding:7px 10px; border:1px solid var(--border); border-
    HR & PAYROLL SYSTEM — 台灣中小企業人力資源與薪資管理
    ═══════════════════════════════════════════════════════ */
 
-const STATE = { currentPage:'employees', editingId:null, currentUser:null };
+const STATE = { currentPage:'clockin', editingId:null, currentUser:null, playSub:false, scheduleMonth:null };
 
 // ═══════════════════════════════════════════════
 //  VERSION CHECK — Free vs Pro
 // ═══════════════════════════════════════════════
-function isFree(){ return STATE.license && STATE.license.tier === 1; }
-function isPro(){ return STATE.license && STATE.license.tier === 2; }
-function getLimits(){ return isFree() ? {employees:20,attendances:500,payroll:12} : null; }
+function isFree(){ return !isPro(); }
+function isPro(){ return (STATE.license && STATE.license.tier >= 2) || STATE.playSub === true; }
+function getLimits(){ return isFree() ? {employees:5,attendances:200,payroll:3} : null; }
 function checkLimit(type){ const l=getLimits(); if(!l) return false; const m={'employees':employees,'attendances':attendances,'payroll':payrollRecords.length}; const d=m[type]; return d&&d>=l[type]; }
 
 // ═══════════════════════════════════════════════
@@ -215,14 +230,13 @@ function showLicenseModal(errMsg){
       <div class="form-group"><label>公司名稱</label><input id="licCompany" placeholder="請輸入公司名稱"></div>
       <div class="form-group"><label>授權金鑰</label><input id="licKey" placeholder="XXXX-XXXX-XXXX-XXXX"></div>
       <div id="licError" style="color:var(--negative);font-size:12px;margin-top:8px;"></div>
-      <div style="margin-top:12px;padding:10px;background:var(--bg-input);border-radius:var(--radius-sm);font-size:11px;color:var(--text-muted);">
-        💡 測試金鑰：PRO-A7F3-B2C9-D8E1（公司名稱：示範企業）
-      </div>
+      <div style="margin-top:12px;padding:10px;background:var(--bg-input);border-radius:var(--radius-sm);font-size:11px;color:var(--text-muted);">已購買永久授權的客戶請輸入金鑰；一般用戶建議使用 Google Play 訂閱。</div>
     </div>
     <div class="modal-footer" style="flex-wrap:wrap;justify-content:space-between;">
       <div style="font-size:11px;color:var(--text-muted);padding:6px 0;">📞 02-26293721 | 📧 janson168@gmail.com</div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn-outline" onclick="activateFree()">🎁 啟用免費版</button>
+        <button class="btn btn-primary" onclick="showSubscribeModal()">⭐ 訂閱方案</button>
+        <button class="btn btn-outline" onclick="activateFree()">免費版（5 人）</button>
         <button class="btn btn-primary" onclick="activateLicense()">🔐 驗證並啟用</button>
       </div>
     </div>`;
@@ -252,9 +266,14 @@ async function activateLicense(){
 function updateSidebarLicense(){
   const el = document.getElementById('sidebarLicense');
   if(!el) return;
-  if(STATE.license && STATE.license.valid){
-    const badge = isPro() ? '<span style="background:#1b7d46;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">專業版</span>' : '<span style="background:#d4820a;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">免費版</span>';
-    el.innerHTML = badge + ' ' + STATE.license.company;
+  if(isPro()){
+    const badge = STATE.playSub ? '<span style="background:#1b7d46;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">訂閱版</span>' : '<span style="background:#1b7d46;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">專業版</span>';
+    const nm = STATE.playSub ? 'Google Play 訂閱' : (STATE.license.company||'專業版');
+    el.innerHTML = badge + ' ' + nm;
+    el.style.display = '';
+  } else if(STATE.license && STATE.license.valid){
+    const badge = '<span style="background:#d4820a;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;">免費版</span>';
+    el.innerHTML = badge + ' ' + (STATE.license.company||'免費試用');
     el.style.display = '';
   } else {
     el.textContent='授權：未啟用';
@@ -265,7 +284,7 @@ function updateSidebarLicense(){
 //  PROFESSIONAL V2.0 — IndexedDB + Login
 // ═══════════════════════════════════════════════
 let DB=null;
-function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open('HR_DB',2);req.onupgradeneeded=(e)=>{const db=e.target.result;['employees','salaryStructures','attendances','leaves','overtimes','payrollRecords','users'].forEach(s=>{if(!db.objectStoreNames.contains(s))db.createObjectStore(s,{keyPath:'id'});});if(!db.objectStoreNames.contains('license'))db.createObjectStore('license',{keyPath:'id'});};req.onsuccess=(e)=>{DB=e.target.result;resolve(DB);};req.onerror=()=>reject(req.error);});}
+function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open('HR_DB',3);req.onupgradeneeded=(e)=>{const db=e.target.result;['employees','salaryStructures','attendances','leaves','overtimes','payrollRecords','users','shiftPresets','schedules'].forEach(s=>{if(!db.objectStoreNames.contains(s))db.createObjectStore(s,{keyPath:'id'});});if(!db.objectStoreNames.contains('license'))db.createObjectStore('license',{keyPath:'id'});};req.onsuccess=(e)=>{DB=e.target.result;resolve(DB);};req.onerror=()=>reject(req.error);});}
 async function dbLoad(store){return new Promise((resolve)=>{const tx=DB.transaction(store,'readonly');const os=tx.objectStore(store);const req=os.getAll();req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve([]);});}
 async function dbSave(store,data){return new Promise((resolve)=>{const tx=DB.transaction(store,'readwrite');const os=tx.objectStore(store);os.clear();data.forEach(d=>os.put(d));tx.oncomplete=()=>resolve();});}
 async function load(k,f){if(!DB)return f;try{const d=await dbLoad(k);if(d&&d.length>0)return d;}catch(e){}try{const v=localStorage.getItem('hr_'+k);if(v){const d=JSON.parse(v);if(d.length>0){await dbSave(k,d);localStorage.removeItem('hr_'+k);return d;}}}catch(e){}return f;}
@@ -289,11 +308,6 @@ const DEFAULT_EMPLOYEES = [
   {id:'e3',code:'E003',name:'張大為',idNumber:'C134567890',gender:'男',birthDate:'1985-11-08',hireDate:'2018-09-15',dept:'業務部',title:'主任',phone:'0933-567-890',email:'chang@example.com',addr:'桃園市中壢區',bankAcct:'003-345-678901',status:'在職'},
   {id:'e4',code:'E004',name:'王美華',idNumber:'D245678901',gender:'女',birthDate:'1990-05-30',hireDate:'2022-03-01',dept:'生產製造部',title:'課長',phone:'0944-678-901',email:'wang@example.com',addr:'台中市西屯區',bankAcct:'004-456-789012',status:'在職'},
   {id:'e5',code:'E005',name:'李建成',idNumber:'E156789012',gender:'男',birthDate:'1992-08-14',hireDate:'2023-07-10',dept:'研發技術部',title:'總工程師',phone:'0955-789-012',email:'lee@example.com',addr:'新竹市東區',bankAcct:'005-567-890123',status:'在職'},
-  {id:'e6',code:'E006',name:'黃小娟',idNumber:'F267890123',gender:'女',birthDate:'1995-01-25',hireDate:'2024-01-15',dept:'財務會計部',title:'組長',phone:'0966-890-123',email:'huang@example.com',addr:'台北市大安區',bankAcct:'006-678-901234',status:'在職'},
-  {id:'e7',code:'E007',name:'劉志豪',idNumber:'G178901234',gender:'男',birthDate:'1998-04-12',hireDate:'2025-02-01',dept:'研發技術部',title:'工程師',phone:'0977-901-234',email:'liu@example.com',addr:'新北市三重區',bankAcct:'007-789-012345',status:'在職'},
-  {id:'e8',code:'E008',name:'周雅文',idNumber:'H289012345',gender:'女',birthDate:'2000-09-03',hireDate:'2025-08-01',dept:'生產製造部',title:'技術士',phone:'0988-012-345',email:'chou@example.com',addr:'高雄市三民區',bankAcct:'008-890-123456',status:'在職'},
-  {id:'e9',code:'E009',name:'吳承翰',idNumber:'I100123456',gender:'男',birthDate:'1997-12-20',hireDate:'2024-06-15',dept:'業務部',title:'職員',phone:'0900-123-456',email:'wu@example.com',addr:'台南市東區',bankAcct:'009-901-234567',status:'在職'},
-  {id:'e10',code:'E010',name:'許嘉玲',idNumber:'J211234567',gender:'女',birthDate:'1999-06-18',hireDate:'2025-11-01',dept:'品管部',title:'技術員',phone:'0911-234-567',email:'hsu@example.com',addr:'台中市南屯區',bankAcct:'010-012-345678',status:'在職'},
 ];
 
 // ── Default Salary Structures ──
@@ -303,11 +317,6 @@ const DEFAULT_SALARIES = [
   {id:'s3',employeeId:'e3',baseSalary:55000,positionAllowance:10000,mealAllowance:2400,otherAllowance:2000},
   {id:'s4',employeeId:'e4',baseSalary:45000,positionAllowance:8000,mealAllowance:2400,otherAllowance:1500},
   {id:'s5',employeeId:'e5',baseSalary:80000,positionAllowance:20000,mealAllowance:2400,otherAllowance:5000},
-  {id:'s6',employeeId:'e6',baseSalary:42000,positionAllowance:6000,mealAllowance:2400,otherAllowance:1000},
-  {id:'s7',employeeId:'e7',baseSalary:50000,positionAllowance:10000,mealAllowance:2400,otherAllowance:2000},
-  {id:'s8',employeeId:'e8',baseSalary:35000,positionAllowance:4000,mealAllowance:2400,otherAllowance:800},
-  {id:'s9',employeeId:'e9',baseSalary:38000,positionAllowance:5000,mealAllowance:2400,otherAllowance:1000},
-  {id:'s10',employeeId:'e10',baseSalary:33000,positionAllowance:3000,mealAllowance:2400,otherAllowance:800},
 ];
 
 // ── Taiwan Insurance Grade Tables (2025 ver) ──
@@ -343,27 +352,37 @@ function calcTaxWithholding(grossPay, dependents) {
 }
 
 // ── Init data ──
-let employees, salaryStructures, attendances, leaves, overtimes, payrollRecords;
+let employees, salaryStructures, attendances, leaves, overtimes, payrollRecords, shiftPresets, schedules;
 (async function(){
   await migrateData();
   await initUsers();
-  // Check license
+  await initBilling();
+  // License: freemium — 自動啟用免費版，訂閱／金鑰隨後疊加
   const savedLicense = await dbLoad('license');
   if(!savedLicense||savedLicense.length===0){
-    showLicenseModal(); return;
+    await dbSave('license',[{id:'license',company:'免費試用',key:'FREE-TRIAL-0000-999999',tier:1,tierName:'免費版',expiry:'永久',valid:true}]);
   }
-  const lic = savedLicense[0];
-  // Free tier: skip crypto verification
+  const lic = (await dbLoad('license'))[0];
   if(lic.tier===1||(lic.key&&lic.key.startsWith('FREE'))){
     STATE.license={valid:true,tier:1,tierName:'免費版',company:lic.company||'免費試用',key:lic.key||'FREE',expiry:'永久'};
   }else{
     const result = await verifyLicenseAsync(lic.key, lic.company);
     if(!result.valid){
-      showLicenseModal('授權已失效：'+result.reason); return;
+      STATE.license={valid:true,tier:1,tierName:'免費版',company:'免費試用',key:'FREE',expiry:'永久'};
+      await dbSave('license',[{id:'license',company:'免費試用',key:'FREE-TRIAL-0000-999999',tier:1,tierName:'免費版',expiry:'永久',valid:true}]);
+      setTimeout(()=>toast('授權已失效，已切換為免費版（'+result.reason+'）'),800);
+    } else {
+      STATE.license = result;
     }
-    STATE.license = result;
   }
-  updateSidebarLicense();
+  STATE.playSub = localStorage.getItem('hr_playsub')==='1';
+  checkPlaySubscription().then(v=>{
+    STATE.playSub=v; localStorage.setItem('hr_playsub',v?'1':'0');
+    updateSidebarLicense();
+    const vb=document.getElementById('sidebarVer');
+    if(vb){ vb.textContent=isPro()?(STATE.playSub?'訂閱版 V2.0':'專業版 V2.0'):'免費版 V2.0'; vb.style.color=isPro()?'#1b7d46':'#d4820a'; }
+    renderPage();
+  });
   const ver = document.getElementById('sidebarVer');
   if(ver && STATE.license){ ver.textContent = isPro() ? '專業版 V2.0' : '免費版 V2.0'; ver.style.color = isPro() ? '#1b7d46' : '#d4820a'; }
   employees = await load('employees', DEFAULT_EMPLOYEES);
@@ -372,11 +391,18 @@ let employees, salaryStructures, attendances, leaves, overtimes, payrollRecords;
   leaves = await load('leaves', []);
   overtimes = await load('overtimes', []);
   payrollRecords = await load('payrollRecords', []);
+  shiftPresets = await load('shiftPresets', DEFAULT_SHIFTS);
+  schedules = await load('schedules', []);
 
-  // Free version: auto-login, skip login screen
-  if (STATE.license && STATE.license.tier === 1) {
+    if(!isPro()){
     STATE.currentUser = { id:'free', username:'訪客', role:'免費版' };
-    sessionStorage.setItem('hr_user', JSON.stringify({id:'free', username:'訪客', role:'免費版'}));
+    sessionStorage.setItem('hr_user', JSON.stringify(STATE.currentUser));
+    renderPage();
+    return;
+  }
+  if(STATE.playSub && !(STATE.license && STATE.license.tier >= 2)){
+    STATE.currentUser = { id:'sub', username:'訂閱用戶', role:'訂閱版' };
+    sessionStorage.setItem('hr_user', JSON.stringify(STATE.currentUser));
     renderPage();
     return;
   }
@@ -409,9 +435,9 @@ document.getElementById('sidebarNav').addEventListener('click',(e)=>{
 });
 
 const pageTitles={
-  'employees':'員工基本資料','org-chart':'組織架構','attendance':'出勤管理','leave':'請假管理',
+  'clockin':'打卡機','schedule':'排班表','employees':'員工基本資料','org-chart':'組織架構','attendance':'出勤管理','leave':'請假管理',
   'overtime':'加班管理','salary-structure':'薪資結構設定','payroll':'每月薪資計算',
-  'payslip':'薪資明細查詢','annual-summary':'年度薪資彙總',
+  'payslip':'薪資明細查詢','annual-summary':'年度薪資彙總','subscription':'訂閱方案',
 };
 
 function renderPage(){
@@ -419,10 +445,11 @@ function renderPage(){
   if(isFree()){
     const limits=getLimits();
     const names={employees:'員工',attendances:'出勤記錄',payroll:'薪資月份'};
+    const counts={employees:employees.length,attendances:attendances.length,payroll:payrollRecords.length};
     for(const[k,v] of Object.entries(limits)){
-      if(checkLimit(k)){
+      if(counts[k]>v){
         const mc=document.getElementById('mainContent');
-        if(mc) mc.insertAdjacentHTML('afterbegin','<div style="background:#fef3e0;color:#b87008;padding:8px 16px;font-size:12px;border-radius:4px;margin-bottom:12px;">⚠️ 免費版'+names[k]+'已達上限（'+v+'），請升級專業版。聯絡：02-26293721</div>');
+        if(mc) mc.insertAdjacentHTML('afterbegin','<div style="background:#fef3e0;color:#b87008;padding:8px 16px;font-size:12px;border-radius:4px;margin-bottom:12px;">⚠️ 免費版'+names[k]+'已達上限（'+v+'），<a href="javascript:void(0)" onclick="showSubscribeModal()" style="color:var(--accent);font-weight:700;text-decoration:underline;">點此查看訂閱方案</a></div>');
       }
     }
   }
@@ -439,12 +466,262 @@ function renderPage(){
     case 'payroll': c.innerHTML=renderPayroll(); break;
     case 'payslip': c.innerHTML=renderPayslip(); break;
     case 'annual-summary': c.innerHTML=renderAnnualSummary(); break;
+    case 'clockin': c.innerHTML=renderClockin(); break;
+    case 'schedule': c.innerHTML=renderSchedule(); break;
+    case 'subscription': c.innerHTML=renderSubscription(); break;
     default: c.innerHTML='<div class="card"><div class="card-body" style="text-align:center;padding:40px;color:var(--text-muted);">請選擇功能模組</div></div>';
   }
   bindPageEvents();
 }
 
 // ═══════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════
+//  0A. PLAY SUBSCRIPTION — Digital Goods API (TWA)
+// ═══════════════════════════════════════════════
+let billingService=null;
+const SUB_SKUS=['hr_pro_monthly','hr_pro_yearly'];
+const SUB_MGMT='https://play.google.com/store/account/subscriptions?sku=hr_pro_monthly&package=tw.erpfree.hr';
+async function initBilling(){
+  if(!('getDigitalGoodsService' in window)) return;
+  try{ billingService=await window.getDigitalGoodsService('play'); }catch(e){ billingService=null; }
+}
+async function checkPlaySubscription(){
+  if(!billingService) return false;
+  try{
+    const ps=await billingService.listPurchases();
+    const act=ps.filter(p=>SUB_SKUS.indexOf(p.productId)>=0&&p.purchaseState==='PURCHASED');
+    for(const p of act){ try{ await billingService.acknowledge(p.purchaseToken,p.productId); }catch(e){} }
+    return act.length>0;
+  }catch(e){ return false; }
+}
+async function subscribePlay(sku){
+  if(!billingService){ toast('此環境不支援 Google Play 訂閱，請於 Play 商店版 App 內訂閱，或使用授權金鑰啟用'); return; }
+  try{
+    const details=await billingService.getDetails([sku]);
+    await billingService.launchPaymentFlow(details[0]);
+    const v=await checkPlaySubscription();
+    STATE.playSub=v; localStorage.setItem('hr_playsub',v?'1':'0');
+    if(v){ closeModal(); toast('訂閱成功，完整功能已解鎖'); updateSidebarLicense(); renderPage(); }
+    else{ toast('訂閱流程未完成'); }
+  }catch(e){ toast('訂閱流程未完成或發生錯誤'); }
+}
+async function restorePurchases(){
+  if(!billingService){ toast('此環境不支援 Google Play 訂閱'); return; }
+  const v=await checkPlaySubscription();
+  STATE.playSub=v; localStorage.setItem('hr_playsub',v?'1':'0');
+  updateSidebarLicense();
+  if(STATE.currentPage==='subscription') renderPage();
+  toast(v?'已恢復訂閱':'查無有效訂閱');
+}
+function requirePro(){ showSubscribeModal(); return false; }
+function showSubscribeModal(){
+  const pro=isPro();
+  let h='<div class="modal-header"><h3>⭐ 訂閱方案 — 人力資源薪資系統</h3><button class="close-btn" onclick="closeModal()">✕</button></div>';
+  h+='<div class="modal-body">';
+  if(pro){
+    h+='<div style="background:#e6f4ea;color:var(--positive);padding:12px 16px;border-radius:6px;margin-bottom:14px;font-weight:700;">✓ 完整版已解鎖（'+(STATE.playSub?'Google Play 訂閱':'授權金鑰')+'）</div>';
+    h+='<div style="font-size:13px;color:var(--text-secondary);line-height:1.9;">權益：員工與紀錄無上限、Excel／CSV 匯出、排班表匯出、後續新功能。<br>管理訂閱（續訂／取消）：<a href="'+SUB_MGMT+'" target="_blank" style="color:var(--accent);">Google Play 訂閱中心</a></div>';
+  } else {
+    h+='<div style="background:#fef3e0;color:#b87008;padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:13px;">免費版上限：員工 5 人、出勤 200 筆、薪資 3 個月，且無法匯出報表。升級訂閱解除所有限制。</div>';
+    h+='<div style="display:flex;gap:14px;flex-wrap:wrap;">';
+    h+='<div class="plan-card"><div style="font-size:13px;font-weight:700;color:var(--text-muted);">月訂閱</div><div style="font-size:30px;font-weight:800;font-family:var(--font-mono);margin:6px 0;">NT$149<span style="font-size:13px;color:var(--text-muted);font-weight:600;">/月</span></div><div style="font-size:12px;color:var(--positive);font-weight:700;margin:6px 0 12px;">7 天免費試用</div><button class="btn btn-primary" style="width:100%;" onclick="subscribePlay(\'hr_pro_monthly\')">開始試用</button></div>';
+    h+='<div class="plan-card featured"><div style="font-size:13px;font-weight:700;color:var(--accent);">年訂閱（最划算）</div><div style="font-size:30px;font-weight:800;font-family:var(--font-mono);margin:6px 0;">NT$1,490<span style="font-size:13px;color:var(--text-muted);font-weight:600;">/年</span></div><div style="font-size:12px;color:var(--text-muted);margin:6px 0 12px;">平均每月 NT$124，省 2 個月</div><button class="btn btn-primary" style="width:100%;" onclick="subscribePlay(\'hr_pro_yearly\')">開始試用</button></div>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-top:14px;line-height:1.8;">訂閱透過 Google Play 結帳，試用期 7 天，到期自動續訂，可隨時在 Google Play 訂閱中心取消（取消後至當期結束仍可使用）。於相同 Google 帳戶的裝置上點「恢復購買」即可還原授權。</div>';
+    h+='<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-outline" onclick="restorePurchases()">🔄 恢復購買</button><button class="btn btn-outline" onclick="showLicenseModal()">🔑 以授權金鑰啟用</button></div>';
+  }
+  h+='</div>';
+  document.getElementById('modalBox').innerHTML=h;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+function renderSubscription(){
+  const pro=isPro();
+  let h='<div class="card"><div class="card-header"><h2>訂閱與授權狀態</h2></div><div class="card-body">';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">'+(pro?'<span class="badge badge-success" style="font-size:13px;padding:4px 12px;">完整版已解鎖</span>':'<span class="badge badge-warning" style="font-size:13px;padding:4px 12px;">免費版</span>');
+  h+='<span style="font-size:13px;color:var(--text-secondary);">'+(STATE.playSub?'Google Play 訂閱中':(STATE.license&&STATE.license.tier>=2?('授權：'+(STATE.license.company||'專業版')):'免費使用中（員工 5 人）'))+'</span></div>';
+  if(!pro){
+    h+='<table class="data-table"><thead><tr><th>功能</th><th class="center">免費版</th><th class="center">訂閱版</th></tr></thead><tbody>';
+    h+='<tr><td>打卡機／排班表／出勤／請假／加班／薪資計算</td><td class="center">✓</td><td class="center">✓</td></tr>';
+    h+='<tr><td>員工人數</td><td class="center">5 人</td><td class="center">無上限</td></tr>';
+    h+='<tr><td>出勤／薪資紀錄</td><td class="center">200 筆／3 個月</td><td class="center">無上限</td></tr>';
+    h+='<tr><td>Excel／CSV 匯出</td><td class="center">—</td><td class="center">✓</td></tr>';
+    h+='<tr><td>排班表匯出</td><td class="center">—</td><td class="center">✓</td></tr>';
+    h+='<tr><td>後續新功能</td><td class="center">—</td><td class="center">✓</td></tr>';
+    h+='</tbody></table>';
+    h+='<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-primary" onclick="showSubscribeModal()">⭐ 查看訂閱方案</button><button class="btn btn-outline" onclick="restorePurchases()">🔄 恢復購買</button><button class="btn btn-outline" onclick="showLicenseModal()">🔑 授權金鑰啟用</button></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-top:10px;">訂閱透過 Google Play 結帳並自動續訂，可隨時取消。<a href="'+SUB_MGMT+'" target="_blank" style="color:var(--accent);">管理訂閱</a></div>';
+  } else {
+    h+='<div style="font-size:13px;color:var(--text-secondary);line-height:1.9;">感謝支持！所有功能已解鎖。<br>管理訂閱：<a href="'+SUB_MGMT+'" target="_blank" style="color:var(--accent);">Google Play 訂閱中心</a>　<button class="btn btn-outline btn-xs" onclick="restorePurchases()">恢復購買</button></div>';
+  }
+  h+='</div></div>';
+  return h;
+}
+
+// ═══════════════════════════════════════════════
+//  0B. CLOCK-IN MACHINE — 打卡機
+// ═══════════════════════════════════════════════
+let clockSel=null;
+function renderClockin(){
+  const now=new Date();
+  const today=now.toISOString().split('T')[0];
+  const onDuty=employees.filter(e=>e.status==='在職');
+  if(!clockSel||!onDuty.find(e=>e.id===clockSel)){ clockSel=(onDuty[0]||{}).id||''; }
+  let h='<div class="card"><div class="card-body" style="text-align:center;padding:28px 18px;">';
+  h+='<div id="bigClock" style="font-size:54px;font-weight:800;font-family:var(--font-mono);letter-spacing:-2px;color:var(--text-primary);">'+now.toLocaleTimeString('zh-TW',{hour12:false})+'</div>';
+  h+='<div style="font-size:14px;color:var(--text-muted);margin:4px 0 18px;">'+now.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'})+'</div>';
+  h+='<select class="filter-select" id="clockEmp" style="font-size:15px;padding:10px 14px;width:100%;max-width:380px;" onchange="clockSel=this.value;renderPage()">';
+  h+=onDuty.map(e=>'<option value="'+e.id+'" '+(e.id===clockSel?'selected':'')+'>'+e.code+' '+e.name+'</option>').join('');
+  h+='</select>';
+  h+='<div style="display:flex;gap:16px;justify-content:center;margin-top:20px;flex-wrap:wrap;">';
+  h+='<button class="btn clock-btn" style="background:var(--positive);color:#fff;" onclick="doClock(\'in\')">上班打卡</button>';
+  h+='<button class="btn clock-btn" style="background:var(--accent);color:#fff;" onclick="doClock(\'out\')">下班打卡</button>';
+  h+='</div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-top:14px;">時間取自裝置系統時間；打卡紀錄同時寫入「出勤管理」，可於該頁修正。</div>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="card-header"><h2>今日打卡狀態</h2><span style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);">'+today+'</span></div><div class="card-body">';
+  const todays=attendances.filter(a=>a.date===today);
+  if(todays.length===0){ h+='<div style="text-align:center;padding:18px;color:var(--text-muted);">今天還沒有打卡紀錄</div>'; }
+  else{
+    h+='<table class="data-table"><thead><tr><th>員工</th><th>上班</th><th>下班</th><th>狀態</th><th>備註</th></tr></thead><tbody>';
+    for(const a of todays){
+      h+='<tr><td><strong>'+empName(a.employeeId)+'</strong></td><td class="num">'+(a.checkIn||'—')+'</td><td class="num">'+(a.checkOut||'—')+'</td><td><span class="badge badge-success">'+(a.status||'正常')+'</span></td><td>'+(a.note||'')+'</td></tr>';
+    }
+    h+='</tbody></table>';
+    const noPunch=onDuty.filter(e=>!todays.find(a=>a.employeeId===e.id));
+    if(noPunch.length>0){ h+='<div style="font-size:12px;color:var(--text-muted);margin-top:10px;">未打卡：'+noPunch.map(e=>e.name).join('、')+'</div>'; }
+  }
+  h+='</div></div>';
+  return h;
+}
+function doClock(kind){
+  const empId=clockSel;
+  if(!empId){ toast('請先選擇員工'); return; }
+  const now=new Date();
+  const today=now.toISOString().split('T')[0];
+  const hm=now.toTimeString().slice(0,5);
+  let rec=attendances.find(a=>a.date===today&&a.employeeId===empId);
+  if(kind==='in'){
+    if(rec&&rec.checkIn){
+      if(!confirm('此員工今天已打過上班卡（'+rec.checkIn+'），要覆蓋嗎？'))return;
+      rec.checkIn=hm; rec.status='正常'; toast('上班卡已更新：'+hm);
+    } else if(rec){ rec.checkIn=hm; rec.status='正常'; toast('上班打卡成功：'+hm); }
+    else { attendances.push({id:genId(),date:today,employeeId:empId,checkIn:hm,checkOut:'',status:'正常',note:'打卡機'}); toast('上班打卡成功：'+hm); }
+  } else {
+    if(!rec){ attendances.push({id:genId(),date:today,employeeId:empId,checkIn:'',checkOut:hm,status:'正常',note:'打卡機'}); toast('下班打卡成功：'+hm); }
+    else if(rec.checkOut){ if(!confirm('此員工今天已打過下班卡（'+rec.checkOut+'），要覆蓋嗎？'))return; rec.checkOut=hm; toast('下班卡已更新：'+hm); }
+    else { rec.checkOut=hm; toast('下班打卡成功：'+hm); }
+  }
+  save('attendances',attendances);
+  renderPage();
+}
+
+// ═══════════════════════════════════════════════
+//  0C. SHIFT SCHEDULE — 排班表
+// ═══════════════════════════════════════════════
+const DEFAULT_SHIFTS=[
+  {id:'sh_m',name:'早班',letter:'早',color:'#1b7d46'},
+  {id:'sh_a',name:'午班',letter:'午',color:'#1a56db'},
+  {id:'sh_n',name:'晚班',letter:'晚',color:'#7d3c98'},
+  {id:'sh_r',name:'休假',letter:'休',color:'#9a9995'}
+];
+function schedYM(){
+  if(!STATE.scheduleMonth){ const n=new Date(); STATE.scheduleMonth=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'); }
+  return STATE.scheduleMonth;
+}
+function schedData(){
+  const ym=schedYM();
+  let doc=schedules.find(x=>x.id===ym);
+  if(!doc){ doc={id:ym,data:{}}; schedules.push(doc); }
+  return doc;
+}
+function renderSchedule(){
+  const ym=schedYM();
+  const parts=ym.split('-').map(Number);
+  const Y=parts[0], M=parts[1];
+  const days=new Date(Y,M,0).getDate();
+  const doc=schedData();
+  let h='<div class="card"><div class="card-header"><h2>排班表 '+Y+' 年 '+M+' 月</h2><div style="display:flex;gap:8px;flex-wrap:wrap;">';
+  h+='<button class="btn btn-outline btn-sm" onclick="schedShift(-1)">◀ 上個月</button>';
+  h+='<button class="btn btn-outline btn-sm" onclick="schedShift(1)">下個月 ▶</button>';
+  h+='<button class="btn btn-outline btn-sm" onclick="schedCopyLast()">複製上月</button>';
+  h+='</div></div><div class="card-body">';
+  h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">';
+  for(const p of shiftPresets){ h+='<span class="sched-chip" style="background:'+p.color+';">'+p.letter+' '+p.name+'</span>'; }
+  h+='<span style="font-size:12px;color:var(--text-muted);">點格子循環切換班別 → 排定／清空</span>';
+  h+='</div>';
+  h+='<div style="overflow-x:auto;"><table class="sched-tbl data-table"><thead><tr><th style="min-width:96px;">員工</th>';
+  for(let d=1;d<=days;d++){
+    const dow=new Date(Y,M-1,d).getDay();
+    h+='<th'+((dow===0||dow===6)?' style="color:var(--accent);"':'')+'>'+d+'</th>';
+  }
+  h+='</tr></thead><tbody>';
+  const onDuty=employees.filter(e=>e.status==='在職');
+  for(const e of onDuty){
+    h+='<tr><td style="font-size:12px;white-space:nowrap;">'+e.code+' '+e.name+'</td>';
+    const m=doc.data[e.id]||{};
+    for(let d=1;d<=days;d++){
+      const sp=shiftPresets.find(p=>p.id===m[String(d)]);
+      const dow=new Date(Y,M-1,d).getDay();
+      h+='<td'+((dow===0||dow===6)?' style="background:#faf6ee;"':'')+' onclick="cycleShift(\''+e.id+'\','+d+')">'+(sp?'<span class="sched-chip" style="background:'+sp.color+';">'+sp.letter+'</span>':'')+'</td>';
+    }
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+  h+='<div class="section-title">本月班別統計</div><table class="data-table"><thead><tr><th>員工</th>';
+  for(const p of shiftPresets) h+='<th class="center">'+p.name+'</th>';
+  h+='<th class="center">排班天數</th></tr></thead><tbody>';
+  for(const e of onDuty){
+    const m=doc.data[e.id]||{};
+    h+='<tr><td>'+e.code+' '+(e?e.name:'')+'</td>';
+    let tot=0;
+    for(const p of shiftPresets){ const c=Object.values(m).filter(v=>v===p.id).length; tot+=c; h+='<td class="center">'+(c||'')+'</td>'; }
+    h+='<td class="center" style="font-weight:700;">'+tot+'</td></tr>';
+  }
+  h+='</tbody></table></div></div>';
+  return h;
+}
+function schedShift(dir){
+  const parts=schedYM().split('-').map(Number);
+  const d=new Date(parts[0],parts[1]-1+dir,1);
+  STATE.scheduleMonth=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+  renderPage();
+}
+function cycleShift(empId,day){
+  const doc=schedData();
+  const m=doc.data[empId]||(doc.data[empId]={});
+  const cur=m[String(day)]||'';
+  const ids=[''].concat(shiftPresets.map(p=>p.id));
+  const nx=ids[(ids.indexOf(cur)+1)%ids.length];
+  if(nx){ m[String(day)]=nx; } else { delete m[String(day)]; }
+  save('schedules',schedules);
+  renderPage();
+}
+function schedCopyLast(){
+  const parts=schedYM().split('-').map(Number);
+  const pd=new Date(parts[0],parts[1]-2,1);
+  const pym=pd.getFullYear()+'-'+String(pd.getMonth()+1).padStart(2,'0');
+  const prev=schedules.find(x=>x.id===pym);
+  if(!prev||Object.keys(prev.data||{}).length===0){ toast('上個月（'+pym+'）沒有排班資料可複製'); return; }
+  const doc=schedData();
+  doc.data=JSON.parse(JSON.stringify(prev.data));
+  save('schedules',schedules);
+  renderPage();
+  toast('已複製 '+pym+' 排班');
+}
+function exportSchedule(){
+  const ym=schedYM();
+  const doc=schedules.find(x=>x.id===ym);
+  const rows=employees.filter(e=>e.status==='在職').map(e=>{
+    const row={員工:e.code+' '+e.name};
+    const m=doc&&doc.data[e.id]?doc.data[e.id]:{};
+    for(let d=1;d<=31;d++){ const sp=shiftPresets.find(p=>p.id===m[String(d)]); if(sp) row[d+'日']=sp.name; }
+    return row;
+  });
+  expXLSX(rows,'排班表_'+ym);
+}
+
+
 //  1. EMPLOYEES
 // ═══════════════════════════════════════════════
 function renderEmployees(){
@@ -466,13 +743,14 @@ function renderEmployees(){
 
   h+=`<table class="data-table"><thead><tr><th>編號</th><th>姓名</th><th>部門</th><th>職稱</th><th>身分證</th><th>電話</th><th>到職日</th><th>狀態</th><th></th></tr></thead><tbody>`;
   for(const e of filtered){
-    h+=`<tr><td style="font-family:var(--font-mono);font-size:12px;">${e.code}</td><td><strong>${e.name}</strong></td><td>${e.dept}</td><td>${e.title}</td><td style="font-family:var(--font-mono);font-size:12px;">${e.idNumber.slice(0,1)}*****${e.idNumber.slice(-3)}</td><td>${e.phone}</td><td>${fmtDate(e.hireDate)}</td><td><span class="badge ${e.status==='在職'?'badge-success':'badge-danger'}">${e.status}</span></td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="showEmployeeModal('${e.id}')">編輯</button><button class="btn btn-danger btn-xs" style="margin-left:4px;${isFree()?'display:none;':''}" onclick="deleteEmployee('${e.id}')">刪除</button></td></tr>`;
+    h+=`<tr><td style="font-family:var(--font-mono);font-size:12px;">${e.code}</td><td><strong>${e.name}</strong></td><td>${e.dept}</td><td>${e.title}</td><td style="font-family:var(--font-mono);font-size:12px;">${e.idNumber.slice(0,1)}*****${e.idNumber.slice(-3)}</td><td>${e.phone}</td><td>${fmtDate(e.hireDate)}</td><td><span class="badge ${e.status==='在職'?'badge-success':'badge-danger'}">${e.status}</span></td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="showEmployeeModal('${e.id}')">編輯</button><button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteEmployee('${e.id}')">刪除</button></td></tr>`;
   }
   h+=`</tbody></table></div></div>`;
   return h;
 }
 
 function showEmployeeModal(id){
+  if(isFree()&&checkLimit('employees')){ showSubscribeModal(); return; }
   const e=id?employees.find(x=>x.id===id):null; STATE.editingId=id||null;
   const h=`<div class="modal-header"><h3>${e?'編輯':'新增'}員工</h3><button class="close-btn" onclick="closeModal()">✕</button></div>
     <div class="modal-body">
@@ -575,6 +853,7 @@ function renderAttendance(){
 }
 
 function showAttendanceModal(){
+  if(isFree()&&checkLimit('attendances')){ showSubscribeModal(); return; }
   const today=new Date().toISOString().split('T')[0];
   const h=`<div class="modal-header"><h3>新增出勤記錄</h3><button class="close-btn" onclick="closeModal()">✕</button></div>
     <div class="modal-body">
@@ -610,7 +889,7 @@ function renderLeave(){
     h+=`<table class="data-table"><thead><tr><th>員工</th><th>類型</th><th>起日</th><th>迄日</th><th>時數</th><th>狀態</th><th>原因</th><th></th></tr></thead><tbody>`;
     for(const l of [...leaves].reverse()){
       const sc=l.status==='核准'?'badge-success':(l.status==='待審'?'badge-warning':'badge-danger');
-      h+=`<tr><td>${empName(l.employeeId)}</td><td>${l.type}</td><td>${fmtDate(l.startDate)}</td><td>${fmtDate(l.endDate)}</td><td class="num">${l.hours}h</td><td><span class="badge ${sc}">${l.status}</span></td><td>${l.reason||''}</td><td style="text-align:right;"><button class="btn btn-outline btn-xs" onclick="approveLeave('${l.id}')">核准</button><button class="btn btn-danger btn-xs" style="margin-left:4px;${isFree()?'display:none;':''}" onclick="deleteLeave('${l.id}')">刪除</button></td></tr>`;
+      h+=`<tr><td>${empName(l.employeeId)}</td><td>${l.type}</td><td>${fmtDate(l.startDate)}</td><td>${fmtDate(l.endDate)}</td><td class="num">${l.hours}h</td><td><span class="badge ${sc}">${l.status}</span></td><td>${l.reason||''}</td><td style="text-align:right;"><button class="btn btn-outline btn-xs" onclick="approveLeave('${l.id}')">核准</button><button class="btn btn-danger btn-xs" style="margin-left:4px;" onclick="deleteLeave('${l.id}')">刪除</button></td></tr>`;
     }
     h+=`</tbody></table>`;
   }
@@ -744,7 +1023,7 @@ function renderPayroll(){
 
   let h='';
   if(STATE.license&&STATE.license.tier===1){
-    h+=`<div style="background:#fef9e7;border:1px solid #f9a825;color:#7d6608;padding:10px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:13px;">⚠️ 免費版僅供評估使用，完整功能請升級專業版。聯絡：02-26293721</div>`;
+    h+=`<div style="background:#fef9e7;border:1px solid #f9a825;color:#7d6608;padding:10px 16px;border-radius:var(--radius-sm);margin-bottom:16px;font-size:13px;">⚠️ 免費版上限 3 個月薪資月份。<a href="javascript:void(0)" onclick="showSubscribeModal()" style="color:var(--accent);font-weight:700;text-decoration:underline;">查看訂閱方案</a></div>`;
   }
   h+=`<div class="card"><div class="card-header"><h2>每月薪資計算</h2>
     <div style="display:flex;gap:8px;">
@@ -769,6 +1048,7 @@ function renderPayroll(){
 }
 
 function generatePayroll(){
+  if(isFree()&&checkLimit('payroll')){ showSubscribeModal(); return; }
   const ymInput=document.getElementById('payYM')?.value;
   if(!ymInput) return;
   const ymKey=ymInput.replace('-','');
@@ -903,8 +1183,8 @@ function impXLSX(cb){const i=document.createElement('input');i.type='file';i.acc
 function updateToolbar(){
   const t=document.getElementById('toolbarArea');if(!t)return;
   const p=STATE.currentPage;let h='';
-  const eb=(fn,lb)=>`<button class="btn btn-outline btn-sm" onclick="${fn}">📥 ${lb}</button>`;
-  const ib=(fn,lb)=>`<button class="btn btn-outline btn-sm" onclick="${fn}">📤 ${lb}</button>`;
+  const eb=(fn,lb)=> isPro() ? `<button class="btn btn-outline btn-sm" onclick="${fn}">📥 ${lb}</button>` : `<button class="btn btn-outline btn-sm" onclick="requirePro()">🔒 ${lb}</button>`;
+  const ib=(fn,lb)=> isPro() ? `<button class="btn btn-outline btn-sm" onclick="${fn}">📤 ${lb}</button>` : `<button class="btn btn-outline btn-sm" onclick="requirePro()">🔒 ${lb}</button>`;
   switch(p){
     case 'employees': h=eb("exportEmployees()","匯出員工")+ib("importEmployees()","匯入員工"); break;
     case 'attendance': h=eb("exportAttendance()","匯出出勤")+ib("importAttendance()","匯入出勤"); break;
@@ -914,6 +1194,8 @@ function updateToolbar(){
     case 'payroll': h=eb("exportPayroll()","匯出薪資"); break;
     case 'payslip': h=eb("exportPayroll()","匯出薪資"); break;
     case 'annual-summary': h=eb("exportAnnualSummary()","匯出年度彙總"); break;
+    case 'clockin': h=eb("exportAttendance()","匯出打卡"); break;
+    case 'schedule': h=eb("exportSchedule()","匯出排班"); break;
   }
   t.innerHTML=h;
 }
@@ -944,7 +1226,9 @@ setInterval(()=>{
   const now=new Date();
   document.getElementById('headerDate').textContent=now.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'});
   document.getElementById('sidebarClock').textContent=now.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  const bc=document.getElementById('bigClock'); if(bc) bc.textContent=now.toLocaleTimeString('zh-TW',{hour12:false});
 },1000);
 </script>
+<div class="toast" id="toastBox"></div>
 </body>
 </html>
