@@ -278,7 +278,7 @@ function fmtDocNo(type){var t=DOCTYPES[type];var d=new Date();var ym=d.getFullYe
 /* ── pro / billing ── */
 var billingService=null;
 function isPro(){return !!(DB.pro&&DB.pro.active);}
-function monthCount(){var mk=monthKeyOf(Date.now());return DB.docs.filter(function(d){return monthKeyOf(d.createdAt)===mk;}).length;}
+function monthCount(){var mk=monthKeyOf(Date.now());return DB.docs.filter(function(d){return monthKeyOf(d.createdAt)===mk&&!d.noGate;}).length;}
 function canCreate(){return isPro()||monthCount()<FREE_LIMIT;}
 async function initBilling(){
   if(!('getDigitalGoodsService' in window)){billingService=null;return;}
@@ -575,11 +575,10 @@ function dupDoc(id){var d=getDoc(id);if(!d)return;
   var nd={id:uid(),type:d.type,no:fmtDocNo(d.type),date:todayStr(),due:d.type==='receipt'?'':addDays(todayStr(),DOCTYPES[d.type].dueDays),custId:d.custId,cust:d.cust,items:JSON.parse(JSON.stringify(d.items)),taxMode:d.taxMode,discount:d.discount,note:d.note,terms:d.terms,status:'open',paidDate:'',createdAt:Date.now()};
   DB.docs.push(nd);saveDB();toast('已複製為 '+nd.no);openDoc(nd.id);}
 function makeReceipt(id){var d=getDoc(id);if(!d)return;
-  if(!canCreate()){showPayModal();return;}
   var t=calcTotals(d.items,d.taxMode,d.discount);
   var nd={id:uid(),type:'receipt',no:fmtDocNo('receipt'),date:todayStr(),due:'',custId:d.custId,cust:d.cust,
     items:[{name:'依請款單 '+d.no+' 收款（'+custName(d)+'）',qty:1,unit:'式',price:t.total}],
-    taxMode:'none',discount:0,note:'對應請款單：'+d.no,terms:'',status:'paid',paidDate:todayStr(),createdAt:Date.now(),refNo:d.no};
+    taxMode:'none',discount:0,note:'對應請款單：'+d.no,terms:'',status:'paid',paidDate:todayStr(),createdAt:Date.now(),refNo:d.no,noGate:true};
   DB.docs.push(nd);saveDB();toast('已開立收據 '+nd.no);openDoc(nd.id);}
 
 /* ── sheet HTML（畫面預覽＋列印共用）── */
