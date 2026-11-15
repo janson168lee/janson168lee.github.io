@@ -1,0 +1,17 @@
+{
+  "name": "開單王",
+  "short_name": "開單王",
+  "description": "報價單、估價單、請款單、收據，手機 3 分鐘開好，LINE 秒傳客戶。統編與營業稅內建，完全離線，資料只存本機。",
+  "lang": "zh-Hant",
+  "start_url": "/kaidan/?source=pwa",
+  "scope": "/kaidan/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#14664e",
+  "background_color": "#ffffff",
+  "icons": [
+    { "src": "/kaidan/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/kaidan/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/kaidan/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
