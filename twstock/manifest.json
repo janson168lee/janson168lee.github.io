@@ -1,0 +1,17 @@
+{
+  "name": "台股當沖助手",
+  "short_name": "當沖助手",
+  "description": "部位計算、損益試算、漲跌停檔位、交易日誌與紀律統計。統計參考區間計算工具，完全離線，資料只存本機。不提供投資建議。",
+  "lang": "zh-Hant",
+  "start_url": "/twstock/?source=pwa",
+  "scope": "/twstock/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#10151a",
+  "background_color": "#0f141a",
+  "icons": [
+    { "src": "/twstock/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/twstock/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/twstock/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
