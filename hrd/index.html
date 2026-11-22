@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>人才發展平台 TalentQuest — 職能升階遊戲</title>
+<title>人才發展平台 TalentQuest — 職能升階遊戲 v1.1</title>
 <style>
 :root{
   --bg-app:#0b0f17;--bg-side:#0d1320;--bg-card:#131b28;--bg-card2:#0f1622;--bg-input:#0c121d;
@@ -123,7 +123,8 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
     <div class="nitem" data-page="promotion"><span class="ni">👑</span>晉升評鑑</div>
     <div class="nitem" data-page="ladder"><span class="ni">🗺️</span>職級體系</div>
     <div class="nitem" data-page="comps"><span class="ni">💠</span>職能地圖</div>
-    <div class="nitem" data-page="employees"><span class="ni">👤</span>員工管理</div>
+    <div class="nitem" data-page="qbank"><span class="ni">📝</span>題庫編輯</div>
+      <div class="nitem" data-page="employees"><span class="ni">👤</span>員工管理</div>
     <div class="sec-t">榮耀</div>
     <div class="nitem" data-page="board"><span class="ni">🏆</span>英雄榜</div>
     <div class="nitem" data-page="guide"><span class="ni">📖</span>遊戲說明</div>
@@ -160,13 +161,13 @@ const DEFAULT_TRACKS=[
 
 /* ── 預設：職級階梯（XP 門檻＋升階需求）── */
 const DEFAULT_LADDER=[
- {id:'L1',order:1,name:'見習生',xpNeed:0,reqCourses:[],reqQuiz:'',desc:'入職起步，認識企業與基礎職能'},
- {id:'L2',order:2,name:'初階夥伴',xpNeed:300,reqCourses:['c_newbie','c_comm'],reqQuiz:'q_comm',desc:'獨立完成基礎任務，建立職場基本功'},
- {id:'L3',order:3,name:'中堅幹部',xpNeed:800,reqCourses:['c_time','c_problem','c_excel'],reqQuiz:'q_problem',desc:'能獨當一面，處理複雜日常任務'},
- {id:'L4',order:4,name:'資深骨幹',xpNeed:1600,reqCourses:['c_pm','c_data','c_cross'],reqQuiz:'q_pm',desc:'領域專家，能帶新人、解難題'},
- {id:'L5',order:5,name:'儲備主管',xpNeed:2800,reqCourses:['c_leader','c_okr'],reqQuiz:'q_leader',desc:'開始帶人，具備管理預備能量'},
- {id:'L6',order:6,name:'基層主管',xpNeed:4200,reqCourses:['c_perf','c_coach','c_law'],reqQuiz:'q_perf',desc:'帶領團隊達成目標，執行績效管理'},
- {id:'L7',order:7,name:'部門經理',xpNeed:6000,reqCourses:['c_biz','c_decision'],reqQuiz:'q_boss',desc:'經營視角，統籌部門資源與策略'}
+ {id:'L1',order:1,name:'見習生',xpNeed:0,reqCourses:[],reqQuiz:'',desc:'入職起步，認識企業與基礎職能',salaryBand:'本薪 30,000-35,000'},
+ {id:'L2',order:2,name:'初階夥伴',xpNeed:300,reqCourses:['c_newbie','c_comm'],reqQuiz:'q_comm',desc:'獨立完成基礎任務，建立職場基本功',salaryBand:'本薪 35,000-42,000'},
+ {id:'L3',order:3,name:'中堅幹部',xpNeed:800,reqCourses:['c_time','c_problem','c_excel'],reqQuiz:'q_problem',desc:'能獨當一面，處理複雜日常任務',salaryBand:'本薪 42,000-52,000'},
+ {id:'L4',order:4,name:'資深骨幹',xpNeed:1600,reqCourses:['c_pm','c_data','c_cross'],reqQuiz:'q_pm',desc:'領域專家，能帶新人、解難題',salaryBand:'本薪 52,000-65,000'},
+ {id:'L5',order:5,name:'儲備主管',xpNeed:2800,reqCourses:['c_leader','c_okr'],reqQuiz:'q_leader',desc:'開始帶人，具備管理預備能量',salaryBand:'本薪 60,000-75,000'},
+ {id:'L6',order:6,name:'基層主管',xpNeed:4200,reqCourses:['c_perf','c_coach','c_law'],reqQuiz:'q_perf',desc:'帶領團隊達成目標，執行績效管理',salaryBand:'本薪 70,000-90,000'},
+ {id:'L7',order:7,name:'部門經理',xpNeed:6000,reqCourses:['c_biz','c_decision'],reqQuiz:'q_boss',desc:'經營視角，統籌部門資源與策略',salaryBand:'本薪 90,000-130,000'}
 ];
 
 /* ── 預設：職能字典（16 項，三大類）── */
@@ -373,7 +374,7 @@ function badgesOf(empId){
 function titleOf(emp){const lv=ladder[lvlOf(emp)];const tr=tracks.find(t=>t.id===emp.track);return (tr?tr.icon+' ':'')+(lv?lv.name:'')+(emp.title?(' · '+emp.title):'');}
 
 /* ═══════════ TALENTQUEST — 檢視層 ═══════════ */
-const PAGE_TITLES={hero:'英雄旅程',courses:'訓練課程',quiz:'測驗中心',badges:'徽章牆',team:'團隊總覽',promotion:'晉升評鑑',ladder:'職級體系',comps:'職能地圖',employees:'員工管理',board:'英雄榜',guide:'遊戲說明'};
+const PAGE_TITLES={hero:'英雄旅程',courses:'訓練課程',quiz:'測驗中心',badges:'徽章牆',team:'團隊總覽',promotion:'晉升評鑑',ladder:'職級體系',comps:'職能地圖',qbank:'題庫編輯',qbankedit:'題庫編輯',employees:'員工管理',board:'英雄榜',guide:'遊戲說明'};
 const AVATARS=['🦅','🦉','🐯','🐼','🦊','🐨','🦁','🐺','🐙','🦉','🐸','🦄','🐲','🐬'];
 
 function setHero(v){STATE.heroId=v;renderPage();}
@@ -385,8 +386,9 @@ function renderPage(){
   const heroSel=document.getElementById('heroSelect');
   heroSel.innerHTML=employees.map(e=>'<option value="'+e.id+'" '+(e.id===STATE.heroId?'selected':'')+'>'+e.avatar+' '+esc(e.code)+' '+esc(e.name)+'（'+lvlName(e)+'）</option>').join('');
   const c=document.getElementById('mainContent');
-  const map={hero:renderHero,courses:renderCourses,quiz:renderQuiz,badges:renderBadges,team:renderTeam,promotion:renderPromotion,ladder:renderLadder,comps:renderComps,employees:renderEmployees,board:renderBoard,guide:renderGuide};
+  const map={hero:renderHero,courses:renderCourses,quiz:renderQuiz,badges:renderBadges,team:renderTeam,promotion:renderPromotion,ladder:renderLadder,comps:renderComps,qbank:renderQbank,qbankedit:renderQbankEdit,employees:renderEmployees,board:renderBoard,guide:renderGuide};
   c.innerHTML=(map[p]||renderHero)();
+  if(p==='quiz'&&STATE.quiz&&STATE.quiz.live)renderQuizRun();
   if(p==='quiz'&&STATE.quiz&&STATE.quiz.live)renderQuizRun();
 }
 
@@ -631,7 +633,7 @@ function renderTeam(){
 function renderPromotion(){
   const cands=employees.map(e=>({e,st:reqStatus(e)})).filter(x=>x.st&&x.st.allOk&&!nextLvl(x.st.idx).approvedNoted);
   const waiting=employees.map(e=>({e,st:reqStatus(e)})).filter(x=>x.st&&!x.st.allOk);
-  let h='<div class="card"><div class="ch"><h2>👑 晉升候選人（符合下一職級全部門檻）</h2></div><div class="cb">';
+  let h='<div class="card"><div class="ch"><h2>👑 晉升候選人（符合下一職級全部門檻）</h2><button class="btn btn-outline btn-sm" onclick="exportPromotions()">📤 匯出晉升核定單</button></div><div class="cb">';
   if(cands.length===0)h+='<div style="text-align:center;padding:16px;color:var(--text2);">目前沒有達標的候選人。員工達成「XP＋課程＋測驗」三項門檻後會出現在這裡。</div>';
   cands.forEach(x=>{
     const st=x.st;
@@ -676,12 +678,12 @@ function approvePromotion(empId){
 
 /* ── 7. 職級體系（編輯）── */
 function renderLadder(){
-  let h='<div class="card"><div class="ch"><h2>職級階梯（由低到高）</h2><button class="btn btn-gold btn-sm" onclick="editLadder(\'\')">＋ 新增職級</button></div><div class="cb">';
-  h+='<table class="dt"><thead><tr><th class="center">級</th><th>職級名稱</th><th class="num">XP 門檻</th><th>升階需求</th><th></th></tr></thead><tbody>';
+  let h='<div class="card"><div class="ch"><h2>職級階梯（由低到高）</h2><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="exportSalaryMap()">📤 匯出職級薪級對照</button><button class="btn btn-gold btn-sm" onclick="editLadder(\'\')">＋ 新增職級</button></div></div><div class="cb">';
+  h+='<table class="dt"><thead><tr><th class="center">級</th><th>職級名稱</th><th class="num">XP 門檻</th><th>薪級對照（可編輯）</th><th>升階需求</th><th></th></tr></thead><tbody>';
   ladder.forEach((lv,i)=>{
     const co=(lv.reqCourses||[]).map(id=>{const c=courses.find(x=>x.id===id);return c?c.name:id;}).join('、');
     const qz=lv.reqQuiz?(quizzes.find(x=>x.id===lv.reqQuiz)||{}).name||lv.reqQuiz:'—';
-    h+='<tr><td class="center">'+(i+1)+'</td><td><strong>'+esc(lv.name)+'</strong><div class="mini">'+esc(lv.desc||'')+'</div></td><td class="num">'+lv.xpNeed+'</td><td class="mini">課程：'+(co||'—')+'<br>測驗：'+esc(qz)+'</td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="editLadder(\''+lv.id+'\')">編輯</button> <button class="btn btn-red btn-xs" onclick="delLadder(\''+lv.id+'\')">刪除</button></td></tr>';
+    h+='<tr><td class="center">'+(i+1)+'</td><td><strong>'+esc(lv.name)+'</strong><div class="mini">'+esc(lv.desc||'')+'</div></td><td class="num">'+lv.xpNeed+'</td><td class="mini">'+esc(lv.salaryBand||'—')+'</td><td class="mini">課程：'+(co||'—')+'<br>測驗：'+esc(qz)+'</td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="editLadder(\''+lv.id+'\')">編輯</button> <button class="btn btn-red btn-xs" onclick="delLadder(\''+lv.id+'\')">刪除</button></td></tr>';
   });
   h+='</tbody></table></div></div>';
   h+='<div class="card"><div class="ch"><h2>說明</h2></div><div class="cb"><div class="mini">職級＝遊戲關卡。員工累積 XP（完成課程、通過測驗、晉升獎勵）達到門檻，並修畢該職級指定課程、通過指定測驗（≥80 分）後，即成為晉升候選人；由 HR 在「晉升評鑑」核准後升階。</div></div></div>';
@@ -692,6 +694,7 @@ function editLadder(id){
   let h='<div class="mh"><h3>'+(id?'編輯':'新增')+'職級</h3><button class="cbtn" onclick="closeModal()">✕</button></div><div class="mb">';
   h+='<div class="mrow"><div class="fg"><label>職級名稱</label><input id="lvName" value="'+esc(lv.name)+'"></div><div class="fg"><label>XP 門檻</label><input type="number" id="lvXp" value="'+lv.xpNeed+'"></div></div>';
   h+='<div class="fg"><label>說明</label><input id="lvDesc" value="'+esc(lv.desc||'')+'"></div>';
+  h+='<div class="fg"><label>薪級對照（如：本薪 42,000-52,000 或對應薪級代號）</label><input id="lvBand" value="'+esc(lv.salaryBand||'')+'"></div>';
   h+='<div class="fg"><label>指定測驗（須 ≥80 分）</label><select id="lvQuiz"><option value="">（無）</option>'+quizzes.map(qz=>'<option value="'+qz.id+'" '+(lv.reqQuiz===qz.id?'selected':'')+'>'+esc(qz.name)+'</option>').join('')+'</select></div>';
   h+='<div class="fg"><label>指定課程（須全部修畢）</label><div style="max-height:220px;overflow-y:auto;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:10px;">'+courses.map(c=>'<label style="display:block;font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;"><input type="checkbox" class="lvC" value="'+c.id+'" '+(lv.reqCourses.includes(c.id)?'checked':'')+'> '+esc(c.name)+'（+'+c.xp+' XP）</label>').join('')+'</div></div>';
   h+='</div><div class="mf"><button class="btn btn-out" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="saveLadder(\''+(id||'')+'\')">儲存</button></div>';
@@ -704,9 +707,10 @@ function saveLadder(id){
   const xpNeed=Number(document.getElementById('lvXp').value)||0;
   const desc=document.getElementById('lvDesc').value.trim();
   const reqQuiz=document.getElementById('lvQuiz').value;
+  const salaryBand=document.getElementById('lvBand').value.trim();
   const reqCourses=[].slice.call(document.querySelectorAll('.lvC:checked')).map(x=>x.value);
-  if(id){const lv=ladder.find(x=>x.id===id);Object.assign(lv,{name,xpNeed,desc,reqQuiz,reqCourses});}
-  else ladder.push({id:genId(),name,xpNeed,desc,reqQuiz,reqCourses});
+  if(id){const lv=ladder.find(x=>x.id===id);Object.assign(lv,{name,xpNeed,desc,reqQuiz,reqCourses,salaryBand});}
+  else ladder.push({id:genId(),name,xpNeed,desc,reqQuiz,reqCourses,salaryBand});
   ladder.sort((a,b)=>a.xpNeed-b.xpNeed);
   saveD('ladder',ladder);closeModal();renderPage();
 }
@@ -828,6 +832,135 @@ function renderGuide(){
 }
 
 /* ── 12. 共用 ── */
+
+// ═══════════════════════════════════════════════
+//  12. CSV 匯出工具
+// ═══════════════════════════════════════════════
+function csvExport(rows,fn){
+  if(!rows||!rows.length){toast('無資料可匯出');return;}
+  const keys=Object.keys(rows[0]);
+  const csv='\uFEFF'+keys.join(',')+'\n'+rows.map(r=>keys.map(k=>{let v=String(r[k]==null?'':r[k]);if(/[",\n]/.test(v))v='"'+v.replace(/"/g,'""')+'"';return v;}).join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn+'.csv';a.click();
+  toast('已匯出 '+fn+'.csv');
+}
+function exportPromotions(){
+  const done=promotions.filter(p=>p.status==='通過');
+  if(done.length===0){toast('尚無核定紀錄');return;}
+  const eff=new Date();eff.setDate(1);eff.setMonth(eff.getMonth()+1);
+  csvExport(done.map(p=>{const e=employees.find(x=>x.id===p.empId)||{};const lv=ladder.find(x=>x.name===p.to)||{};return {員工編號:e.code||'',姓名:e.name||'',部門:e.dept||'',原職級:p.from,核定職級:p.to,薪級對照:lv.salaryBand||'',核定日:p.date,建議生效日:eff.getFullYear()+'/'+String(eff.getMonth()+1).padStart(2,'0')+'/01'};}),'晉升核定單');
+}
+function exportSalaryMap(){
+  csvExport(ladder.map(l=>({順序:ladder.indexOf(l)+1,職級名稱:l.name,XP門檻:l.xpNeed,薪級對照:l.salaryBand||'',升階需求課程:(l.reqCourses||[]).map(id=>{const c=courses.find(x=>x.id===id);return c?c.name:id;}).join('、'),指定測驗:l.reqQuiz?((quizzes.find(x=>x.id===l.reqQuiz)||{}).name||l.reqQuiz):'—'})),'職級薪級對照表');
+}
+
+// ═══════════════════════════════════════════════
+//  13. 題庫編輯器（自訂測驗）
+// ═══════════════════════════════════════════════
+function renderQbank(){
+  let h='<div class="card"><div class="ch"><h2>測驗卷列表（'+quizzes.length+' 卷）</h2><div style="display:flex;gap:8px;">'
+   +'<button class="btn btn-outline btn-sm" onclick="qbImport()">📥 匯入題庫 JSON</button>'
+   +'<button class="btn btn-outline btn-sm" onclick="qbExportAll()">📤 匯出全部題庫</button>'
+   +'<button class="btn btn-gold btn-sm" onclick="editQuiz(\'\')">＋ 新增測驗卷</button></div></div><div class="cb">';
+  h+='<div class="mini" style="margin-bottom:12px;">可編輯內建卷與自訂卷：名稱、門檻分數、XP、題目、選項、答案與解析。編輯後立即生效於「測驗中心」。</div>';
+  h+='<table class="dt"><thead><tr><th>測驗卷</th><th class="center">題數</th><th class="center">門檻</th><th class="num">XP</th><th class="center">類別</th><th></th></tr></thead><tbody>';
+  quizzes.forEach(qz=>{
+    h+='<tr><td><strong>'+esc(qz.name)+'</strong></td><td class="center">'+qz.questions.length+'</td><td class="center">'+qz.pass+'</td><td class="num">'+qz.xp+'</td><td class="center">'+(qz.cat==='mgmt'?'<span class="badge b-purple">管理</span>':(qz.cat==='pro'?'<span class="badge b-cyan">專業</span>':'<span class="badge b-gold">核心</span>'))+'</td>'
+     +'<td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="editQuiz(\''+qz.id+'\')">編輯</button> <button class="btn btn-outline btn-xs" onclick="startQuiz(\''+qz.id+'\')">預覽</button> <button class="btn btn-red btn-xs" onclick="delQuiz(\''+qz.id+'\')">刪除</button></td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  h+='<div class="card"><div class="cb mini">💡 題庫設計建議：每卷 6-8 題、情境題優於背誦題、每題附解析（錯了也要學到東西）；晉升關鍵卷建議門檻 80 分以上。刪除測驗卷時，歷史成績會保留（顯示為已刪測驗），已核可的職級門檻請同步於「職級體系」調整。</div></div>';
+  return h;
+}
+function editQuiz(id){
+  const qz=quizzes.find(x=>x.id===id);
+  STATE.qb=qz?JSON.parse(JSON.stringify(qz)):{id:'',name:'',pass:80,xp:150,cat:'core',questions:[]};
+  if(!id)STATE.qb.id='';
+  STATE.page='qbankedit';renderPage();
+}
+function renderQbankEdit(){
+  if(!STATE.qb){STATE.page='qbank';return renderQbank();}
+  const qb=STATE.qb;
+  let h='<div class="card"><div class="ch"><h2>編輯測驗卷</h2><button class="btn btn-out btn-sm" onclick="qbCancel()">返回列表</button></div><div class="cb">';
+  h+='<div class="mrow"><div class="fg"><label>測驗名稱</label><input id="qbName" value="'+esc(qb.name)+'"></div>';
+  h+='<div class="fg"><label>通過門檻（分）</label><input type="number" id="qbPass" value="'+qb.pass+'"></div>';
+  h+='<div class="fg"><label>卷面 XP</label><input type="number" id="qbXp" value="'+qb.xp+'"></div>';
+  h+='<div class="fg"><label>類別</label><select id="qbCat"><option value="core" '+(qb.cat==='core'?'selected':'')+'>核心</option><option value="pro" '+(qb.cat==='pro'?'selected':'')+'>專業</option><option value="mgmt" '+(qb.cat==='mgmt'?'selected':'')+'>管理</option></select></div></div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 10px;"><h3 style="font-size:14px;font-weight:800;">題目（'+qb.questions.length+'）</h3><button class="btn btn-gold btn-sm" onclick="qbSync();qbAddQ()">＋ 新增題目</button></div>';
+  qb.questions.forEach((qq,i)=>{
+    h+='<div class="course" style="margin-bottom:12px;"><div class="mini" style="margin-bottom:6px;">第 '+(i+1)+' 題</div>';
+    h+='<div class="fg"><textarea id="qbQ'+i+'" rows="2">'+esc(qq.q)+'</textarea></div>';
+    for(let j=0;j<4;j++){h+='<div class="fg" style="display:flex;gap:8px;align-items:center;"><span style="font-weight:800;min-width:18px;">'+String.fromCharCode(65+j)+'</span><input id="qbO'+i+'_'+j+'" value="'+esc(qq.o[j]||'')+'" style="flex:1;"><label style="display:flex;gap:4px;align-items:center;font-weight:400;text-transform:none;letter-spacing:0;white-space:nowrap;margin:0;"><input type="radio" name="qbA'+i+'" '+(qq.a===j?'checked':'')+'> 正確</label></div>';}
+    h+='<div class="fg"><label>解析（答錯也要學到東西）</label><input id="qbE'+i+'" value="'+esc(qq.e||'')+'"></div>';
+    h+='<div style="text-align:right;"><button class="btn btn-red btn-xs" onclick="qbSync();qbDelQ('+i+')">刪除此題</button></div></div>';
+  });
+  h+='<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">';
+  h+='<button class="btn btn-out" onclick="qbSync();qbExportOne()">📤 匯出此卷 JSON</button>';
+  h+='<button class="btn btn-gold" onclick="qbSave()">💾 儲存測驗卷</button></div>';
+  h+='</div></div>';
+  return h;
+}
+function qbSync(){
+  const qb=STATE.qb;if(!qb)return;
+  qb.name=document.getElementById('qbName')?document.getElementById('qbName').value:qb.name;
+  qb.pass=Number(document.getElementById('qbPass')?document.getElementById('qbPass').value:qb.pass)||80;
+  qb.xp=Number(document.getElementById('qbXp')?document.getElementById('qbXp').value:qb.xp)||150;
+  qb.cat=document.getElementById('qbCat')?document.getElementById('qbCat').value:qb.cat;
+  qb.questions.forEach((qq,i)=>{
+    const q=document.getElementById('qbQ'+i);if(q)qq.q=q.value;
+    for(let j=0;j<4;j++){const o=document.getElementById('qbO'+i+'_'+j);if(o)qq.o[j]=o.value;}
+    const r=document.querySelector('input[name="qbA'+i+'"]:checked');if(r)qq.a=Number(r.value);
+    const e=document.getElementById('qbE'+i);if(e)qq.e=e.value;
+  });
+}
+function qbAddQ(){STATE.qb.questions.push({q:'',o:['','','',''],a:0,e:''});renderQbankEdit();}
+function qbDelQ(i){if(STATE.qb.questions.length<=1){toast('至少保留一題');return;}STATE.qb.questions.splice(i,1);renderQbankEdit();}
+function qbCancel(){STATE.qb=null;STATE.page='qbank';renderPage();}
+function qbSave(){
+  qbSync();const qb=STATE.qb;
+  if(!qb.name.trim()){toast('請輸入測驗名稱');return;}
+  if(qb.questions.some(qq=>!qq.q.trim()||qq.o.some(o=>!String(o).trim()))){toast('有題目或選項未填完整');return;}
+  const idx=quizzes.findIndex(x=>x.id===qb.id);
+  if(idx>=0)quizzes[idx]=qb;else{qb.id=genId();quizzes.push(qb);}
+  saveD('quizzes',quizzes);
+  STATE.qb=null;STATE.page='qbank';renderPage();
+  toast('測驗卷已儲存，立即生效於測驗中心');
+}
+function delQuiz(id){
+  const qz=quizzes.find(x=>x.id===id);
+  const used=ladder.find(l=>l.reqQuiz===id);
+  if(used){toast('此測驗卷被「'+used.name+'」職級設為門檻，請先於職級體系調整');return;}
+  if(!confirm('確定刪除「'+(qz?qz.name:'')+'」？歷史成績將保留。'))return;
+  quizzes=quizzes.filter(x=>x.id!==id);
+  saveD('quizzes',quizzes);renderPage();
+}
+function qbExportOne(){
+  qbSync();
+  const blob=new Blob([JSON.stringify(STATE.qb,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(STATE.qb.name||'測驗卷')+'.json';a.click();
+  toast('已匯出測驗卷 JSON');
+}
+function qbExportAll(){
+  const blob=new Blob([JSON.stringify(quizzes,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='TalentQuest_題庫.json';a.click();
+  toast('已匯出全部題庫');
+}
+function qbImport(){
+  const i=document.createElement('input');i.type='file';i.accept='.json';
+  i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=ev=>{try{const d=JSON.parse(ev.target.result);const arr=Array.isArray(d)?d:[d];
+      let added=0;
+      arr.forEach(qz=>{if(qz.name&&Array.isArray(qz.questions)&&qz.questions.length>0){
+        qz.id=genId();qz.pass=qz.pass||80;qz.xp=qz.xp||150;qz.cat=qz.cat||'core';
+        qz.questions=qz.questions.map(qq=>({q:qq.q||'',o:[qq.o?qq.o[0]||'':'',qq.o?qq.o[1]||'':'',qq.o?qq.o[2]||'':'',qq.o?qq.o[3]||'':''],a:Number(qq.a)||0,e:qq.e||''}));
+        quizzes.push(qz);added++;}});
+      saveD('quizzes',quizzes);renderPage();toast('已匯入 '+added+' 卷測驗');
+    }catch(err){toast('匯入失敗：'+err.message);}};
+    r.readAsText(f);};
+  i.click();
+}
+
+
 function closeModal(){document.getElementById('modalOv').classList.add('hidden');}
 document.getElementById('modalOv').addEventListener('click',e=>{if(e.target===document.getElementById('modalOv'))closeModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
