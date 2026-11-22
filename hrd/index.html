@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人才發展平台 TalentQuest — 職能升階遊戲</title>
+<style>
+:root{
+  --bg-app:#0b0f17;--bg-side:#0d1320;--bg-card:#131b28;--bg-card2:#0f1622;--bg-input:#0c121d;
+  --text:#e7ecf3;--text2:#9aa7b8;--mute:#5f6c7d;--border:#1f2a3a;--border2:#2a3850;
+  --gold:#f0a93c;--gold2:#ffcf7d;--cyan:#38bdf8;--green:#2fbf71;--red:#e2585b;--purple:#a78bfa;
+  --radius:10px;--radius-sm:6px;
+  --mono:'SF Mono','Cascadia Code',Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg-app);color:var(--text);display:flex;height:100vh;overflow:hidden}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#2a3850;border-radius:4px}
+.sidebar{width:232px;min-width:232px;background:var(--bg-side);border-right:1px solid #1a2230;display:flex;flex-direction:column;z-index:10}
+.brand{padding:16px 16px 12px;border-bottom:1px solid #1a2230;display:flex;align-items:center;gap:10px}
+.brand .logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#f0a93c,#b45309);display:flex;align-items:center;justify-content:center;font-size:19px}
+.brand .t1{font-size:14px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.brand .t2{font-size:10px;color:var(--text2)}
+.snav{flex:1;overflow-y:auto;padding:8px 0}
+.sec-t{padding:12px 16px 4px;font-size:10px;font-weight:800;letter-spacing:1.4px;color:var(--gold);opacity:.75}
+.nitem{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;font-size:13px;color:var(--text2);border-left:2px solid transparent;user-select:none}
+.nitem:hover{background:rgba(240,169,60,.06);color:var(--text)}
+.nitem.active{background:rgba(240,169,60,.1);color:var(--gold2);border-left-color:var(--gold);font-weight:700}
+.nitem .ni{width:18px;text-align:center}
+.sfoot{padding:10px 16px;border-top:1px solid #1a2230;font-size:10px;color:var(--mute)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.header{height:52px;min-height:52px;background:var(--bg-card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;justify-content:space-between}
+.header h1{font-size:16px;font-weight:800}
+.heroSel{display:flex;gap:8px;align-items:center}
+.heroSel select{background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;font-family:inherit}
+.content{flex:1;overflow-y:auto;padding:20px;background:radial-gradient(1200px 500px at 70% -10%,rgba(240,169,60,.05),transparent),var(--bg-app)}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:16px}
+.ch{padding:13px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.ch h2{font-size:14px;font-weight:800}
+.cb{padding:16px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;transition:filter .15s}
+.btn:hover{filter:brightness(1.12)}
+.btn-gold{background:linear-gradient(135deg,#f0a93c,#d4820a);color:#141a24}
+.btn-cyan{background:var(--cyan);color:#06121f}
+.btn-out{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-out:hover{border-color:var(--gold);color:var(--gold2)}
+.btn-red{background:transparent;color:var(--red);border:1px solid rgba(226,88,91,.4)}
+.btn-sm{padding:4px 10px;font-size:12px}.btn-xs{padding:2px 8px;font-size:11px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+table.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{background:var(--bg-input);padding:9px 10px;text-align:left;font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--text2);border-bottom:2px solid var(--border);white-space:nowrap}
+.dt td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.dt tbody tr:hover{background:rgba(240,169,60,.04)}
+.dt .num{text-align:right;font-family:var(--mono);font-size:12px}
+.dt .center{text-align:center}
+.mrow{display:flex;gap:10px}.mrow>*{flex:1}
+.fg{margin-bottom:10px}
+.fg label{display:block;font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px;letter-spacing:.4px;text-transform:uppercase}
+.fg input,.fg select,.fg textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:inherit;background:var(--bg-input);color:var(--text)}
+.fg input:focus,.fg select:focus{outline:none;border-color:var(--gold)}
+.modal-ov{position:fixed;inset:0;background:rgba(4,7,12,.72);z-index:100;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--bg-card);border:1px solid var(--border2);border-radius:12px;width:680px;max-width:92vw;max-height:86vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.mh{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.mh h3{font-size:15px;font-weight:800}
+.mb{padding:18px}
+.mf{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.cbtn{background:none;border:none;font-size:19px;cursor:pointer;color:var(--mute)}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:700}
+.b-gold{background:rgba(240,169,60,.15);color:var(--gold2)}.b-green{background:rgba(47,191,113,.15);color:var(--green)}
+.b-cyan{background:rgba(56,189,248,.15);color:var(--cyan)}.b-red{background:rgba(226,88,91,.15);color:var(--red)}
+.b-purple{background:rgba(167,139,250,.15);color:var(--purple)}.b-grey{background:rgba(95,108,125,.18);color:var(--text2)}
+.xpbar{height:14px;background:var(--bg-input);border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.xpbar>div{height:100%;background:linear-gradient(90deg,#d4820a,#f5c56b);border-radius:8px;transition:width .6s}
+.lvl-badge{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;width:74px;height:74px;border-radius:50%;background:linear-gradient(160deg,#f7d489,#c87c10);color:#241503;font-weight:800;text-align:center;box-shadow:0 4px 18px rgba(240,169,60,.35);border:3px solid #ffe3ad}
+.lvl-badge .lv-t{font-size:9px;opacity:.75}.lvl-badge .lv-n{font-size:14px;line-height:1.15}
+.hero-grid{display:grid;grid-template-columns:280px 1fr;gap:16px}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}}
+.avater{font-size:52px;text-align:center;margin:6px 0}
+.quest{display:flex;gap:10px;align-items:flex-start;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.quest .qi{font-size:20px}
+.quest.done{opacity:.55;border-color:rgba(47,191,113,.4)}
+.quest .qt{font-size:13px;font-weight:700}.quest .qd{font-size:11.5px;color:var(--text2);margin-top:2px}
+.qbar{height:8px;background:var(--bg-input);border-radius:5px;overflow:hidden;margin-top:6px}
+.qbar>div{height:100%;background:var(--cyan)}
+.chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:700;margin:2px 3px 2px 0;border:1px solid var(--border2);color:var(--text2)}
+.chip.on{background:rgba(240,169,60,.14);color:var(--gold2);border-color:rgba(240,169,60,.4)}
+.bcard{display:inline-flex;flex-direction:column;align-items:center;width:86px;padding:10px 6px;background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;margin:0 8px 8px 0}
+.bcard .bi{font-size:26px}.bcard .bn{font-size:10.5px;color:var(--text2);text-align:center;margin-top:4px}
+.lvl-up{font-size:12px;color:var(--gold2);font-weight:700}
+.rank-1{color:#ffd75e;font-weight:800}.rank-2{color:#cfd8e3;font-weight:800}.rank-3{color:#e0a96d;font-weight:800}
+.kpi{background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.kpi .kl{font-size:10px;font-weight:800;letter-spacing:.6px;color:var(--mute);text-transform:uppercase}
+.kpi .kv{font-size:22px;font-weight:800;font-family:var(--mono);margin-top:4px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.course{background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:14px}
+.course .cn{font-size:14px;font-weight:800;margin-bottom:4px}
+.course .cd{font-size:11.5px;color:var(--text2);margin-bottom:8px;min-height:32px}
+.course.done{border-color:rgba(47,191,113,.5)}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;transition:all .25s;background:#1a2230;border:1px solid var(--border2);color:var(--text);padding:11px 22px;border-radius:10px;z-index:300;font-size:13px;pointer-events:none;max-width:80vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.qlabel{font-size:13px;font-weight:700;margin:14px 0 10px;line-height:1.6}
+.opt{display:block;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;margin-bottom:9px;cursor:pointer;font-size:13.5px;transition:all .15s}
+.opt:hover{border-color:var(--gold)}
+.opt.sel{border-color:var(--gold);background:rgba(240,169,60,.1);font-weight:700}
+.opt.right{border-color:var(--green);background:rgba(47,191,113,.1)}
+.opt.wrong{border-color:var(--red);background:rgba(226,88,91,.08)}
+.explain{background:var(--bg-card2);border-left:3px solid var(--cyan);padding:10px 14px;font-size:12.5px;color:var(--text2);border-radius:4px;margin-top:8px;line-height:1.7}
+.mini{font-size:11px;color:var(--mute)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand"><div class="logo">🚀</div><div><div class="t1">TalentQuest</div><div class="t2">人才發展平台 · 職能升階</div></div></div>
+  <nav class="snav" id="snav">
+    <div class="sec-t">我的旅程</div>
+    <div class="nitem active" data-page="hero"><span class="ni">🧭</span>英雄旅程</div>
+    <div class="nitem" data-page="courses"><span class="ni">📚</span>訓練課程</div>
+    <div class="nitem" data-page="quiz"><span class="ni">⚔️</span>測驗中心</div>
+    <div class="nitem" data-page="badges"><span class="ni">🏅</span>徽章牆</div>
+    <div class="sec-t">企業端</div>
+    <div class="nitem" data-page="team"><span class="ni">🛡️</span>團隊總覽</div>
+    <div class="nitem" data-page="promotion"><span class="ni">👑</span>晉升評鑑</div>
+    <div class="nitem" data-page="ladder"><span class="ni">🗺️</span>職級體系</div>
+    <div class="nitem" data-page="comps"><span class="ni">💠</span>職能地圖</div>
+    <div class="nitem" data-page="employees"><span class="ni">👤</span>員工管理</div>
+    <div class="sec-t">榮耀</div>
+    <div class="nitem" data-page="board"><span class="ni">🏆</span>英雄榜</div>
+    <div class="nitem" data-page="guide"><span class="ni">📖</span>遊戲說明</div>
+  </nav>
+  <div class="sfoot">TalentQuest v1.0 · 台灣中小企業適用</div>
+</aside>
+<main class="main">
+  <header class="header">
+    <h1 id="pageTitle">英雄旅程</h1>
+    <div class="heroSel"><span style="font-size:12px;color:var(--mute);">目前玩家</span><select id="heroSelect" onchange="setHero(this.value)"></select></div>
+  </header>
+  <div class="content" id="mainContent"></div>
+</main>
+<div class="modal-ov hidden" id="modalOv"><div class="modal" id="modalBox"></div></div>
+<div class="toast" id="toastBox"></div>
+<script>
+/* ═══════════ TALENTQUEST — 資料層 ═══════════ */
+const STATE={page:'hero',heroId:null,quiz:null};
+let DB=null,employees=[],courses=[],quizzes=[],completions=[],quizResults=[],promotions=[],ladder=[],comps=[],tracks=[];
+
+function openDB(){return new Promise((res,rej)=>{const req=indexedDB.open('TQ_DB',1);req.onupgradeneeded=e=>{const db=e.target.result;['employees','courses','quizzes','completions','quizResults','promotions','ladder','comps','tracks','settings'].forEach(s=>{if(!db.objectStoreNames.contains(s))db.createObjectStore(s,{keyPath:'id'});});};req.onsuccess=e=>{DB=e.target.result;res(DB);};req.onerror=()=>rej(req.error);});}
+function dbLoad(st){return new Promise(r=>{const tx=DB.transaction(st,'readonly'),rq=tx.objectStore(st).getAll();rq.onsuccess=()=>r(rq.result||[]);rq.onerror=()=>r([]);});}
+function dbSave(st,arr){return new Promise(r=>{const tx=DB.transaction(st,'readwrite'),os=tx.objectStore(st);os.clear();arr.forEach(d=>os.put(d));tx.oncomplete=()=>r();});}
+async function loadD(st,def){const d=await dbLoad(st);return(d&&d.length>0)?d:def;}
+async function saveD(st,arr){await dbSave(st,arr);}
+
+/* ── 預設：職系 ── */
+const DEFAULT_TRACKS=[
+ {id:'t_mgr',name:'管理職系',icon:'👔'},
+ {id:'t_tech',name:'技術職系',icon:'🔧'},
+ {id:'t_sales',name:'業務職系',icon:'📈'},
+ {id:'t_staff',name:'幕僚職系',icon:'🗂️'}
+];
+
+/* ── 預設：職級階梯（XP 門檻＋升階需求）── */
+const DEFAULT_LADDER=[
+ {id:'L1',order:1,name:'見習生',xpNeed:0,reqCourses:[],reqQuiz:'',desc:'入職起步，認識企業與基礎職能'},
+ {id:'L2',order:2,name:'初階夥伴',xpNeed:300,reqCourses:['c_newbie','c_comm'],reqQuiz:'q_comm',desc:'獨立完成基礎任務，建立職場基本功'},
+ {id:'L3',order:3,name:'中堅幹部',xpNeed:800,reqCourses:['c_time','c_problem','c_excel'],reqQuiz:'q_problem',desc:'能獨當一面，處理複雜日常任務'},
+ {id:'L4',order:4,name:'資深骨幹',xpNeed:1600,reqCourses:['c_pm','c_data','c_cross'],reqQuiz:'q_pm',desc:'領域專家，能帶新人、解難題'},
+ {id:'L5',order:5,name:'儲備主管',xpNeed:2800,reqCourses:['c_leader','c_okr'],reqQuiz:'q_leader',desc:'開始帶人，具備管理預備能量'},
+ {id:'L6',order:6,name:'基層主管',xpNeed:4200,reqCourses:['c_perf','c_coach','c_law'],reqQuiz:'q_perf',desc:'帶領團隊達成目標，執行績效管理'},
+ {id:'L7',order:7,name:'部門經理',xpNeed:6000,reqCourses:['c_biz','c_decision'],reqQuiz:'q_boss',desc:'經營視角，統籌部門資源與策略'}
+];
+
+/* ── 預設：職能字典（16 項，三大類）── */
+const DEFAULT_COMPS=[
+ {id:'cp_comm',name:'溝通表達',cat:'core',desc:'清楚傳遞訊息、傾聽理解、對上對下對外皆能有效溝通'},
+ {id:'cp_team',name:'團隊合作',cat:'core',desc:'與他人協作達成共同目標，願意補位與分享'},
+ {id:'cp_learn',name:'學習成長',cat:'core',desc:'主動學習新知，把回饋轉化為改進'},
+ {id:'cp_cust',name:'客戶導向',cat:'core',desc:'以客戶視角思考，交付符合期待的成果'},
+ {id:'cp_solve',name:'問題解決',cat:'core',desc:'拆解問題、找根因、提出可行方案'},
+ {id:'cp_exec',name:'執行力',cat:'core',desc:'說到做到：按時、按質、按量完成承諾'},
+ {id:'cp_prof',name:'專業知識',cat:'pro',desc:'職務所需的專業技能與產業知識'},
+ {id:'cp_digi',name:'數位素養',cat:'pro',desc:'善用數位工具與資料提升工作效率'},
+ {id:'cp_pm',name:'專案管理',cat:'pro',desc:'規劃時程、調度資源、控管風險與交付'},
+ {id:'cp_data',name:'資料分析',cat:'pro',desc:'用數據描述現況、發現問題、支持決策'},
+ {id:'cp_inno',name:'創新改善',cat:'pro',desc:'持續優化流程與服務，勇於嘗試新做法'},
+ {id:'cp_goal',name:'目標管理',cat:'mgmt',desc:'設定明確目標並拆解為可執行行動'},
+ {id:'cp_lead',name:'領導統御',cat:'mgmt',desc:'凝聚團隊、給方向、帶出成果'},
+ {id:'cp_perf',name:'績效管理',cat:'mgmt',desc:'公平評估表現並給予具體回饋'},
+ {id:'cp_talent',name:'人才培育',cat:'mgmt',desc:'發現成員潛力，安排挑戰與教練引導'},
+ {id:'cp_biz',name:'經營思維',cat:'mgmt',desc:'理解成本、收入與市場，做出取捨判斷'}
+];
+
+/* ── 預設：訓練課程（24 門）── */
+const DEFAULT_COURSES=[
+ {id:'c_newbie',name:'新人必修：企業文化與職場倫理',cat:'core',comps:['cp_team','cp_learn'],xp:80,hours:1,track:'',desc:'認識企業價值、職場規範與職涯遊戲規則'},
+ {id:'c_comm',name:'溝通協作基礎',cat:'core',comps:['cp_comm','cp_team'],xp:120,hours:1.5,track:'',desc:'傾聽、表達、回饋：職場溝通三支箭'},
+ {id:'c_time',name:'時間管理與優先序',cat:'core',comps:['cp_exec'],xp:100,hours:1,track:'',desc:'要事第一：用四象限與時間塊拿回主導權'},
+ {id:'c_cust',name:'客戶服務心法',cat:'core',comps:['cp_cust'],xp:120,hours:1.5,track:'t_sales',desc:'從抱怨到感動：客戶視角的服務設計'},
+ {id:'c_problem',name:'問題分析與解決',cat:'core',comps:['cp_solve'],xp:150,hours:2,track:'',desc:'根因分析五步驟，搭配魚骨圖與 5 Why'},
+ {id:'c_excel',name:'Excel 職場實戰',cat:'pro',comps:['cp_digi'],xp:150,hours:2,track:'',desc:'樞紐分析、函數與圖表：讓數字說話'},
+ {id:'c_write',name:'商務報告寫作',cat:'pro',comps:['cp_comm'],xp:100,hours:1,track:'',desc:'結論先行的金字塔寫作法'},
+ {id:'c_meeting',name:'會議紀錄與簡報',cat:'pro',comps:['cp_comm'],xp:100,hours:1,track:'',desc:'開會不浪费：紀錄結構化、簡報說重點'},
+ {id:'c_pm',name:'專案管理入門',cat:'pro',comps:['cp_pm','cp_exec'],xp:200,hours:2.5,track:'',desc:'範圍、時程、風險：小型專案也能管得漂亮'},
+ {id:'c_data',name:'資料素養與圖表',cat:'pro',comps:['cp_data','cp_digi'],xp:150,hours:2,track:'',desc:'看得懂圖表、不被數字誤導'},
+ {id:'c_service',name:'服務補救技巧',cat:'core',comps:['cp_cust','cp_solve'],xp:120,hours:1,track:'t_sales',desc:'客訴是轉機：LAST 四步驟'},
+ {id:'c_cross',name:'跨部門協作',cat:'core',comps:['cp_team','cp_comm'],xp:150,hours:1.5,track:'',desc:'沒有職權也能推動事情完成'},
+ {id:'c_leader',name:'團隊領導入門',cat:'mgmt',comps:['cp_lead','cp_team'],xp:220,hours:2.5,track:'t_mgr',desc:'從個人貢獻者到帶人的心態與技術'},
+ {id:'c_okr',name:'目標設定與 OKR',cat:'mgmt',comps:['cp_goal'],xp:200,hours:2,track:'',desc:'寫出可衡量的目標，對齊團隊方向'},
+ {id:'c_perf',name:'績效面談實務',cat:'mgmt',comps:['cp_perf','cp_comm'],xp:220,hours:2,track:'t_mgr',desc:'用 SBI 回饋法談績效，不傷感情有成效'},
+ {id:'c_coach',name:'人才培育與教練技巧',cat:'mgmt',comps:['cp_talent'],xp:220,hours:2,track:'t_mgr',desc:'GROW 模型：問出部屬的答案'},
+ {id:'c_decision',name:'決策與風險管理',cat:'mgmt',comps:['cp_solve'],xp:240,hours:2,track:'t_mgr',desc:'決策樹、前提假設與最壞情況演練'},
+ {id:'c_biz',name:'經營數字解讀',cat:'mgmt',comps:['cp_biz','cp_data'],xp:260,hours:2.5,track:'t_mgr',desc:'損益表、現金流與經營指標的實務解讀'},
+ {id:'c_resil',name:'情緒管理與韌性',cat:'core',comps:['cp_learn'],xp:120,hours:1,track:'',desc:'壓力下的自我調節與復原力'},
+ {id:'c_present',name:'簡報說服力',cat:'pro',comps:['cp_comm'],xp:140,hours:1.5,track:'',desc:'用故事結構讓聽眾行動'},
+ {id:'c_law',name:'勞基法基本概念',cat:'mgmt',comps:['cp_perf'],xp:140,hours:1.5,track:'',desc:'工時、加班、特休：主管不能踩的線'},
+ {id:'c_safety',name:'職業安全衛生',cat:'core',comps:['cp_exec'],xp:100,hours:1,track:'',desc:'職安衛基本觀念與通報流程'},
+ {id:'c_kaizen',name:'創新與持續改善',cat:'pro',comps:['cp_inno'],xp:180,hours:1.5,track:'',desc:'PDCA＋小型實驗：讓改善成為日常'},
+ {id:'c_interview',name:'招募面談技巧',cat:'mgmt',comps:['cp_talent','cp_perf'],xp:200,hours:2,track:'t_mgr',desc:'行為面談法：問對問題選對人'}
+];
+
+/* ── 預設：測驗題庫（8 卷）── */
+const DEFAULT_QUIZZES=[
+ {id:'q_comm',name:'溝通協作認證',pass:80,xp:120,cat:'core',questions:[
+  {q:'同事向你抱怨另一個部門「都不配合」，你最應該先做什麼？',o:['跟著一起抱怨，表示你懂他','先傾聽並確認具體發生了什麼事','直接找對方部門主管理論','向上級檢舉對方部門'],a:1,e:'先傾聽與釐清事實，才能分辨是溝通問題、流程問題還是認知落差，避免情緒放大誤判。'},
+  {q:'「我訊息」（I-Message）的核心是什麼？',o:['指出對方的個性缺陷','描述事實與自己的感受，而非指責對方','用沉默讓對方自知理虧','越激烈越好，對方才會改'],a:1,e:'我訊息＝事實＋影響＋感受（例如「報告延遲兩天，導致我無法如期回覆客戶，我有些焦慮」），降低防衛心。'},
+  {q:'跨部門開會前，最有生產力的準備是什麼？',o:['準備大量簡報頁數','先想清楚「我要對方做什麼、我能提供什麼」','把所有細節背下來','先在信件中指責對方'],a:1,e:'會議的本質是交換資源與達成共識；先界定訴求與可交換條件，會議效率最高。'},
+  {q:'收到模糊不清的工作指示時，最佳做法是？',o:['用自己的猜測直接做','回覆確認：目標、期限、交付格式三個重點','等同事也收到指示再比較','不斷追問每一個細節'],a:1,e:'確認「目標／期限／格式」能以最低成本消除歧義，過度追問反而造成干擾。'},
+  {q:'以下何者是「有效的讚美」？',o:['你好棒！','你很認真！','這次報告的資料比對非常完整，讓客戶當場確認了合作方向','你比誰都強'],a:2,e:'具體行為＋造成的影響，才是可複製的有效讚美；空泛讚美無法強化行為。'},
+  {q:'書面溝通中最容易造成誤解的是什麼？',o:['使用表情符號','文字缺乏語氣與表情，容易被過度解讀','太常換行','使用標點符號'],a:1,e:'文字看不到語氣；重要或敏感事項應改用口語或視訊，文字僅做確認與留紀錄。'}
+ ]},
+ {id:'q_problem',name:'問題解決認證',pass:80,xp:150,cat:'core',questions:[
+  {q:'問題解決的第一步應該是什麼？',o:['立刻提出解決方案','明確定義問題與現象（何時、何地、多嚴重）','先找誰該負責','開檢討會'],a:1,e:'未定義清楚的問題無法有效解決；先描述現象與影響範圍，避免急著開藥方。'},
+  {q:'5 Why 分析的主要目的是？',o:['問五個人責任在誰','逐層追問「為什麼」找到根本原因','讓會議剛好五分鐘','規避責任'],a:1,e:'5 Why 逐層往下問，從表面現象追到系統性根因；停在表面只會頭痛醫頭。'},
+  {q:'魚骨圖（要因分析圖）最適合用來做什麼？',o:['排定工作優先序','系統性整理問題的可能原因分類','計算成本','追蹤專案時程'],a:1,e:'魚骨圖依人、機、料、法、環等向度展開可能原因，避免遺漏思考面向。'},
+  {q:'「解決方案」評估時，下列哪一組維度最完整？',o:['成本低就好','可行性、成本、風險、預期效果','老闆喜好','速度最快'],a:1,e:'四維度評估避免只看單一面（便宜但無效、有效但風險過高）的偏誤。'},
+  {q:'改善對策實施後，接下來應該做什麼？',o:['直接結案','設定追蹤指標驗證效果並標準化','換下一個問題','等老闆確認'],a:1,e:'PDCA 的 C/A：用指標驗證對策有效，再把做法標準化，否則問題容易復發。'},
+  {q:'面對「經常性」與「偶發性」問題，處理重點有何不同？',o:['都一樣開檢討會','經常性問題要改流程根治；偶發問題先處理個案','偶發問題更該開專案','都不用處理'],a:1,e:'經常性問題代表系統有洞（改流程）；偶發問題用例外處理，避免資源錯置。'}
+ ]},
+ {id:'q_pm',name:'專案管理認證',pass:80,xp:180,cat:'pro',questions:[
+  {q:'專案啟動時最重要的三個確認是？',o:['預算、地點、餐點','目標範圍、時程里程碑、資源與角色','參與人數、天氣、服裝','工具、軟體、版位'],a:1,e:'範圍（做什麼／不做什麼）、時程（何時交付什麼）、資源角色（誰做）是專案三大支柱。'},
+  {q:'專案中途客戶要求「加功能但不加時間與預算」，較合理的回應是？',o:['默默接受並加班','說明取捨：新增項目需排擠哪些範圍或延長時程，請對方決定優先序','直接拒絕並結束合作','答應但不執行'],a:1,e:'範圍—時間—成本三角連動；讓決策者看到取捨並簽認，是專業的做法。'},
+  {q:'甘特圖最主要呈現的是什麼？',o:['組織架構','各項工作的时间排序與相依關係','成本明細','風險清單'],a:1,e:'甘特圖以時間軸呈現工作排程與相依性，是時程管理的核心工具。'},
+  {q:'「里程碑（Milestone）」的意義是？',o:['每天要做的事','關鍵交付節點，用來檢核專案健康度','專案結束才有的東西','團隊聚餐時間'],a:1,e:'里程碑是可驗收的關鍵節點，及早暴露偏差，避免末期才爆雷。'},
+  {q:'專案風險管理的基本動作是？',o:['假設不會出事','識別風險、評估機率與影響、預擬應對方案','出事再說','全部外包'],a:1,e:'風險登記表（識別→評估→應對→追蹤）讓團隊對不確定性有共同劇本。'},
+  {q:'專案結束後最有價值的動作是？',o:['馬上解散團隊','舉行復盤（Retrospective）把經驗變成組織資產','刪除所有檔案','不談缺點'],a:1,e:'復盤把「做對的」與「待改的」沉淀為流程與模板，是組織學習的核心。'}
+ ]},
+ {id:'q_leader',name:'團隊領導認證',pass:80,xp:200,cat:'mgmt',questions:[
+  {q:'從「個人貢獻者」轉為「主管」最大的心態轉變是？',o:['自己做得更快更強','透過他人完成成果，並為團隊結果負責','減少與人接觸','把工作都留給自己最安心'],a:1,e:'管理者的產出＝團隊產出；放下「我做最快」的成就感，改投資在授權與培育。'},
+  {q:'授權時最常見的失敗原因是？',o:['授權後完全不追蹤，或只交工作不交資訊與權限','授權太多人','選太資深的部屬','用太正式的文件'],a:1,e:'授權＝交付目標＋資源權限＋回報節點；只交工作不給舞台，等於責任轉嫁。'},
+  {q:'團隊士氣低落時，主管第一步應該做什麼？',o:['立刻發獎金','先觀察與一對一傾聽，找出真正原因','舉辦團建就好','直接換人'],a:1,e:'士氣問題常源自目標模糊、回饋缺乏或公平感受；先診斷再開藥。'},
+  {q:'「情境領導」主張主管應該？',o:['對所有人用同一種管理方式','依部屬的意願與能力調整指導與支持程度','永遠民主表決','完全放任'],a:1,e:'新手多指導、熟手多授權；領導風格跟著部屬狀態走，而非主管個性。'},
+  {q:'以下何者是「有效的團隊目標」？',o:['大家加油！','Q2 前將客訴處理平均時程從 48 小時縮短至 24 小時','做到業界最好','全力衝刺'],a:1,e:'可衡量＋有期限＋有意義的比較基準，團隊才知道「做到什麼叫達成」。'},
+  {q:'主管交代任務時，確認部屬理解的最好方式是？',o:['問「聽懂了嗎」','請部屬用自己的話複述目標與交付標準','發郵件就好','看表情'],a:1,e:'複述能即時暴露認知落差；「聽懂了嗎」只會得到禮貌性的點頭。'}
+ ]},
+ {id:'q_perf',name:'績效管理認證',pass:80,xp:200,cat:'mgmt',questions:[
+  {q:'SBI 回饋法的三個要素是？',o:['Situation情境、Behavior行為、Impact影響','Style、Balance、Initiative','Salary、Bonus、Promotion','Score、Band、Index'],a:0,e:'先講情境與觀察到的行為，再說明造成的影響——具體、可討論、不做人身評價。'},
+  {q:'績效面談最應避免的做法是？',o:['用具體事例說明','拿「比比都是」的相對批評、翻舊帳、只談近因','事前準備資料','聽部屬說完'],a:1,e:'翻舊帳與模糊比較會引發防衛；聚焦本期行為與未來改善才是面談目的。'},
+  {q:'「強制分配曲線」的主要風險是？',o:['成本太高','團隊規模小時易失真，且可能傷害合作文化','太容易執行','法規禁止'],a:1,e:'小團隊硬套 271 分配常失真；重點在對話品質與標準透明，而非分佈強制。'},
+  {q:'設定目標時 SMART 的 M 是指？',o:['Motivation','Measurable 可衡量','Mission','Management'],a:1,e:'無法衡量的目標無法管理；M 確保「做到與否」有客觀依據。'},
+  {q:'部屬表現優異時，最能強化行為的回饋是？',o:['口頭說聲辛苦','具體指出他做了什麼、帶來什麼價值，並在適當場合公開肯定','什麼都不說，避免他驕傲','只發獎金'],a:1,e:'具體＋即時＋看見過程的肯定，比泛泛獎勵更能建立行為與意義的連結。'},
+  {q:'績效不佳的部屬，第一步應該是？',o:['直接資遣','一對一釐清：是能力、意願還是環境資源問題','公開點名','加倍工作量'],a:1,e:'先診斷根因（能力可訓練、意願可激勵、環境可調整），再對症處理；直接懲罰常誤傷。'}
+ ]},
+ {id:'q_data',name:'資料素養認證',pass:80,xp:150,cat:'pro',questions:[
+  {q:'長條圖最適合呈現什麼？',o:['時間趨勢','類別之間的比較','比例構成','相關性'],a:1,e:'類別比較用長條、趨勢用折線、構成用堆疊或圓餅（項目少於五個）。'},
+  {q:'「平均數」容易被什麼扭曲？',o:['極端值（離群值）','樣本顏色','報告頁數','圖表顏色'],a:0,e:'少數極端值會拉偏平均；搭配中位數一起看，才能判斷資料分布。'},
+  {q:'「相關不等於因果」的意思是？',o:['資料都是假的','兩個數字一起變動，不代表其中一個造成另一個','因果無法研究','圖表不準'],a:1,e:'可能存在第三變數或巧合；下因果結論前需控制變因或實驗驗證。'},
+  {q:'報告中呈現「客訴件數連三季下降」，還應該補充什麼才完整？',o:['不用補充','絕對量與基期、客訴類型分布與處理時程','只放圖片','把圖縮小'],a:1,e:'只看相對變化會誤判規模；類型分布能指出改善是否全面。'},
+  {q:'Excel 樞紐分析最適合做什麼？',o:['寫報告文字','快速依類別彙總與交叉檢視大量明細','設計商標','編輯照片'],a:1,e:'樞紐分析是明細資料「分類彙總＋交叉檢視」的最快工具。'},
+  {q:'用數據做決策時，最該先確認的是？',o:['圖表配色','資料來源與統計口徑是否一致','報告長度','簡報動畫'],a:1,e:'口徑不一致（統計區間、定義、母體）是數據決策最常見的陷阱。'}
+ ]},
+ {id:'q_service',name:'客戶服務認證',pass:80,xp:120,cat:'core',questions:[
+  {q:'客戶抱怨時的第一反應應該是？',o:['先解釋公司規定','真誠傾聽並確認問題全貌，表達理解','請客戶看網站說明','轉接其他部門'],a:1,e:'情緒未被接住之前，任何解釋都聽不進去；先傾聽、再處理。'},
+  {q:'LAST 服務補救四步驟是？',o:['Listen、Apologize、Solve、Thank','Listen、Argue、Solve、Transfer','Leave、Avoid、Silence、Tell','Log、Assign、Send、Track'],a:0,e:'傾聽→道歉（承擔感受）→解決→感謝（把抱怨當改善訊號）。'},
+  {q:'「超過客戶期待」最好的做法是？',o:['無限上綱地答應所有要求','在承諾範圍內給予確定性，並在關鍵處多想一步','送大量贈品','降低價格'],a:1,e:'確定性（說到做到）＋主動補位的小驚喜，比無底線討好更能建立信任。'},
+  {q:'客訴處理完成後，最有價值的動作是？',o:['結案歸檔不再想','回饋到流程改善，避免同樣問題再發生','等下次發生再處理','歸咎個人'],a:1,e:'客訴是免費的體檢報告；把個案轉為系統改善才是服務升級。'},
+  {q:'客戶提出超過權限的要求時，應該？',o:['直接答應再說','先安撫並說明將確認後於承諾時間回覆，同時向上尋求資源','拒絕並結束對話','假裝沒聽到'],a:1,e:'給明確回覆時間＋內部爭取資源，比當場答應或拒絕更能維持信任。'},
+  {q:'以下何者是「以客戶為中心」的思考？',o:['公司流程比較省事就好','從客戶完成任務的路徑設計服務，減少他的麻煩','把成本轉嫁客戶','客服只照腳本念'],a:1,e:'客戶導向＝降低他的努力成本（努力減少），而非降低公司自己的成本。'}
+ ]},
+ {id:'q_boss',name:'主管晉升綜合評鑑',pass:80,xp:260,cat:'mgmt',questions:[
+  {q:'部門明年預算縮減 20% 但目標不變，身為主管的第一步是？',o:['直接全線砍人力','重新盤點業務價值排序：停低效專案、聚焦高產出行動，再談資源','要求全員無薪加班','向客戶調漲價格'],a:1,e:'資源縮減時先做價值取捨（停、砍、聚焦），再談效率提升與資源爭取。'},
+  {q:'兩位資深部屬公開衝突，影響團隊氛圍，處理順序應該是？',o:['立刻當眾裁決誰對誰錯','分別一對一了解各自的立場與事實，再居中協調共識','假裝沒看到','把兩人調開了事'],a:1,e:'先分別聽事實（避免當眾對質激化），再找出可合作的交集與共同目標。'},
+  {q:'「經營視角」看一份提案時，最關鍵的問題是？',o:['簡報美不美','投入產出比：成本、效益、風險與機會成本','報告頁數','提案人資歷'],a:1,e:'資源有限，任何提案都要回答「值不值得」與「現在是不是最該做這件事」。'},
+  {q:'部門內有位高潛力新人想離職，最有效的留才動作是？',o:['直接加薪留人','一對一了解離職動機，安排具挑戰性的任務與可見的發展路徑','增加工作量磨練','請他顧全大局'],a:1,e:'高潛力人才離開常因「看不到成長」；發展路徑與挑戰任務比短期加薪有效。'},
+  {q:'公司策略轉向時，主管對團隊溝通的重點是？',o:['只傳達命令','說清楚「為什麼變、變什麼、對團隊的影響、下一步」，並回應焦慮','散發電子郵件就好','等塵埃落定再說'],a:1,e:'變革溝通的關鍵是意義與安全感；被動等待謠言只會放大恐懼。'},
+  {q:'以下哪項是「部門 KPI」與「公司目標」對齊的正確做法？',o:['各部門自己訂自己的','部門 KPI 必須能支撐公司目標的分解（可追溯貢獻）','抄競爭對手的 KPI','越多 KPI 越好'],a:1,e:'KPI 是策略的分解；無法追溯到公司目標的指標，做多也只是局部最佳化。'},
+  {q:'你發現自己的一項決策造成損失，最專業的處理是？',o:['隱藏資訊等待離職','及時向上呈報、提出補救方案並復盤檢討','推給執行團隊','否認到底'],a:1,e:'誠信與補救速度是管理者的信任資本；隱瞞會把小損失變成信任危機。'},
+  {q:'建立部門人才梯隊的核心動作是？',o:['只挖外部空降','為關鍵職位安排繼任者培育計畫（挑戰任務＋教練＋評鑑）','等老闆指派','全員輪調'],a:1,e:'繼任計畫讓關鍵職位「有人可用」；70-20-10：挑戰任務為主、教練為輔、課程為支。'}
+ ]}
+];
+
+/* ── 預設：員工（含種子紀錄）── */
+const DEFAULT_EMPLOYEES=[
+ {id:'e1',code:'T001',name:'林志明',dept:'管理部',track:'t_mgr',avatar:'🦅',title:'總經理',level:'L7',hireDate:'2010-01-05',status:'在職'},
+ {id:'e2',code:'T002',name:'陳雅玲',dept:'人資部',track:'t_staff',avatar:'🦉',title:'人資經理',level:'L6',hireDate:'2015-03-02',status:'在職'},
+ {id:'e3',code:'T003',name:'張大為',dept:'業務部',track:'t_sales',avatar:'🐯',title:'業務主任',level:'L4',hireDate:'2019-06-10',status:'在職'},
+ {id:'e4',code:'T004',name:'王美華',dept:'生產部',track:'t_tech',avatar:'🐼',title:'資深技術員',level:'L3',hireDate:'2021-09-01',status:'在職'},
+ {id:'e5',code:'T005',name:'李建成',dept:'研發部',track:'t_tech',avatar:'🦊',title:'工程師',level:'L3',hireDate:'2022-05-20',status:'在職'},
+ {id:'e6',code:'T006',name:'黃小娟',dept:'財務部',track:'t_staff',avatar:'🐨',title:'初階專員',level:'L2',hireDate:'2024-02-15',status:'在職'}
+];
+const DEFAULT_COMPLETIONS=[
+ {id:'k1',empId:'e1',courseId:'c_leader',date:'2025-03-10',by:'系統'},
+ {id:'k2',empId:'e1',courseId:'c_okr',date:'2025-04-02',by:'系統'},
+ {id:'k3',empId:'e1',courseId:'c_perf',date:'2025-06-15',by:'系統'},
+ {id:'k4',empId:'e1',courseId:'c_coach',date:'2025-08-20',by:'系統'},
+ {id:'k5',empId:'e1',courseId:'c_decision',date:'2025-10-01',by:'系統'},
+ {id:'k6',empId:'e2',courseId:'c_leader',date:'2025-05-11',by:'系統'},
+ {id:'k7',empId:'e2',courseId:'c_perf',date:'2025-07-03',by:'系統'},
+ {id:'k8',empId:'e2',courseId:'c_interview',date:'2025-09-12',by:'系統'},
+ {id:'k9',empId:'e3',courseId:'c_cust',date:'2025-04-20',by:'系統'},
+ {id:'k10',empId:'e3',courseId:'c_problem',date:'2025-08-08',by:'系統'},
+ {id:'k11',empId:'e3',courseId:'c_comm',date:'2024-11-05',by:'系統'},
+ {id:'k12',empId:'e4',courseId:'c_comm',date:'2025-01-15',by:'系統'},
+ {id:'k13',empId:'e4',courseId:'c_safety',date:'2025-02-01',by:'系統'},
+ {id:'k14',empId:'e5',courseId:'c_excel',date:'2025-03-22',by:'系統'},
+ {id:'k15',empId:'e5',courseId:'c_data',date:'2025-06-30',by:'系統'},
+ {id:'k16',empId:'e6',courseId:'c_newbie',date:'2025-02-20',by:'系統'},
+ {id:'k17',empId:'e6',courseId:'c_comm',date:'2025-04-11',by:'系統'}
+];
+const DEFAULT_RESULTS=[
+ {id:'r1',empId:'e1',quizId:'q_boss',score:92,pass:true,date:'2025-10-15'},
+ {id:'r2',empId:'e2',quizId:'q_perf',score:88,pass:true,date:'2025-08-01'},
+ {id:'r3',empId:'e3',quizId:'q_problem',score:83,pass:true,date:'2025-09-01'},
+ {id:'r4',empId:'e4',quizId:'q_comm',score:100,pass:true,date:'2025-03-01'},
+ {id:'r5',empId:'e5',quizId:'q_comm',score:85,pass:true,date:'2025-05-01'},
+ {id:'r6',empId:'e6',quizId:'q_comm',score:100,pass:true,date:'2025-06-01'}
+];
+
+/* ── 工具與計算 ── */
+function $(s){return document.querySelector(s);}
+function $$s(s){return document.querySelectorAll(s);}
+function genId(){return 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);}
+function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(msg){const t=document.getElementById('toastBox');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400);}
+function hero(){return employees.find(x=>x.id===STATE.heroId)||employees[0]||null;}
+function lvlOf(emp){let idx=0;for(let i=0;i<ladder.length;i++){if((emp.xp||0)>=ladder[i].xpNeed)idx=i;}return idx;}
+function lvlName(emp){return ladder[lvlOf(emp)]?ladder[lvlOf(emp)].name:'—';}
+function nextLvl(idx){return ladder[idx+1]||null;}
+function empXp(emp){return emp.xp||0;}
+function recalcXp(empId){
+  const emp=employees.find(x=>x.id===empId);if(!emp)return;
+  let xp=0;
+  completions.filter(c=>c.empId===empId).forEach(c=>{const co=courses.find(x=>x.id===c.courseId);if(co)xp+=co.xp;});
+  quizResults.filter(r=>r.empId===empId&&r.pass).forEach(r=>{const qz=quizzes.find(x=>x.id===r.quizId);if(qz)xp+=Math.round(r.score/100*qz.xp);});
+  promotions.filter(p=>p.empId===empId&&p.status==='通過').forEach(()=>{xp+=300;});
+  emp.xp=xp;
+}
+function bestScore(empId,quizId){const rs=quizResults.filter(r=>r.empId===empId&&r.quizId===quizId);if(!rs.length)return null;return Math.max.apply(null,rs.map(r=>r.score));}
+function reqStatus(emp){
+  const idx=lvlOf(emp);const nxt=nextLvl(idx);if(!nxt)return null;
+  const xpOk=(emp.xp||0)>=nxt.xpNeed;
+  const done=new Set(completions.filter(c=>c.empId===emp.id).map(c=>c.courseId));
+  const coursesOk=(nxt.reqCourses||[]).every(id=>done.has(id));
+  const needQ=nxt.reqQuiz;let quizOk=true,quizScore=null;
+  if(needQ){quizScore=bestScore(emp.id,needQ);quizOk=quizScore!=null&&quizScore>=80;}
+  return {nxt,idx,xpOk,coursesOk,quizOk,quizScore,courses:(nxt.reqCourses||[]).map(id=>({id,done:done.has(id)})),allOk:xpOk&&coursesOk&&quizOk};
+}
+function badgesOf(empId){
+  const list=[];const done=completions.filter(c=>c.empId===empId);
+  const res=quizResults.filter(r=>r.empId===empId&&r.pass);
+  const pros=promotions.filter(p=>p.empId===empId&&p.status==='通過');
+  const emp=employees.find(x=>x.id===empId);
+  if(done.length>=1)list.push({i:'🎒',n:'初來乍到',d:'完成第一堂課'});
+  if(done.length>=5)list.push({i:'📚',n:'學霸養成',d:'完成 5 堂課程'});
+  if(done.length>=12)list.push({i:'🎓',n:'學富五車',d:'完成 12 堂課程'});
+  if(res.some(r=>r.score===100))list.push({i:'💯',n:'百分俱樂部',d:'測驗拿到滿分'});
+  const cats=new Set(res.map(r=>{const qz=quizzes.find(x=>x.id===r.quizId);return qz?qz.cat:'';}));
+  if(cats.size>=3)list.push({i:'🌀',n:'全能選手',d:'通過 3 類不同測驗'});
+  if(pros.length>=1)list.push({i:'🚀',n:'一飛沖天',d:'首次晉升'});
+  if(pros.length>=3)list.push({i:'👑',n:'平步青雲',d:'晉升 3 次'});
+  if((emp&&emp.xp>=3000)||0)list.push({i:'🧠',n:'經驗老道',d:'累積 XP 3000+'});
+  if(done.some(c=>{const co=courses.find(x=>x.id===c.courseId);return co&&co.cat==='mgmt';}))list.push({i:'🧩',n:'管理入門',d:'完成管理類課程'});
+  return list;
+}
+function titleOf(emp){const lv=ladder[lvlOf(emp)];const tr=tracks.find(t=>t.id===emp.track);return (tr?tr.icon+' ':'')+(lv?lv.name:'')+(emp.title?(' · '+emp.title):'');}
+
+/* ═══════════ TALENTQUEST — 檢視層 ═══════════ */
+const PAGE_TITLES={hero:'英雄旅程',courses:'訓練課程',quiz:'測驗中心',badges:'徽章牆',team:'團隊總覽',promotion:'晉升評鑑',ladder:'職級體系',comps:'職能地圖',employees:'員工管理',board:'英雄榜',guide:'遊戲說明'};
+const AVATARS=['🦅','🦉','🐯','🐼','🦊','🐨','🦁','🐺','🐙','🦉','🐸','🦄','🐲','🐬'];
+
+function setHero(v){STATE.heroId=v;renderPage();}
+document.getElementById('snav').addEventListener('click',e=>{const it=e.target.closest('.nitem');if(!it)return;$$s('.nitem').forEach(el=>el.classList.remove('active'));it.classList.add('active');STATE.page=it.dataset.page;renderPage();});
+
+function renderPage(){
+  const p=STATE.page;
+  document.getElementById('pageTitle').textContent=PAGE_TITLES[p]||p;
+  const heroSel=document.getElementById('heroSelect');
+  heroSel.innerHTML=employees.map(e=>'<option value="'+e.id+'" '+(e.id===STATE.heroId?'selected':'')+'>'+e.avatar+' '+esc(e.code)+' '+esc(e.name)+'（'+lvlName(e)+'）</option>').join('');
+  const c=document.getElementById('mainContent');
+  const map={hero:renderHero,courses:renderCourses,quiz:renderQuiz,badges:renderBadges,team:renderTeam,promotion:renderPromotion,ladder:renderLadder,comps:renderComps,employees:renderEmployees,board:renderBoard,guide:renderGuide};
+  c.innerHTML=(map[p]||renderHero)();
+  if(p==='quiz'&&STATE.quiz&&STATE.quiz.live)renderQuizRun();
+}
+
+/* ── 1. 英雄旅程 ── */
+function renderHero(){
+  const emp=hero();if(!emp)return '<div class="card"><div class="cb">請先在「員工管理」建立員工。</div></div>';
+  const idx=lvlOf(emp),lv=ladder[idx],nxt=nextLvl(idx);
+  const st=reqStatus(emp);
+  const badges=badgesOf(emp.id);
+  const doneCount=completions.filter(c=>c.empId===emp.id).length;
+  const passCount=quizResults.filter(r=>r.empId===emp.id&&r.pass).length;
+  let h='<div class="hero-grid">';
+  h+='<div class="card" style="text-align:center;"><div class="cb">';
+  h+='<div class="avater">'+(emp.avatar||'🦊')+'</div>';
+  h+='<div style="font-size:19px;font-weight:800;">'+esc(emp.code)+' '+esc(emp.name)+'</div>';
+  h+='<div style="font-size:12px;color:var(--text2);margin:4px 0 12px;">'+titleOf(emp)+'｜'+esc(emp.dept)+'｜'+esc((tracks.find(t=>t.id===emp.track)||{}).name||'')+'</div>';
+  h+='<div style="display:flex;justify-content:center;margin-bottom:8px;"><div class="lvl-badge"><span class="lv-t">LEVEL</span><span class="lv-n">'+(idx+1)+'<br>'+esc(lv.name)+'</span></div></div>';
+  if(nxt){
+    const pct=Math.min(100,Math.round((emp.xp||0)/nxt.xpNeed*100));
+    h+='<div class="xpbar"><div style="width:'+pct+'%"></div></div>';
+    h+='<div style="font-size:12px;color:var(--text2);margin-top:6px;">XP <b style="color:var(--gold2);font-family:var(--mono);">'+(emp.xp||0)+'</b> / '+nxt.xpNeed+'（'+nxt.name+'）· '+pct+'%</div>';
+    h+='<div class="lvl-up" style="margin-top:10px;">'+(st&&st.allOk?'✨ 已達晉升門檻！請 HR 於「晉升評鑑」核准':(st?'距離晉升還有 '+Math.max(0,nxt.xpNeed-(emp.xp||0))+' XP':'已達最高職級'))+'</div>';
+  } else { h+='<div class="lvl-up">👑 已達頂級職級，傳奇！</div>'; }
+  h+='<div style="display:flex;gap:14px;justify-content:center;margin-top:14px;"><div><span class="badge b-cyan">課程 '+doneCount+'</span></div><div><span class="badge b-green">通過測驗 '+passCount+'</span></div><div><span class="badge b-gold">徽章 '+badges.length+'</span></div></div>';
+  h+='</div></div>';
+  h+='<div>';
+  h+='<div class="card"><div class="ch"><h2>🗺️ 前往 '+esc(nxt?nxt.name:'頂點')+' — 任務清單</h2></div><div class="cb">';
+  if(nxt&&st){
+    const tasks=[];
+    tasks.push({done:st.xpOk,i:'⚡',t:'累積經驗值 '+nxt.xpNeed+' XP',d:'目前 '+ (emp.xp||0)+' XP',pct:Math.min(100,Math.round((emp.xp||0)/nxt.xpNeed*100))});
+    st.courses.forEach(cs=>{const co=courses.find(x=>x.id===cs.id);tasks.push({done:cs.done,i:'📚',t:'修畢課程：'+(co?co.name:cs.id),d:(co?co.desc:''),pct:cs.done?100:0});});
+    if(nxt.reqQuiz){const qz=quizzes.find(x=>x.id===nxt.reqQuiz);tasks.push({done:st.quizOk,i:'⚔️',t:'通過測驗：'+(qz?qz.name:'')+'（≥80 分）',d:st.quizScore!=null?('目前最高分 '+st.quizScore):'尚未挑戰',pct:st.quizScore!=null?Math.min(100,st.quizScore):0});}
+    tasks.forEach(t=>{
+      h+='<div class="quest'+(t.done?' done':'')+'"><div class="qi">'+(t.done?'✅':t.i)+'</div><div style="flex:1;"><div class="qt">'+esc(t.t)+'</div>'+(t.d?'<div class="qd">'+esc(t.d)+'</div>':'')+(t.pct!=null?'<div class="qbar"><div style="width:'+t.pct+'%"></div></div>':'')+'</div></div>';
+    });
+    if(st.allOk)h+='<div style="text-align:center;margin-top:6px;"><span class="badge b-gold" style="font-size:13px;padding:6px 16px;">👑 晉升資格達成 — 由 HR 於「晉升評鑑」核准後升階</span></div>';
+  } else h+='<div style="text-align:center;color:var(--text2);padding:10px;">已是最高職級</div>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="ch"><h2>🏅 我的徽章（'+badges.length+'）</h2></div><div class="cb">';
+  if(badges.length===0)h+='<div class="mini">完成課程與測驗即可獲得徽章。</div>';
+  badges.forEach(b=>{h+='<div class="bcard"><div class="bi">'+b.i+'</div><div class="bn">'+b.n+'</div><div class="bn mini">'+b.d+'</div></div>';});
+  h+='</div></div>';
+  h+='</div></div>';
+  return h;
+}
+
+/* ── 2. 訓練課程 ── */
+function renderCourses(){
+  const emp=hero();
+  const catF=window._cCat||'';const trF=window._cTr||'';
+  const done=new Set(completions.filter(c=>c.empId===emp.id).map(c=>c.courseId));
+  let list=courses.slice();
+  if(catF)list=list.filter(c=>c.cat===catF);
+  if(trF)list=list.filter(c=>!c.track||c.track===trF);
+  let h='<div class="card"><div class="ch"><h2>課程目錄（'+list.length+' 門）</h2><div style="display:flex;gap:8px;">'
+   +'<select class="filter" id="cCat" onchange="window._cCat=this.value;renderPage()" style="background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit;"><option value="">全部類別</option>'
+   +[['core','核心職能'],['pro','專業職能'],['mgmt','管理職能']].map(x=>'<option value="'+x[0]+'" '+(catF===x[0]?'selected':'')+'>'+x[1]+'</option>').join('')
+   +'</select><select id="cTr" onchange="window._cTr=this.value;renderPage()" style="background:var(--bg-input);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:12px;font-family:inherit;"><option value="">全部職系</option>'
+   +tracks.map(t=>'<option value="'+t.id+'" '+(trF===t.id?'selected':'')+'>'+t.name+'</option>').join('')
+   +'</select></div></div><div class="cb"><div class="grid3">';
+  list.forEach(c=>{
+    const dn=done.has(c.id);
+    h+='<div class="course'+(dn?' done':'')+'"><div class="cn">'+esc(c.name)+'</div><div class="cd">'+esc(c.desc||'')+'</div>';
+    h+='<div style="margin-bottom:10px;">'+(c.comps||[]).map(cid=>{const cp=comps.find(x=>x.id===cid);return cp?'<span class="chip">'+esc(cp.name)+'</span>':'';}).join('')+'</div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;"><span class="mini">⏱ '+c.hours+' 小時　⚡ +'+c.xp+' XP</span>';
+    h+=dn?'<span class="badge b-green">✓ 已修畢</span>':'<button class="btn btn-gold btn-sm" onclick="markCourse(\''+c.id+'\')">完成課程</button>';
+    h+='</div></div>';
+  });
+  h+='</div></div></div>';
+  return h;
+}
+function checkLevelUp(empId){
+  const emp=employees.find(x=>x.id===empId);if(!emp)return;
+  const st=reqStatus(emp);
+  if(st&&st.allOk){ toast('👑 晉升門檻已達成！請通知 HR 於「晉升評鑑」核准'); }
+}
+function markCourse(id){
+  const emp=hero();if(!emp)return;
+  if(completions.find(c=>c.empId===emp.id&&c.courseId===id)){toast('已修畢此課程');return;}
+  const co=courses.find(x=>x.id===id);if(!co)return;
+  completions.push({id:genId(),empId:emp.id,courseId:id,date:new Date().toISOString().split('T')[0],by:'本人'});
+  saveD('completions',completions);
+  recalcXp(emp.id);saveD('employees',employees);
+  toast('完成「'+co.name+'」！獲得 +'+co.xp+' XP ⚡');
+  checkLevelUp(emp.id);
+  renderPage();
+}
+
+/* ── 3. 測驗中心 ── */
+function renderQuiz(){
+  if(STATE.quiz&&STATE.quiz.live)return renderQuizRun();
+  const emp=hero();
+  let h='<div class="card"><div class="ch"><h2>測驗列表（'+quizzes.length+' 卷）</h2><span class="mini">≥80 分為通過；通過可獲得 XP，成績終身保留最高分</span></div><div class="cb"><div class="grid3">';
+  quizzes.forEach(qz=>{
+    const best=bestScore(emp.id,qz.id);
+    const n=qz.questions.length;
+    h+='<div class="course"><div class="cn">'+esc(qz.name)+'</div><div class="cd">'+n+' 題 · 通過門檻 '+qz.pass+' 分 · 最高可得 '+qz.xp+' XP</div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h+=best!=null?'<span class="badge '+(best>=qz.pass?'b-green':'b-grey')+'">最高 '+best+' 分</span>':'<span class="badge b-grey">未挑戰</span>';
+    h+='<button class="btn '+(best!=null&&best>=qz.pass?'btn-out':'btn-cyan')+' btn-sm" onclick="startQuiz(\''+qz.id+'\')">'+(best!=null?'重新挑戰':'開始挑戰')+'</button></div></div>';
+  });
+  h+='</div></div></div>';
+  h+='<div class="card"><div class="ch"><h2>我的測驗紀錄</h2></div><div class="cb">';
+  const rs=quizResults.filter(r=>r.empId===emp.id).slice().reverse();
+  if(rs.length===0)h+='<div class="mini">尚無紀錄。</div>';
+  else{h+='<table class="dt"><thead><tr><th>日期</th><th>測驗</th><th class="num">分數</th><th class="center">結果</th></tr></thead><tbody>';
+    rs.forEach(r=>{const qz=quizzes.find(x=>x.id===r.quizId);h+='<tr><td>'+r.date+'</td><td>'+(qz?esc(qz.name):'—')+'</td><td class="num">'+r.score+'</td><td class="center">'+(r.pass?'<span class="badge b-green">通過</span>':'<span class="badge b-red">未通過</span>')+'</td></tr>';});
+    h+='</tbody></table>';
+  }
+  h+='</div></div>';
+  return h;
+}
+function startQuiz(id){
+  const qz=quizzes.find(x=>x.id===id);if(!qz)return;
+  STATE.quiz={live:true,id,answers:new Array(qz.questions.length).fill(null),idx:0};
+  renderPage();
+}
+function renderQuizRun(){
+  const qz=quizzes.find(x=>x.id===STATE.quiz.id);
+  const i=STATE.quiz.idx;
+  let h='<div class="card"><div class="ch"><h2>'+esc(qz.name)+'</h2><span class="badge b-cyan">第 '+(i+1)+' / '+qz.questions.length+' 題</span></div><div class="cb">';
+  h+='<div class="qbar" style="margin-bottom:6px;"><div style="width:'+Math.round((i)/qz.questions.length*100)+'%"></div></div>';
+  const qq=qz.questions[i];
+  h+='<div class="qlabel">'+(i+1)+'. '+esc(qq.q)+'</div>';
+  qq.o.forEach((op,oi)=>{
+    let cls='opt';
+    if(STATE.quiz.answers[i]===oi)cls+=' sel';
+    h+='<div class="'+cls+'" onclick="quizPick('+i+','+oi+')">'+String.fromCharCode(65+oi)+'. '+esc(op)+'</div>';
+  });
+  h+='<div style="display:flex;justify-content:space-between;margin-top:14px;">';
+  h+='<button class="btn btn-out" onclick="quizMove(-1)" '+(i===0?'disabled':'')+'>◀ 上一題</button>';
+  h+= (i===qz.questions.length-1)
+    ? '<button class="btn btn-gold" onclick="quizSubmit()">交卷</button>'
+    : '<button class="btn btn-gold" onclick="quizMove(1)">下一題 ▶</button>';
+  h+='</div></div></div>';
+  document.getElementById('mainContent').innerHTML=h;
+}
+function quizPick(i,oi){STATE.quiz.answers[i]=oi;renderQuizRun();}
+function quizMove(d){STATE.quiz.idx=Math.max(0,Math.min(STATE.quiz.idx+d,quizzes.find(x=>x.id===STATE.quiz.id).questions.length-1));renderQuizRun();}
+function quizSubmit(){
+  const qz=quizzes.find(x=>x.id===STATE.quiz.id);
+  const qs=STATE.quiz;
+  if(qs.answers.some(a=>a===null)){toast('還有未作答的題目');return;}
+  let right=0;const marks=[];
+  qz.questions.forEach((qq,i)=>{const good=qs.answers[i]===qq.a;if(good)right++;marks.push({good,sel:qs.answers[i]});});
+  const score=Math.round(right/qz.questions.length*100);
+  const pass=score>=qz.pass;
+  const emp=hero();
+  quizResults.push({id:genId(),empId:emp.id,quizId:qz.id,score,pass,date:new Date().toISOString().split('T')[0]});
+  saveD('quizResults',quizResults);
+  recalcXp(emp.id);saveD('employees',employees);
+  STATE.quiz.live=false;STATE.quiz.marks=marks;STATE.quiz.score=score;
+  checkLevelUp(emp.id);
+  renderPage();
+  window.scrollTo(0,0);
+}
+function renderQuiz(){
+  if(STATE.quiz&&STATE.quiz.live)return renderQuizRun();
+  if(STATE.quiz&&STATE.quiz.marks){
+    const qz=quizzes.find(x=>x.id===STATE.quiz.id);const emp=hero();
+    const gain=Math.round(STATE.quiz.score/100*qz.xp);
+    let h='<div class="card"><div class="cb" style="text-align:center;padding:30px;">';
+    h+='<div style="font-size:52px;">'+(STATE.quiz.score>=qz.pass?'🎉':'💪')+'</div>';
+    h+='<div style="font-size:24px;font-weight:800;margin:8px 0;">'+STATE.quiz.score+' 分 — '+(STATE.quiz.score>=qz.pass?'測驗通過！':'未達門檻，再接再厲')+'</div>';
+    h+='<div style="color:var(--text2);font-size:13px;">答對 '+qz.questions.filter((qq,i)=>STATE.quiz.marks[i].good).length+' / '+qz.questions.length+' 題 · 獲得 '+gain+' XP</div>';
+    h+='<div style="margin-top:14px;"><button class="btn btn-out" onclick="STATE.quiz=null;renderPage()">返回測驗中心</button> <button class="btn btn-cyan" onclick="startQuiz(\''+qz.id+'\')">再挑戰一次</button></div>';
+    h+='</div></div>';
+    h+='<div class="card"><div class="ch"><h2>逐題解析</h2></div><div class="cb">';
+    qz.questions.forEach((qq,i)=>{
+      const m=STATE.quiz.marks[i];
+      h+='<div class="qlabel">'+(m.good?'✅ ':'❌ ')+(i+1)+'. '+esc(qq.q)+'</div>';
+      qq.o.forEach((op,oi)=>{let cls='opt';if(oi===qq.a)cls+=' right';else if(oi===m.sel)cls+=' wrong';h+='<div class="'+cls+'">'+String.fromCharCode(65+oi)+'. '+esc(op)+'</div>';});
+      h+='<div class="explain">💡 '+esc(qq.e)+'</div>';
+    });
+    h+='<div style="text-align:center;margin-top:10px;"><button class="btn btn-out" onclick="STATE.quiz=null;renderPage()">返回</button></div>';
+    h+='</div></div>';
+    return h;
+  }
+  const emp=hero();
+  let h='<div class="card"><div class="ch"><h2>測驗列表（'+quizzes.length+' 卷）</h2><span class="mini">≥80 分為通過；成績保留最高分</span></div><div class="cb"><div class="grid3">';
+  quizzes.forEach(qz=>{
+    const best=bestScore(emp.id,qz.id);
+    h+='<div class="course"><div class="cn">'+esc(qz.name)+'</div><div class="cd">'+qz.questions.length+' 題 · 門檻 '+qz.pass+' 分 · 最高 '+qz.xp+' XP</div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
+    h+=best!=null?'<span class="badge '+(best>=qz.pass?'b-green':'b-grey')+'">最高 '+best+' 分</span>':'<span class="badge b-grey">未挑戰</span>';
+    h+='<button class="btn '+(best!=null&&best>=qz.pass?'btn-out':'btn-cyan')+' btn-sm" onclick="startQuiz(\''+qz.id+'\')">'+(best!=null?'重新挑戰':'開始挑戰')+'</button></div></div>';
+  });
+  h+='</div></div></div>';
+  h+='<div class="card"><div class="ch"><h2>我的測驗紀錄</h2></div><div class="cb">';
+  const rs=quizResults.filter(r=>r.empId===emp.id).slice().reverse();
+  if(rs.length===0)h+='<div class="mini">尚無紀錄。</div>';
+  else{h+='<table class="dt"><thead><tr><th>日期</th><th>測驗</th><th class="num">分數</th><th class="center">結果</th></tr></thead><tbody>';
+    rs.forEach(r=>{const qz=quizzes.find(x=>x.id===r.quizId);h+='<tr><td>'+r.date+'</td><td>'+(qz?esc(qz.name):'—')+'</td><td class="num">'+r.score+'</td><td class="center">'+(r.pass?'<span class="badge b-green">通過</span>':'<span class="badge b-red">未通過</span>')+'</td></tr>';});
+    h+='</tbody></table>';}
+  h+='</div></div>';
+  return h;
+}
+
+/* ── 4. 徽章牆 ── */
+function renderBadges(){
+  const emp=hero();const badges=badgesOf(emp.id);
+  const all=[{i:'🎒',n:'初來乍到'},{i:'📚',n:'學霸養成'},{i:'🎓',n:'學富五車'},{i:'💯',n:'百分俱樂部'},{i:'🌀',n:'全能選手'},{i:'🚀',n:'一飛沖天'},{i:'👑',n:'平步青雲'},{i:'🧠',n:'經驗老道'},{i:'🧩',n:'管理入門'}];
+  const have=new Set(badges.map(b=>b.n));
+  let h='<div class="card"><div class="ch"><h2>'+esc(emp.name)+' 的徽章（'+badges.length+'/'+all.length+'）</h2></div><div class="cb">';
+  all.forEach(b=>{const got=have.has(b.n);h+='<div class="bcard" style="'+(got?'border-color:rgba(240,169,60,.5);':'opacity:.35;')+'"><div class="bi">'+(got?b.i:'🔒')+'</div><div class="bn">'+b.n+'</div></div>';});
+  h+='</div></div>';
+  h+='<div class="card"><div class="ch"><h2>全員徽章榜</h2></div><div class="cb"><table class="dt"><thead><tr><th>員工</th><th class="num">徽章數</th><th>代表徽章</th></tr></thead><tbody>';
+  employees.forEach(e=>{const bs=badgesOf(e.id);h+='<tr><td>'+e.avatar+' '+esc(e.name)+'</td><td class="num">'+bs.length+'</td><td>'+(bs.length?bs.map(b=>b.i).join(' '):'—')+'</td></tr>';});
+  h+='</tbody></table></div></div>';
+  return h;
+}
+
+/* ── 5. 團隊總覽 ── */
+function renderTeam(){
+  let h='<div class="kpi-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px;">';
+  const totalXp=employees.reduce((a,e)=>a+(e.xp||0),0);
+  const avgXp=employees.length?Math.round(totalXp/employees.length):0;
+  const totalCourses=completions.length;
+  const totalQuiz=quizResults.filter(r=>r.pass).length;
+  h+='<div class="kpi"><div class="kl">團隊人數</div><div class="kv">'+employees.length+'</div></div>';
+  h+='<div class="kpi"><div class="kl">團隊總 XP</div><div class="kv" style="color:var(--gold2)">'+totalXp.toLocaleString()+'</div></div>';
+  h+='<div class="kpi"><div class="kl">平均 XP</div><div class="kv">'+avgXp+'</div></div>';
+  h+='<div class="kpi"><div class="kl">課程完成數</div><div class="kv">'+totalCourses+'</div></div>';
+  h+='<div class="kpi"><div class="kl">測驗通過數</div><div class="kv" style="color:var(--green)">'+totalQuiz+'</div></div>';
+  h+='</div>';
+  h+='<div class="grid3">';
+  employees.forEach(e=>{
+    const idx=lvlOf(e);const nxt=nextLvl(idx);
+    const pct=nxt?Math.min(100,Math.round((e.xp||0)/nxt.xpNeed*100)):100;
+    const doneCount=completions.filter(c=>c.empId===e.id).length;
+    h+='<div class="course" style="cursor:pointer;" onclick="setHero(\''+e.id+'\');STATE.page=\'hero\';document.querySelector(\'#heroSelect\').value=\''+e.id+'\';renderPage();">';
+    h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><span style="font-size:28px;">'+e.avatar+'</span><div><div style="font-weight:800;">'+esc(e.name)+'</div><div class="mini">'+esc(titleOf(e))+'</div></div></div>';
+    h+='<div class="xpbar"><div style="width:'+pct+'%"></div></div>';
+    h+='<div style="display:flex;justify-content:space-between;margin-top:6px;"><span class="mini">Lv.'+(idx+1)+' '+lvlName(e)+'</span><span class="mini">⚡ '+(e.xp||0)+' XP · 📚 '+doneCount+'</span></div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  return h;
+}
+
+/* ── 6. 晉升評鑑（HR）── */
+function renderPromotion(){
+  const cands=employees.map(e=>({e,st:reqStatus(e)})).filter(x=>x.st&&x.st.allOk&&!nextLvl(x.st.idx).approvedNoted);
+  const waiting=employees.map(e=>({e,st:reqStatus(e)})).filter(x=>x.st&&!x.st.allOk);
+  let h='<div class="card"><div class="ch"><h2>👑 晉升候選人（符合下一職級全部門檻）</h2></div><div class="cb">';
+  if(cands.length===0)h+='<div style="text-align:center;padding:16px;color:var(--text2);">目前沒有達標的候選人。員工達成「XP＋課程＋測驗」三項門檻後會出現在這裡。</div>';
+  cands.forEach(x=>{
+    const st=x.st;
+    h+='<div class="course"><div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;"><span style="font-size:30px;">'+x.e.avatar+'</span><div><div style="font-weight:800;font-size:15px;">'+esc(x.e.name)+'（'+lvlName(x.e)+' → '+esc(st.nxt.name)+'）</div><div class="mini">⚡ '+(x.e.xp||0)+' XP</div></div></div>';
+    h+='<div class="mini" style="margin-bottom:10px;">✓ XP 達標　✓ 課程完成　'+(st.quizScore!=null?('✓ 測驗 '+st.quizScore+' 分'):'✓')+'</div>';
+    h+='<div style="display:flex;gap:8px;"><button class="btn btn-gold" onclick="approvePromotion(\''+x.e.id+'\')">👑 核准晉升</button></div></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="card"><div class="ch"><h2>尚未達標（進度差異）</h2></div><div class="cb"><table class="dt"><thead><tr><th>員工</th><th>現職級</th><th>目標職級</th><th class="num">XP</th><th>課程缺口</th><th>測驗</th></tr></thead><tbody>';
+  waiting.forEach(x=>{
+    const st=x.st;const miss=(st.courses.filter(c=>!c.done).map(c=>{const co=courses.find(y=>y.id===c.id);return co?co.name:c.id;}));
+    h+='<tr><td>'+x.e.avatar+' '+esc(x.e.name)+'</td><td>'+lvlName(x.e)+'</td><td>'+esc(st.nxt.name)+'</td><td class="num">'+(x.e.xp||0)+'/'+st.nxt.xpNeed+'</td><td class="mini">'+(miss.length?esc(miss.join('、')):'✓')+'</td><td class="mini">'+(st.quizScore==null?('待測 '+esc((quizzes.find(q=>q.id===st.nxt.reqQuiz)||{}).name||'')):(st.quizScore>=80?'✓ '+st.quizScore:'未達 80（'+st.quizScore+'）'))+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  h+='<div class="card"><div class="ch"><h2>晉升紀錄</h2></div><div class="cb">';
+  const ps=promotions.slice().reverse();
+  if(ps.length===0)h+='<div class="mini">尚無晉升紀錄。</div>';
+  else{h+='<table class="dt"><thead><tr><th>日期</th><th>員工</th><th>晉升</th><th class="center">結果</th></tr></thead><tbody>';
+    ps.forEach(p=>{h+='<tr><td>'+p.date+'</td><td>'+empName(p.empId)+'</td><td>'+esc(p.from)+' → '+esc(p.to)+'</td><td class="center">'+(p.status==='通過'?'<span class="badge b-green">通過</span>':'<span class="badge b-red">'+p.status+'</span>')+'</td></tr>';});
+    h+='</tbody></table>';}
+  h+='</div></div>';
+  return h;
+}
+function approvePromotion(empId){
+  const emp=employees.find(x=>x.id===empId);const st=reqStatus(emp);if(!st||!st.allOk)return;
+  const from=lvlName(emp),to=st.nxt.name;
+  promotions.push({id:genId(),empId,from,to,status:'通過',date:new Date().toISOString().split('T')[0]});
+  saveD('promotions',promotions);
+  recalcXp(empId);saveD('employees',employees);
+  const nl=ladder[lvlOf(emp)];
+  const h='<div class="mh"><h3>🎉 晉升通過！</h3></div><div class="mb" style="text-align:center;padding:30px 18px;">'
+   +'<div style="font-size:56px;">'+emp.avatar+'</div>'
+   +'<div style="font-size:22px;font-weight:800;margin:10px 0;">'+esc(emp.name)+' 晋升成功！</div>'
+   +'<div style="color:var(--gold2);font-size:16px;font-weight:700;">'+esc(from)+' → '+esc(to)+'</div>'
+   +'<div class="mini" style="margin-top:10px;">晉升獎勵 +300 XP　新職級：'+esc(nl.name)+'</div>'
+   +'<div class="mini" style="margin-top:6px;">'+esc(nl.desc||'')+'</div>'
+   +'<div style="margin-top:16px;"><button class="btn btn-gold" onclick="closeModal();renderPage()">繼續冒險</button></div></div>';
+  document.getElementById('modalBox').innerHTML=h;
+  document.getElementById('modalOv').classList.remove('hidden');
+  renderPage();
+}
+
+/* ── 7. 職級體系（編輯）── */
+function renderLadder(){
+  let h='<div class="card"><div class="ch"><h2>職級階梯（由低到高）</h2><button class="btn btn-gold btn-sm" onclick="editLadder(\'\')">＋ 新增職級</button></div><div class="cb">';
+  h+='<table class="dt"><thead><tr><th class="center">級</th><th>職級名稱</th><th class="num">XP 門檻</th><th>升階需求</th><th></th></tr></thead><tbody>';
+  ladder.forEach((lv,i)=>{
+    const co=(lv.reqCourses||[]).map(id=>{const c=courses.find(x=>x.id===id);return c?c.name:id;}).join('、');
+    const qz=lv.reqQuiz?(quizzes.find(x=>x.id===lv.reqQuiz)||{}).name||lv.reqQuiz:'—';
+    h+='<tr><td class="center">'+(i+1)+'</td><td><strong>'+esc(lv.name)+'</strong><div class="mini">'+esc(lv.desc||'')+'</div></td><td class="num">'+lv.xpNeed+'</td><td class="mini">課程：'+(co||'—')+'<br>測驗：'+esc(qz)+'</td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="editLadder(\''+lv.id+'\')">編輯</button> <button class="btn btn-red btn-xs" onclick="delLadder(\''+lv.id+'\')">刪除</button></td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  h+='<div class="card"><div class="ch"><h2>說明</h2></div><div class="cb"><div class="mini">職級＝遊戲關卡。員工累積 XP（完成課程、通過測驗、晉升獎勵）達到門檻，並修畢該職級指定課程、通過指定測驗（≥80 分）後，即成為晉升候選人；由 HR 在「晉升評鑑」核准後升階。</div></div></div>';
+  return h;
+}
+function editLadder(id){
+  const lv=ladder.find(x=>x.id===id)||{id:'',name:'',xpNeed:0,reqCourses:[],reqQuiz:'',desc:''};
+  let h='<div class="mh"><h3>'+(id?'編輯':'新增')+'職級</h3><button class="cbtn" onclick="closeModal()">✕</button></div><div class="mb">';
+  h+='<div class="mrow"><div class="fg"><label>職級名稱</label><input id="lvName" value="'+esc(lv.name)+'"></div><div class="fg"><label>XP 門檻</label><input type="number" id="lvXp" value="'+lv.xpNeed+'"></div></div>';
+  h+='<div class="fg"><label>說明</label><input id="lvDesc" value="'+esc(lv.desc||'')+'"></div>';
+  h+='<div class="fg"><label>指定測驗（須 ≥80 分）</label><select id="lvQuiz"><option value="">（無）</option>'+quizzes.map(qz=>'<option value="'+qz.id+'" '+(lv.reqQuiz===qz.id?'selected':'')+'>'+esc(qz.name)+'</option>').join('')+'</select></div>';
+  h+='<div class="fg"><label>指定課程（須全部修畢）</label><div style="max-height:220px;overflow-y:auto;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:10px;">'+courses.map(c=>'<label style="display:block;font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;"><input type="checkbox" class="lvC" value="'+c.id+'" '+(lv.reqCourses.includes(c.id)?'checked':'')+'> '+esc(c.name)+'（+'+c.xp+' XP）</label>').join('')+'</div></div>';
+  h+='</div><div class="mf"><button class="btn btn-out" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="saveLadder(\''+(id||'')+'\')">儲存</button></div>';
+  document.getElementById('modalBox').innerHTML=h;
+  document.getElementById('modalOv').classList.remove('hidden');
+}
+function saveLadder(id){
+  const name=document.getElementById('lvName').value.trim();
+  if(!name){toast('請輸入職級名稱');return;}
+  const xpNeed=Number(document.getElementById('lvXp').value)||0;
+  const desc=document.getElementById('lvDesc').value.trim();
+  const reqQuiz=document.getElementById('lvQuiz').value;
+  const reqCourses=[].slice.call(document.querySelectorAll('.lvC:checked')).map(x=>x.value);
+  if(id){const lv=ladder.find(x=>x.id===id);Object.assign(lv,{name,xpNeed,desc,reqQuiz,reqCourses});}
+  else ladder.push({id:genId(),name,xpNeed,desc,reqQuiz,reqCourses});
+  ladder.sort((a,b)=>a.xpNeed-b.xpNeed);
+  saveD('ladder',ladder);closeModal();renderPage();
+}
+function delLadder(id){
+  if(ladder.length<=2){toast('至少保留兩個職級');return;}
+  const used=employees.find(e=>e.level===id);
+  if(used){toast('此職級仍有員工使用，請先調整員工職級');return;}
+  if(!confirm('確定刪除此職級？'))return;
+  ladder=ladder.filter(x=>x.id!==id);saveD('ladder',ladder);renderPage();
+}
+
+/* ── 8. 職能地圖 ── */
+function renderComps(){
+  const catName={core:'核心職能（全員）',pro:'專業職能（職務相關）',mgmt:'管理職能（主管進階）'};
+  let h='';
+  ['core','pro','mgmt'].forEach(cat=>{
+    h+='<div class="card"><div class="ch"><h2>'+catName[cat]+'</h2></div><div class="cb"><div class="grid3">';
+    comps.filter(c=>c.cat===cat).forEach(c=>{
+      const nCo=courses.filter(x=>(x.comps||[]).includes(c.id)).length;
+      const nQz=quizzes.filter(x=>(x.questions||[]).length&&false).length;
+      h+='<div class="course"><div class="cn">'+esc(c.name)+'</div><div class="cd">'+esc(c.desc)+'</div><div class="mini">關聯課程：'+nCo+' 門　相關測驗可於測驗中心挑戰</div></div>';
+    });
+    h+='</div></div></div>';
+  });
+  h+='<div class="card"><div class="ch"><h2>職能 × 課程 對照</h2></div><div class="cb"><table class="dt"><thead><tr><th>課程</th><th>類別</th><th>培育職能</th></tr></thead><tbody>';
+  courses.forEach(c=>{h+='<tr><td>'+esc(c.name)+'</td><td>'+(c.cat==='core'?'核心':(c.cat==='pro'?'專業':'管理'))+'</td><td class="mini">'+(c.comps||[]).map(cid=>{const cp=comps.find(x=>x.id===cid);return cp?esc(cp.name):'';}).join('、')+'</td></tr>';});
+  h+='</tbody></table></div></div>';
+  return h;
+}
+
+/* ── 9. 員工管理 ── */
+function renderEmployees(){
+  let h='<div class="card"><div class="ch"><h2>員工名冊（'+employees.length+'）</h2><div style="display:flex;gap:8px;">'
+   +'<button class="btn btn-out btn-sm" onclick="exportTQ()">匯出 JSON 備份</button>'
+   +'<button class="btn btn-gold btn-sm" onclick="editEmp(\'\')">＋ 新增員工</button></div></div><div class="cb">';
+  h+='<table class="dt"><thead><tr><th></th><th>姓名</th><th>部門</th><th>職系</th><th>職級</th><th class="num">XP</th><th class="num">課程</th><th class="center">狀態</th><th></th></tr></thead><tbody>';
+  employees.forEach(e=>{
+    const doneC=completions.filter(c=>c.empId===e.id).length;
+    h+='<tr><td style="font-size:22px;">'+e.avatar+'</td><td><strong>'+esc(e.name)+'</strong><div class="mini">'+esc(e.code)+'</div></td><td>'+esc(e.dept)+'</td><td>'+esc((tracks.find(t=>t.id===e.track)||{}).name||'')+'</td><td>'+lvlName(e)+'</td><td class="num">'+(e.xp||0)+'</td><td class="num">'+doneC+'</td><td class="center">'+(e.status==='在職'?'<span class="badge b-green">在職</span>':'<span class="badge b-grey">離職</span>')+'</td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="setHero(\''+e.id+'\')">選為玩家</button> <button class="btn btn-outline btn-xs" onclick="editEmp(\''+e.id+'\')">編輯</button> <button class="btn btn-red btn-xs" onclick="delEmp(\''+e.id+'\')">刪除</button></td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  return h;
+}
+function editEmp(id){
+  const e=employees.find(x=>x.id===id)||{id:'',code:'T'+String(employees.length+1).padStart(3,'0'),name:'',dept:'',track:'t_staff',avatar:'🦊',title:'',level:ladder[0].id,hireDate:new Date().toISOString().split('T')[0],status:'在職',xp:0};
+  let h='<div class="mh"><h3>'+(id?'編輯':'新增')+'員工</h3><button class="cbtn" onclick="closeModal()">✕</button></div><div class="mb">';
+  h+='<div class="mrow"><div class="fg"><label>員工編號</label><input id="eeCode" value="'+esc(e.code)+'"></div><div class="fg"><label>姓名</label><input id="eeName" value="'+esc(e.name)+'"></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>部門</label><input id="eeDept" value="'+esc(e.dept)+'"></div><div class="fg"><label>職稱</label><input id="eeTitle" value="'+esc(e.title||'')+'"></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>職系</label><select id="eeTrack">'+tracks.map(t=>'<option value="'+t.id+'" '+(e.track===t.id?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></div>';
+  h+='<div class="fg"><label>起始職級</label><select id="eeLevel">'+ladder.map(l=>'<option value="'+l.id+'" '+(e.level===l.id?'selected':'')+'>'+esc(l.name)+'</option>').join('')+'</select></div></div>';
+  h+='<div class="fg"><label>頭像</label><div>'+AVATARS.map(a=>'<label style="display:inline-block;font-size:22px;margin:4px 8px;cursor:pointer;text-transform:none;font-weight:400;"><input type="radio" name="av" value="'+a+'" '+(e.avatar===a?'checked':'')+' style="display:none;" onchange="document.getElementById(\'avPrev\').textContent=this.value">'+(a)+'</label>').join('')+'<span id="avPrev" style="font-size:26px;margin-left:10px;">'+e.avatar+'</span></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>到職日</label><input type="date" id="eeHire" value="'+esc(e.hireDate)+'"></div><div class="fg"><label>狀態</label><select id="eeStatus"><option '+(e.status==='在職'?'selected':'')+'>在職</option><option '+(e.status==='離職'?'selected':'')+'>離職</option></select></div></div>';
+  h+='</div><div class="mf"><button class="btn btn-out" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="saveEmp(\''+(id||'')+'\')">儲存</button></div>';
+  document.getElementById('modalBox').innerHTML=h;
+  document.getElementById('modalOv').classList.remove('hidden');
+}
+function saveEmp(id){
+  const code=document.getElementById('eeCode').value.trim(),name=document.getElementById('eeName').value.trim();
+  if(!code||!name){toast('請填寫編號與姓名');return;}
+  let avatar='🦊';const radios=document.querySelectorAll('input[name="av"]');radios.forEach(r=>{if(r.checked)avatar=r.value;});
+  const level=document.getElementById('eeLevel').value;
+  const data={id:id||genId(),code,name,dept:document.getElementById('eeDept').value.trim(),title:document.getElementById('eeTitle').value.trim(),track:document.getElementById('eeTrack').value,level,avatar,hireDate:document.getElementById('eeHire').value,status:document.getElementById('eeStatus').value};
+  if(id){const e=employees.find(x=>x.id===id);Object.assign(e,data);}
+  else{employees.push(data);if(!STATE.heroId)STATE.heroId=data.id;}
+  saveD('employees',employees);closeModal();renderPage();
+}
+function delEmp(id){
+  if(employees.length<=1){toast('至少保留一位員工');return;}
+  if(!confirm('確定刪除此員工？其課程與測驗紀錄將保留但不再顯示於名冊。'))return;
+  employees=employees.filter(x=>x.id!==id);
+  if(STATE.heroId===id)STATE.heroId=employees[0].id;
+  saveD('employees',employees);renderPage();
+}
+function exportTQ(){
+  const data={employees,tracks,ladder,comps,courses,quizzes,completions,quizResults,promotions,exportedAt:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='TalentQuest_備份_'+new Date().toISOString().split('T')[0]+'.json';a.click();
+  toast('已匯出備份 JSON');
+}
+
+/* ── 10. 英雄榜 ── */
+function renderBoard(){
+  const sorted=employees.slice().sort((a,b)=>(b.xp||0)-(a.xp||0));
+  let h='<div class="card"><div class="ch"><h2>🏆 英雄榜（依 XP 排名）</h2></div><div class="cb"><table class="dt"><thead><tr><th class="center" style="width:60px;">排名</th><th>玩家</th><th>職級</th><th class="num">XP</th><th class="num">課程</th><th class="num">徽章</th></tr></thead><tbody>';
+  sorted.forEach((e,i)=>{
+    const cls=i===0?'rank-1':(i===1?'rank-2':(i===2?'rank-3':''));
+    h+='<tr><td class="center"><span class="'+cls+'">'+(i===0?'🥇':(i===1?'🥈':(i===2?'🥉':(i+1))))+'</span></td><td><span style="font-size:18px;margin-right:6px;">'+e.avatar+'</span><strong>'+esc(e.name)+'</strong><div class="mini">'+esc(titleOf(e))+'</div></td><td>'+lvlName(e)+'</td><td class="num" style="color:var(--gold2);font-weight:700;">'+(e.xp||0)+'</td><td class="num">'+completions.filter(c=>c.empId===e.id).length+'</td><td class="num">'+badgesOf(e.id).length+'</td></tr>';
+  });
+  h+='</tbody></table></div></div>';
+  h+='<div class="card"><div class="cb mini">排行榜以累積 XP 排序；XP 來源＝完成課程＋通過測驗（依分數比例）＋晉升獎勵。排名僅供激勵，不與薪資連動——鼓勵比較「自己的成長」而非同事之間的競爭。</div></div>';
+  return h;
+}
+
+/* ── 11. 遊戲說明 ── */
+function renderGuide(){
+  let h='<div class="card"><div class="ch"><h2>🎮 遊戲玩法</h2></div><div class="cb">';
+  h+='<div class="quest"><div class="qi">🧭</div><div><div class="qt">1. 建立你的角色</div><div class="qd">每位員工就是一位冒險者：頭像、職系、職級。入職從「見習生」開始。</div></div></div>';
+  h+='<div class="quest"><div class="qi">📚</div><div><div class="qt">2. 修課程＝解任務</div><div class="qd">每門課程是一個任務，完成即獲得 XP 經驗值。課程對應職能，是升階的指定裝備。</div></div></div>';
+  h+='<div class="quest"><div class="qi">⚔️</div><div><div class="qt">3. 考測驗＝打怪認證</div><div class="qd">每卷測驗是職能認證，80 分過關；分數越高獲得越多 XP，並留下解析讓你越來越強。</div></div></div>';
+  h+='<div class="quest"><div class="qi">👑</div><div><div class="qt">4. 晉升＝升階打王</div><div class="qd">XP＋指定課程＋指定測驗三項門檻全達成，HR 核准後正式升階，獲得新稱號與 +300 XP。</div></div></div>';
+  h+='<div class="quest"><div class="qi">🏆</div><div><div class="qt">5. 徽章與英雄榜</div><div class="qd">里程碑自動頒發徽章；英雄榜以 XP 排名，鼓勵「跟自己的過去比」。</div></div></div>';
+  h+='</div></div>';
+  h+='<div class="card"><div class="ch"><h2>🎓 制度設計依據（HRD 理論）</h2></div><div class="cb">';
+  h+='<table class="dt"><thead><tr><th>遊戲機制</th><th>人力發展理論</th><th>說明</th></tr></thead><tbody>';
+  h+='<tr><td>職級階梯＋晉升門檻</td><td>職能模型（Competency Model）</td><td>每個職級定義應具備的職能與行為指標，晉升＝職能被驗證</td></tr>';
+  h+='<tr><td>課程任務＋工作實戰</td><td>70-20-10 學習法則</td><td>70% 工作實戰＋20% 他人教練＋10% 課程；本平台記錄課程與認證，實戰由主管帶</td></tr>';
+  h+='<tr><td>測驗＋逐題解析</td><td>Kirkpatrick 四層評估（L2 學習層）</td><td>測驗驗證「學到什麼」；反應層滿意度與行為層落地由主管觀察</td></tr>';
+  h+='<tr><td>XP 即時回饋</td><td>行為強化（增強理論）</td><td>立即回饋讓學習行為被看見、被強化</td></tr>';
+  h+='<tr><td>晉升審核（HR 把關）</td><td>晉升委員會／IDP 個人發展計畫</td><td>門檻達成≠自動晉升，仍需組織核可職缺與意願，符合實務治理</td></tr>';
+  h+='</tbody></table></div></div>';
+  h+='<div class="card"><div class="ch"><h2>推行建議（HR 顧問視角）</h2></div><div class="cb"><ul style="padding-left:20px;font-size:13px;line-height:2;">'
+   +'<li>① 先與員工共擬「個人發展計畫（IDP）」，把職級需求轉成年度目標</li>'
+   +'<li>② 課程完成需主管在職場上給實戰任務（70%），平台只記錄正式訓練（10%）</li>'
+   +'<li>③ 晉升門檻建議半年檢視一次，隨組織需求調整職能權重</li>'
+   +'<li>④ 排行榜以「自我成長」為訴求，避免過度內卷；建議搭配季度表揚</li>'
+   +'<li>⑤ 資料僅存本機，涉及個人發展隱私，請定期匯出 JSON 備份</li>'
+   +'</ul></div></div>';
+  return h;
+}
+
+/* ── 12. 共用 ── */
+function closeModal(){document.getElementById('modalOv').classList.add('hidden');}
+document.getElementById('modalOv').addEventListener('click',e=>{if(e.target===document.getElementById('modalOv'))closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ── 13. Boot ── */
+(async function boot(){
+  await openDB();
+  ladder=await loadD('ladder',DEFAULT_LADDER);
+  tracks=await loadD('tracks',DEFAULT_TRACKS);
+  comps=await loadD('comps',DEFAULT_COMPS);
+  courses=await loadD('courses',DEFAULT_COURSES);
+  quizzes=await loadD('quizzes',DEFAULT_QUIZZES);
+  employees=await loadD('employees',DEFAULT_EMPLOYEES);
+  completions=await loadD('completions',DEFAULT_COMPLETIONS);
+  quizResults=await loadD('quizResults',DEFAULT_RESULTS);
+  promotions=await loadD('promotions',[]);
+  if(ladder!==DEFAULT_LADDER)await saveD('ladder',ladder);
+  if(employees!==DEFAULT_EMPLOYEES)await saveD('employees',employees);
+  if(completions!==DEFAULT_COMPLETIONS)await saveD('completions',completions);
+  if(quizResults!==DEFAULT_RESULTS)await saveD('quizResults',quizResults);
+  employees.forEach(e=>recalcXp(e.id));
+  STATE.heroId=employees[0]?employees[0].id:null;
+  renderPage();
+})();
+
+</script>
+</body>
+</html>
