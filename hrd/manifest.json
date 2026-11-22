@@ -1,0 +1,29 @@
+{
+  "name": "人才發展平台 TalentQuest",
+  "short_name": "人才發展",
+  "description": "遊戲化人才發展平台：新人入職建角色卡，修課程、考測驗、晉升升階。",
+  "lang": "zh-Hant",
+  "start_url": "/hrd/?source=pwa",
+  "scope": "/hrd/",
+  "display": "standalone",
+  "theme_color": "#d4820a",
+  "background_color": "#0b0f17",
+  "icons": [
+    {
+      "src": "/hrd/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/hrd/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/hrd/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
