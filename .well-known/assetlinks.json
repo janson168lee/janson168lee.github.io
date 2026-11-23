@@ -68,7 +68,8 @@
       "namespace": "android_app",
       "package_name": "com.erpfree.hrd",
       "sha256_cert_fingerprints": [
-        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E"
+        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E",
+        "8E:AD:51:FB:70:E3:6F:A4:BB:67:52:5A:3D:6D:8C:12:23:56:A0:33:77:1F:70:40:A1:97:BF:1C:9F:B5:3B:01"
       ]
     }
   },
