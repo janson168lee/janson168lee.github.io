@@ -135,7 +135,7 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
     <div class="nitem" data-page="board"><span class="ni">🏆</span>英雄榜</div>
     <div class="nitem" data-page="guide"><span class="ni">📖</span>遊戲說明</div>
   </nav>
-  <div class="sfoot">TalentQuest v1.2.1 · 台灣中小企業適用</div>
+  <div class="sfoot">TalentQuest v1.2.3 · 台灣中小企業適用</div>
 </aside>
 <main class="main">
   <header class="header">
@@ -1448,7 +1448,7 @@ function applyShell(){
   const bt2 = document.querySelector('.brand .t2');
   if(bt2){ if(!bt2.dataset.zh) bt2.dataset.zh = bt2.textContent.trim(); bt2.textContent = T(bt2.dataset.zh); }
   const sf = document.querySelector('.sfoot');
-  if(sf){ if(!sf.dataset.zh) sf.dataset.zh = 'TalentQuest v1.2.1 · 台灣中小企業適用'; sf.textContent = LANG==='en'?'TalentQuest v1.1 · for SMEs':(LANG==='ja'?'TalentQuest v1.1 ・ 中小企業向け':sf.dataset.zh); }
+  if(sf){ if(!sf.dataset.zh) sf.dataset.zh = 'TalentQuest v1.2.3 · 台灣中小企業適用'; sf.textContent = LANG==='en'?'TalentQuest v1.1 · for SMEs':(LANG==='ja'?'TalentQuest v1.1 ・ 中小企業向け':sf.dataset.zh); }
 }
 function setModalHTML(h){ const mb=document.getElementById('modalBox'); mb.innerHTML = trHTML(h); LANG_SNAP.modal = mb.innerHTML; }
 
