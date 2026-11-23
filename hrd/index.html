@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>人才發展平台 TalentQuest — 職能升階遊戲 v1.1</title>
+<meta http-equiv="Cache-Control" content="no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <link rel="manifest" href="/hrd/manifest.json">
 <link rel="icon" href="/hrd/favicon.ico">
 <meta name="theme-color" content="#d4820a">
@@ -133,7 +135,7 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
     <div class="nitem" data-page="board"><span class="ni">🏆</span>英雄榜</div>
     <div class="nitem" data-page="guide"><span class="ni">📖</span>遊戲說明</div>
   </nav>
-  <div class="sfoot">TalentQuest v1.1 · 台灣中小企業適用</div>
+  <div class="sfoot">TalentQuest v1.2.1 · 台灣中小企業適用</div>
 </aside>
 <main class="main">
   <header class="header">
@@ -1237,7 +1239,7 @@ function applyShell(){
   const hs = document.getElementById('heroSelectLabel');
   if(hs){ if(!hs.dataset.zh) hs.dataset.zh = hs.textContent.trim(); hs.textContent = T(hs.dataset.zh); }
   const sf = document.querySelector('.sfoot');
-  if(sf){ if(!sf.dataset.zh) sf.dataset.zh = 'TalentQuest v1.1 · 台灣中小企業適用'; sf.textContent = LANG==='en'?'TalentQuest v1.1 · for SMEs':(LANG==='ja'?'TalentQuest v1.1 ・ 中小企業向け':sf.dataset.zh); }
+  if(sf){ if(!sf.dataset.zh) sf.dataset.zh = 'TalentQuest v1.2.1 · 台灣中小企業適用'; sf.textContent = LANG==='en'?'TalentQuest v1.1 · for SMEs':(LANG==='ja'?'TalentQuest v1.1 ・ 中小企業向け':sf.dataset.zh); }
 }
 function setModalHTML(h){ const mb=document.getElementById('modalBox'); mb.innerHTML = trHTML(h); LANG_SNAP.modal = mb.innerHTML; }
 
