@@ -421,7 +421,7 @@ function renderHero(){
     h+='<div style="font-size:12px;color:var(--text2);margin-top:6px;">XP <b style="color:var(--gold2);font-family:var(--mono);">'+(emp.xp||0)+'</b> / '+nxt.xpNeed+'（'+nxt.name+'）· '+pct+'%</div>';
     h+='<div class="lvl-up" style="margin-top:10px;">'+(st&&st.allOk?'✨ 已達晉升門檻！請 HR 於「晉升評鑑」核准':(st?'距離晉升還有 '+Math.max(0,nxt.xpNeed-(emp.xp||0))+' XP':'已達最高職級'))+'</div>';
   } else { h+='<div class="lvl-up">👑 已達頂級職級，傳奇！</div>'; }
-  h+='<div style="display:flex;gap:14px;justify-content:center;margin-top:14px;"><div><span class="badge b-cyan">課程 '+doneCount+'</span></div><div><span class="badge b-green">通過測驗 '+passCount+'</span></div><div><span class="badge b-gold">徽章 '+badges.length+'</span></div></div>';
+  h+='<div style="display:flex;gap:14px;justify-content:center;margin-top:14px;"><div><span class="badge b-cyan">'+T('課程 ')+doneCount+'</span></div><div><span class="badge b-green">'+T('通過測驗 ')+passCount+'</span></div><div><span class="badge b-gold">'+T('徽章 ')+badges.length+'</span></div></div>';
   h+='</div></div>';
   h+='<div>';
   h+='<div class="card"><div class="ch"><h2>🗺️ 前往 '+esc(nxt?nxt.name:'頂點')+' — 任務清單</h2></div><div class="cb">';
@@ -431,7 +431,7 @@ function renderHero(){
     st.courses.forEach(cs=>{const co=courses.find(x=>x.id===cs.id);tasks.push({done:cs.done,i:'📚',t:'修畢課程：'+(co?co.name:cs.id),d:(co?co.desc:''),pct:cs.done?100:0});});
     if(nxt.reqQuiz){const qz=quizzes.find(x=>x.id===nxt.reqQuiz);tasks.push({done:st.quizOk,i:'⚔️',t:'通過測驗：'+(qz?qz.name:'')+'（≥80 分）',d:st.quizScore!=null?('目前最高分 '+st.quizScore):'尚未挑戰',pct:st.quizScore!=null?Math.min(100,st.quizScore):0});}
     tasks.forEach(t=>{
-      h+='<div class="quest'+(t.done?' done':'')+'"><div class="qi">'+(t.done?'✅':t.i)+'</div><div style="flex:1;"><div class="qt">'+esc(t.t)+'</div>'+(t.d?'<div class="qd">'+esc(t.d)+'</div>':'')+(t.pct!=null?'<div class="qbar"><div style="width:'+t.pct+'%"></div></div>':'')+'</div></div>';
+      h+='<div class="quest'+(t.done?' done':'')+'"><div class="qi">'+(t.done?'✓':t.i)+'</div><div style="flex:1;"><div class="qt">'+esc(t.t)+'</div>'+(t.d?'<div class="qd">'+esc(t.d)+'</div>':'')+(t.pct!=null?'<div class="qbar"><div style="width:'+t.pct+'%"></div></div>':'')+'</div></div>';
     });
     if(st.allOk)h+='<div style="text-align:center;margin-top:6px;"><span class="badge b-gold" style="font-size:13px;padding:6px 16px;">👑 晉升資格達成 — 由 HR 於「晉升評鑑」核准後升階</span></div>';
   } else h+='<div style="text-align:center;color:var(--text2);padding:10px;">已是最高職級</div>';
@@ -463,7 +463,7 @@ function renderCourses(){
     h+='<div class="course'+(dn?' done':'')+'"><div class="cn">'+esc(c.name)+'</div><div class="cd">'+esc(c.desc||'')+'</div>';
     h+='<div style="margin-bottom:10px;">'+(c.comps||[]).map(cid=>{const cp=comps.find(x=>x.id===cid);return cp?'<span class="chip">'+esc(cp.name)+'</span>':'';}).join('')+'</div>';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;"><span class="mini">⏱ '+c.hours+' 小時　⚡ +'+c.xp+' XP</span>';
-    h+=dn?'<span class="badge b-green">✓ 已修畢</span>':'<button class="btn btn-gold btn-sm" onclick="markCourse(\''+c.id+'\')">完成課程</button>';
+    h+=dn?'<span class="badge b-green">✓ 已修畢</span>':'<button class="btn btn-gold btn-sm" onclick="markCourse(\''+c.id+'\')">'+T('完成課程')+'</button>';
     h+='</div></div>';
   });
   h+='</div></div></div>';
@@ -496,14 +496,14 @@ function renderQuiz(){
     const n=qz.questions.length;
     h+='<div class="course"><div class="cn">'+esc(qz.name)+'</div><div class="cd">'+n+' 題 · 通過門檻 '+qz.pass+' 分 · 最高可得 '+qz.xp+' XP</div>';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
-    h+=best!=null?'<span class="badge '+(best>=qz.pass?'b-green':'b-grey')+'">最高 '+best+' 分</span>':'<span class="badge b-grey">未挑戰</span>';
+    h+=best!=null?'<span class="badge '+(best>=qz.pass?'b-green':'b-grey')+'">'+T('最高 ')+best+T(' 分')+'</span>':'<span class="badge b-grey">'+T('未挑戰')+'</span>';
     h+='<button class="btn '+(best!=null&&best>=qz.pass?'btn-out':'btn-cyan')+' btn-sm" onclick="startQuiz(\''+qz.id+'\')">'+(best!=null?'重新挑戰':'開始挑戰')+'</button></div></div>';
   });
   h+='</div></div></div>';
   h+='<div class="card"><div class="ch"><h2>我的測驗紀錄</h2></div><div class="cb">';
   const rs=quizResults.filter(r=>r.empId===emp.id).slice().reverse();
   if(rs.length===0)h+='<div class="mini">尚無紀錄。</div>';
-  else{h+='<table class="dt"><thead><tr><th>日期</th><th>測驗</th><th class="num">分數</th><th class="center">結果</th></tr></thead><tbody>';
+  else{h+='<table class="dt"><thead><tr><th>日期</th><th>'+T('測驗')+'</th><th class="num">'+T('分數')+'</th><th class="center">結果</th></tr></thead><tbody>';
     rs.forEach(r=>{const qz=quizzes.find(x=>x.id===r.quizId);h+='<tr><td>'+r.date+'</td><td>'+(qz?esc(qz.name):'—')+'</td><td class="num">'+r.score+'</td><td class="center">'+(r.pass?'<span class="badge b-green">通過</span>':'<span class="badge b-red">未通過</span>')+'</td></tr>';});
     h+='</tbody></table>';
   }
@@ -568,7 +568,7 @@ function renderQuiz(){
     h+='<div class="card"><div class="ch"><h2>逐題解析</h2></div><div class="cb">';
     qz.questions.forEach((qq,i)=>{
       const m=STATE.quiz.marks[i];
-      h+='<div class="qlabel">'+(m.good?'✅ ':'❌ ')+(i+1)+'. '+esc(qq.q)+'</div>';
+      h+='<div class="qlabel">'+(m.good?'✓ ':'❌ ')+(i+1)+'. '+esc(qq.q)+'</div>';
       qq.o.forEach((op,oi)=>{let cls='opt';if(oi===qq.a)cls+=' right';else if(oi===m.sel)cls+=' wrong';h+='<div class="'+cls+'">'+String.fromCharCode(65+oi)+'. '+esc(op)+'</div>';});
       h+='<div class="explain">💡 '+esc(qq.e)+'</div>';
     });
@@ -582,14 +582,14 @@ function renderQuiz(){
     const best=bestScore(emp.id,qz.id);
     h+='<div class="course"><div class="cn">'+esc(qz.name)+'</div><div class="cd">'+qz.questions.length+' 題 · 門檻 '+qz.pass+' 分 · 最高 '+qz.xp+' XP</div>';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
-    h+=best!=null?'<span class="badge '+(best>=qz.pass?'b-green':'b-grey')+'">最高 '+best+' 分</span>':'<span class="badge b-grey">未挑戰</span>';
+    h+=best!=null?'<span class="badge '+(best>=qz.pass?'b-green':'b-grey')+'">'+T('最高 ')+best+T(' 分')+'</span>':'<span class="badge b-grey">'+T('未挑戰')+'</span>';
     h+='<button class="btn '+(best!=null&&best>=qz.pass?'btn-out':'btn-cyan')+' btn-sm" onclick="startQuiz(\''+qz.id+'\')">'+(best!=null?'重新挑戰':'開始挑戰')+'</button></div></div>';
   });
   h+='</div></div></div>';
   h+='<div class="card"><div class="ch"><h2>我的測驗紀錄</h2></div><div class="cb">';
   const rs=quizResults.filter(r=>r.empId===emp.id).slice().reverse();
   if(rs.length===0)h+='<div class="mini">尚無紀錄。</div>';
-  else{h+='<table class="dt"><thead><tr><th>日期</th><th>測驗</th><th class="num">分數</th><th class="center">結果</th></tr></thead><tbody>';
+  else{h+='<table class="dt"><thead><tr><th>日期</th><th>'+T('測驗')+'</th><th class="num">'+T('分數')+'</th><th class="center">結果</th></tr></thead><tbody>';
     rs.forEach(r=>{const qz=quizzes.find(x=>x.id===r.quizId);h+='<tr><td>'+r.date+'</td><td>'+(qz?esc(qz.name):'—')+'</td><td class="num">'+r.score+'</td><td class="center">'+(r.pass?'<span class="badge b-green">通過</span>':'<span class="badge b-red">未通過</span>')+'</td></tr>';});
     h+='</tbody></table>';}
   h+='</div></div>';
@@ -647,14 +647,14 @@ function renderPromotion(){
   cands.forEach(x=>{
     const st=x.st;
     h+='<div class="course"><div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;"><span style="font-size:30px;">'+x.e.avatar+'</span><div><div style="font-weight:800;font-size:15px;">'+esc(x.e.name)+'（'+lvlName(x.e)+' → '+esc(st.nxt.name)+'）</div><div class="mini">⚡ '+(x.e.xp||0)+' XP</div></div></div>';
-    h+='<div class="mini" style="margin-bottom:10px;">✓ XP 達標　✓ 課程完成　'+(st.quizScore!=null?('✓ 測驗 '+st.quizScore+' 分'):'✓')+'</div>';
+    h+='<div class="mini" style="margin-bottom:10px;">✓ XP 達標　✓ 課程完成　'+(st.quizScore!=null?(T('✓ 測驗 ')+st.quizScore+T(' 分')):'✓')+'</div>';
     h+='<div style="display:flex;gap:8px;"><button class="btn btn-gold" onclick="approvePromotion(\''+x.e.id+'\')">👑 核准晉升</button></div></div>';
   });
   h+='</div></div>';
   h+='<div class="card"><div class="ch"><h2>尚未達標（進度差異）</h2></div><div class="cb"><table class="dt"><thead><tr><th>員工</th><th>現職級</th><th>目標職級</th><th class="num">XP</th><th>課程缺口</th><th>測驗</th></tr></thead><tbody>';
   waiting.forEach(x=>{
     const st=x.st;const miss=(st.courses.filter(c=>!c.done).map(c=>{const co=courses.find(y=>y.id===c.id);return co?co.name:c.id;}));
-    h+='<tr><td>'+x.e.avatar+' '+esc(x.e.name)+'</td><td>'+lvlName(x.e)+'</td><td>'+esc(st.nxt.name)+'</td><td class="num">'+(x.e.xp||0)+'/'+st.nxt.xpNeed+'</td><td class="mini">'+(miss.length?esc(miss.join('、')):'✓')+'</td><td class="mini">'+(st.quizScore==null?('待測 '+esc((quizzes.find(q=>q.id===st.nxt.reqQuiz)||{}).name||'')):(st.quizScore>=80?'✓ '+st.quizScore:'未達 80（'+st.quizScore+'）'))+'</td></tr>';
+    h+='<tr><td>'+x.e.avatar+' '+esc(x.e.name)+'</td><td>'+lvlName(x.e)+'</td><td>'+esc(st.nxt.name)+'</td><td class="num">'+(x.e.xp||0)+'/'+st.nxt.xpNeed+'</td><td class="mini">'+(miss.length?esc(miss.join('、')):'✓')+'</td><td class="mini">'+(st.quizScore==null?(T('待測 ')+esc((quizzes.find(q=>q.id===st.nxt.reqQuiz)||{}).name||'')):(st.quizScore>=80?'✓ '+st.quizScore:'未達 80（'+st.quizScore+'）'))+'</td></tr>';
   });
   h+='</tbody></table></div></div>';
   h+='<div class="card"><div class="ch"><h2>晉升紀錄</h2></div><div class="cb">';
@@ -687,7 +687,7 @@ function approvePromotion(empId){
 
 /* ── 7. 職級體系（編輯）── */
 function renderLadder(){
-  let h='<div class="card"><div class="ch"><h2>職級階梯（由低到高）</h2><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="exportSalaryMap()">📤 匯出職級薪級對照</button><button class="btn btn-gold btn-sm" onclick="editLadder(\'\')">＋ 新增職級</button></div></div><div class="cb">';
+  let h='<div class="card"><div class="ch"><h2>職級階梯（由低到高）</h2><div style="display:flex;gap:8px;"><button class="btn btn-outline btn-sm" onclick="exportSalaryMap()">📤 匯出職級薪級對照</button><button class="btn btn-gold btn-sm" onclick="editLadder(\'\')">'+T('＋ 新增職級')+'</button></div></div><div class="cb">';
   h+='<table class="dt"><thead><tr><th class="center">級</th><th>職級名稱</th><th class="num">XP 門檻</th><th>薪級對照（可編輯）</th><th>升階需求</th><th></th></tr></thead><tbody>';
   ladder.forEach((lv,i)=>{
     const co=(lv.reqCourses||[]).map(id=>{const c=courses.find(x=>x.id===id);return c?c.name:id;}).join('、');
@@ -695,17 +695,17 @@ function renderLadder(){
     h+='<tr><td class="center">'+(i+1)+'</td><td><strong>'+esc(lv.name)+'</strong><div class="mini">'+esc(lv.desc||'')+'</div></td><td class="num">'+lv.xpNeed+'</td><td class="mini">'+esc(lv.salaryBand||'—')+'</td><td class="mini">課程：'+(co||'—')+'<br>測驗：'+esc(qz)+'</td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="editLadder(\''+lv.id+'\')">編輯</button> <button class="btn btn-red btn-xs" onclick="delLadder(\''+lv.id+'\')">刪除</button></td></tr>';
   });
   h+='</tbody></table></div></div>';
-  h+='<div class="card"><div class="ch"><h2>說明</h2></div><div class="cb"><div class="mini">職級＝遊戲關卡。員工累積 XP（完成課程、通過測驗、晉升獎勵）達到門檻，並修畢該職級指定課程、通過指定測驗（≥80 分）後，即成為晉升候選人；由 HR 在「晉升評鑑」核准後升階。</div></div></div>';
+  h+='<div class="card"><div class="ch"><h2>'+T('說明')+'</h2></div><div class="cb"><div class="mini">職級＝遊戲關卡。員工累積 XP（完成課程、通過測驗、晉升獎勵）達到門檻，並修畢該職級指定課程、通過指定測驗（≥80 分）後，即成為晉升候選人；由 HR 在「晉升評鑑」核准後升階。</div></div></div>';
   return h;
 }
 function editLadder(id){
   const lv=ladder.find(x=>x.id===id)||{id:'',name:'',xpNeed:0,reqCourses:[],reqQuiz:'',desc:''};
   let h='<div class="mh"><h3>'+(id?'編輯':'新增')+'職級</h3><button class="cbtn" onclick="closeModal()">✕</button></div><div class="mb">';
-  h+='<div class="mrow"><div class="fg"><label>職級名稱</label><input id="lvName" value="'+esc(lv.name)+'"></div><div class="fg"><label>XP 門檻</label><input type="number" id="lvXp" value="'+lv.xpNeed+'"></div></div>';
-  h+='<div class="fg"><label>說明</label><input id="lvDesc" value="'+esc(lv.desc||'')+'"></div>';
-  h+='<div class="fg"><label>薪級對照（如：本薪 42,000-52,000 或對應薪級代號）</label><input id="lvBand" value="'+esc(lv.salaryBand||'')+'"></div>';
-  h+='<div class="fg"><label>指定測驗（須 ≥80 分）</label><select id="lvQuiz"><option value="">（無）</option>'+quizzes.map(qz=>'<option value="'+qz.id+'" '+(lv.reqQuiz===qz.id?'selected':'')+'>'+esc(qz.name)+'</option>').join('')+'</select></div>';
-  h+='<div class="fg"><label>指定課程（須全部修畢）</label><div style="max-height:220px;overflow-y:auto;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:10px;">'+courses.map(c=>'<label style="display:block;font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;"><input type="checkbox" class="lvC" value="'+c.id+'" '+(lv.reqCourses.includes(c.id)?'checked':'')+'> '+esc(c.name)+'（+'+c.xp+' XP）</label>').join('')+'</div></div>';
+  h+='<div class="mrow"><div class="fg"><label>'+T('職級名稱')+'</label><input id="lvName" value="'+esc(lv.name)+'"></div><div class="fg"><label>'+T('XP 門檻')+'</label><input type="number" id="lvXp" value="'+lv.xpNeed+'"></div></div>';
+  h+='<div class="fg"><label>'+T('說明')+'</label><input id="lvDesc" value="'+esc(lv.desc||'')+'"></div>';
+  h+='<div class="fg"><label>'+T('薪級對照（如：本薪 42,000-52,000 或對應薪級代號）')+'</label><input id="lvBand" value="'+esc(lv.salaryBand||'')+'"></div>';
+  h+='<div class="fg"><label>'+T('指定測驗（須 ≥80 分）')+'</label><select id="lvQuiz"><option value="">（無）</option>'+quizzes.map(qz=>'<option value="'+qz.id+'" '+(lv.reqQuiz===qz.id?'selected':'')+'>'+esc(qz.name)+'</option>').join('')+'</select></div>';
+  h+='<div class="fg"><label>'+T('指定課程（須全部修畢）')+'</label><div style="max-height:220px;overflow-y:auto;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:10px;">'+courses.map(c=>'<label style="display:block;font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;"><input type="checkbox" class="lvC" value="'+c.id+'" '+(lv.reqCourses.includes(c.id)?'checked':'')+'> '+esc(c.name)+'（+'+c.xp+' XP）</label>').join('')+'</div></div>';
   h+='</div><div class="mf"><button class="btn btn-out" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="saveLadder(\''+(id||'')+'\')">儲存</button></div>';
   setModalHTML(h);
   document.getElementById('modalOv').classList.remove('hidden');
@@ -744,7 +744,7 @@ function renderComps(){
     });
     h+='</div></div></div>';
   });
-  h+='<div class="card"><div class="ch"><h2>職能 × 課程 對照</h2></div><div class="cb"><table class="dt"><thead><tr><th>課程</th><th>類別</th><th>培育職能</th></tr></thead><tbody>';
+  h+='<div class="card"><div class="ch"><h2>職能 × 課程 對照</h2></div><div class="cb"><table class="dt"><thead><tr><th>'+T('課程')+'</th><th>'+T('類別')+'</th><th>'+T('培育職能')+'</th></tr></thead><tbody>';
   courses.forEach(c=>{h+='<tr><td>'+esc(c.name)+'</td><td>'+(c.cat==='core'?'核心':(c.cat==='pro'?'專業':'管理'))+'</td><td class="mini">'+(c.comps||[]).map(cid=>{const cp=comps.find(x=>x.id===cid);return cp?esc(cp.name):'';}).join('、')+'</td></tr>';});
   h+='</tbody></table></div></div>';
   return h;
@@ -753,9 +753,9 @@ function renderComps(){
 /* ── 9. 員工管理 ── */
 function renderEmployees(){
   let h='<div class="card"><div class="ch"><h2>員工名冊（'+employees.length+'）</h2><div style="display:flex;gap:8px;">'
-   +'<button class="btn btn-out btn-sm" onclick="exportTQ()">匯出 JSON 備份</button>'
-   +'<button class="btn btn-gold btn-sm" onclick="editEmp(\'\')">＋ 新增員工</button></div></div><div class="cb">';
-  h+='<table class="dt"><thead><tr><th></th><th>姓名</th><th>部門</th><th>職系</th><th>職級</th><th class="num">XP</th><th class="num">課程</th><th class="center">狀態</th><th></th></tr></thead><tbody>';
+   +'<button class="btn btn-out btn-sm" onclick="exportTQ()">'+T('匯出 JSON 備份')+'</button>'
+   +'<button class="btn btn-gold btn-sm" onclick="editEmp(\'\')">'+T('＋ 新增員工')+'</button></div></div><div class="cb">';
+  h+='<table class="dt"><thead><tr><th></th><th>姓名</th><th>部門</th><th>'+T('職系')+'</th><th>'+T('職級')+'</th><th class="num">XP</th><th class="num">'+T('課程')+'</th><th class="center">狀態</th><th></th></tr></thead><tbody>';
   employees.forEach(e=>{
     const doneC=completions.filter(c=>c.empId===e.id).length;
     h+='<tr><td style="font-size:22px;">'+e.avatar+'</td><td><strong>'+esc(e.name)+'</strong><div class="mini">'+esc(e.code)+'</div></td><td>'+esc(e.dept)+'</td><td>'+esc((tracks.find(t=>t.id===e.track)||{}).name||'')+'</td><td>'+lvlName(e)+'</td><td class="num">'+(e.xp||0)+'</td><td class="num">'+doneC+'</td><td class="center">'+(e.status==='在職'?'<span class="badge b-green">在職</span>':'<span class="badge b-grey">離職</span>')+'</td><td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="setHero(\''+e.id+'\')">選為玩家</button> <button class="btn btn-outline btn-xs" onclick="editEmp(\''+e.id+'\')">編輯</button> <button class="btn btn-red btn-xs" onclick="delEmp(\''+e.id+'\')">刪除</button></td></tr>';
@@ -766,12 +766,12 @@ function renderEmployees(){
 function editEmp(id){
   const e=employees.find(x=>x.id===id)||{id:'',code:'T'+String(employees.length+1).padStart(3,'0'),name:'',dept:'',track:'t_staff',avatar:'🦊',title:'',level:ladder[0].id,hireDate:new Date().toISOString().split('T')[0],status:'在職',xp:0};
   let h='<div class="mh"><h3>'+(id?'編輯':'新增')+'員工</h3><button class="cbtn" onclick="closeModal()">✕</button></div><div class="mb">';
-  h+='<div class="mrow"><div class="fg"><label>員工編號</label><input id="eeCode" value="'+esc(e.code)+'"></div><div class="fg"><label>姓名</label><input id="eeName" value="'+esc(e.name)+'"></div></div>';
-  h+='<div class="mrow"><div class="fg"><label>部門</label><input id="eeDept" value="'+esc(e.dept)+'"></div><div class="fg"><label>職稱</label><input id="eeTitle" value="'+esc(e.title||'')+'"></div></div>';
-  h+='<div class="mrow"><div class="fg"><label>職系</label><select id="eeTrack">'+tracks.map(t=>'<option value="'+t.id+'" '+(e.track===t.id?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></div>';
-  h+='<div class="fg"><label>起始職級</label><select id="eeLevel">'+ladder.map(l=>'<option value="'+l.id+'" '+(e.level===l.id?'selected':'')+'>'+esc(l.name)+'</option>').join('')+'</select></div></div>';
-  h+='<div class="fg"><label>頭像</label><div>'+AVATARS.map(a=>'<label style="display:inline-block;font-size:22px;margin:4px 8px;cursor:pointer;text-transform:none;font-weight:400;"><input type="radio" name="av" value="'+a+'" '+(e.avatar===a?'checked':'')+' style="display:none;" onchange="document.getElementById(\'avPrev\').textContent=this.value">'+(a)+'</label>').join('')+'<span id="avPrev" style="font-size:26px;margin-left:10px;">'+e.avatar+'</span></div></div>';
-  h+='<div class="mrow"><div class="fg"><label>到職日</label><input type="date" id="eeHire" value="'+esc(e.hireDate)+'"></div><div class="fg"><label>狀態</label><select id="eeStatus"><option '+(e.status==='在職'?'selected':'')+'>在職</option><option '+(e.status==='離職'?'selected':'')+'>離職</option></select></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>'+T('員工編號')+'</label><input id="eeCode" value="'+esc(e.code)+'"></div><div class="fg"><label>'+T('姓名')+'</label><input id="eeName" value="'+esc(e.name)+'"></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>'+T('部門')+'</label><input id="eeDept" value="'+esc(e.dept)+'"></div><div class="fg"><label>'+T('職稱')+'</label><input id="eeTitle" value="'+esc(e.title||'')+'"></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>'+T('職系')+'</label><select id="eeTrack">'+tracks.map(t=>'<option value="'+t.id+'" '+(e.track===t.id?'selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select></div>';
+  h+='<div class="fg"><label>'+T('起始職級')+'</label><select id="eeLevel">'+ladder.map(l=>'<option value="'+l.id+'" '+(e.level===l.id?'selected':'')+'>'+esc(l.name)+'</option>').join('')+'</select></div></div>';
+  h+='<div class="fg"><label>'+T('頭像')+'</label><div>'+AVATARS.map(a=>'<label style="display:inline-block;font-size:22px;margin:4px 8px;cursor:pointer;text-transform:none;font-weight:400;"><input type="radio" name="av" value="'+a+'" '+(e.avatar===a?'checked':'')+' style="display:none;" onchange="document.getElementById(\'avPrev\').textContent=this.value">'+(a)+'</label>').join('')+'<span id="avPrev" style="font-size:26px;margin-left:10px;">'+e.avatar+'</span></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>'+T('到職日')+'</label><input type="date" id="eeHire" value="'+esc(e.hireDate)+'"></div><div class="fg"><label>'+T('狀態')+'</label><select id="eeStatus"><option '+(e.status==='在職'?'selected':'')+'>在職</option><option '+(e.status==='離職'?'selected':'')+'>離職</option></select></div></div>';
   h+='</div><div class="mf"><button class="btn btn-out" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="saveEmp(\''+(id||'')+'\')">儲存</button></div>';
   setModalHTML(h);
   document.getElementById('modalOv').classList.remove('hidden');
@@ -868,14 +868,14 @@ function exportSalaryMap(){
 // ═══════════════════════════════════════════════
 function renderQbank(){
   let h='<div class="card"><div class="ch"><h2>測驗卷列表（'+quizzes.length+' 卷）</h2><div style="display:flex;gap:8px;">'
-   +'<button class="btn btn-outline btn-sm" onclick="qbImport()">📥 匯入題庫 JSON</button>'
-   +'<button class="btn btn-outline btn-sm" onclick="qbExportAll()">📤 匯出全部題庫</button>'
-   +'<button class="btn btn-gold btn-sm" onclick="editQuiz(\'\')">＋ 新增測驗卷</button></div></div><div class="cb">';
+   +'<button class="btn btn-outline btn-sm" onclick="qbImport()">'+T('📥 匯入題庫 JSON')+'</button>'
+   +'<button class="btn btn-outline btn-sm" onclick="qbExportAll()">'+T('📤 匯出全部題庫')+'</button>'
+   +'<button class="btn btn-gold btn-sm" onclick="editQuiz(\'\')">'+T('＋ 新增測驗卷')+'</button></div></div><div class="cb">';
   h+='<div class="mini" style="margin-bottom:12px;">可編輯內建卷與自訂卷：名稱、門檻分數、XP、題目、選項、答案與解析。編輯後立即生效於「測驗中心」。</div>';
   h+='<table class="dt"><thead><tr><th>測驗卷</th><th class="center">題數</th><th class="center">門檻</th><th class="num">XP</th><th class="center">類別</th><th></th></tr></thead><tbody>';
   quizzes.forEach(qz=>{
     h+='<tr><td><strong>'+esc(qz.name)+'</strong></td><td class="center">'+qz.questions.length+'</td><td class="center">'+qz.pass+'</td><td class="num">'+qz.xp+'</td><td class="center">'+(qz.cat==='mgmt'?'<span class="badge b-purple">管理</span>':(qz.cat==='pro'?'<span class="badge b-cyan">專業</span>':'<span class="badge b-gold">核心</span>'))+'</td>'
-     +'<td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="editQuiz(\''+qz.id+'\')">編輯</button> <button class="btn btn-outline btn-xs" onclick="startQuiz(\''+qz.id+'\')">預覽</button> <button class="btn btn-red btn-xs" onclick="delQuiz(\''+qz.id+'\')">刪除</button></td></tr>';
+     +'<td style="text-align:right;white-space:nowrap;"><button class="btn btn-outline btn-xs" onclick="editQuiz(\''+qz.id+'\')">編輯</button> <button class="btn btn-outline btn-xs" onclick="startQuiz(\''+qz.id+'\')">'+T('預覽')+'</button> <button class="btn btn-red btn-xs" onclick="delQuiz(\''+qz.id+'\')">刪除</button></td></tr>';
   });
   h+='</tbody></table></div></div>';
   h+='<div class="card"><div class="cb mini">💡 題庫設計建議：每卷 6-8 題、情境題優於背誦題、每題附解析（錯了也要學到東西）；晉升關鍵卷建議門檻 80 分以上。刪除測驗卷時，歷史成績會保留（顯示為已刪測驗），已核可的職級門檻請同步於「職級體系」調整。</div></div>';
@@ -891,10 +891,10 @@ function renderQbankEdit(){
   if(!STATE.qb){STATE.page='qbank';return renderQbank();}
   const qb=STATE.qb;
   let h='<div class="card"><div class="ch"><h2>編輯測驗卷</h2><button class="btn btn-out btn-sm" onclick="qbCancel()">返回列表</button></div><div class="cb">';
-  h+='<div class="mrow"><div class="fg"><label>測驗名稱</label><input id="qbName" value="'+esc(qb.name)+'"></div>';
-  h+='<div class="fg"><label>通過門檻（分）</label><input type="number" id="qbPass" value="'+qb.pass+'"></div>';
-  h+='<div class="fg"><label>卷面 XP</label><input type="number" id="qbXp" value="'+qb.xp+'"></div>';
-  h+='<div class="fg"><label>類別</label><select id="qbCat"><option value="core" '+(qb.cat==='core'?'selected':'')+'>核心</option><option value="pro" '+(qb.cat==='pro'?'selected':'')+'>專業</option><option value="mgmt" '+(qb.cat==='mgmt'?'selected':'')+'>管理</option></select></div></div>';
+  h+='<div class="mrow"><div class="fg"><label>'+T('測驗名稱')+'</label><input id="qbName" value="'+esc(qb.name)+'"></div>';
+  h+='<div class="fg"><label>'+T('通過門檻（分）')+'</label><input type="number" id="qbPass" value="'+qb.pass+'"></div>';
+  h+='<div class="fg"><label>'+T('卷面 XP')+'</label><input type="number" id="qbXp" value="'+qb.xp+'"></div>';
+  h+='<div class="fg"><label>'+T('類別')+'</label><select id="qbCat"><option value="core" '+(qb.cat==='core'?'selected':'')+'>'+T('核心')+'</option><option value="pro" '+(qb.cat==='pro'?'selected':'')+'>'+T('專業')+'</option><option value="mgmt" '+(qb.cat==='mgmt'?'selected':'')+'>'+T('管理')+'</option></select></div></div>';
   h+='<div style="display:flex;justify-content:space-between;align-items:center;margin:6px 0 10px;"><h3 style="font-size:14px;font-weight:800;">題目（'+qb.questions.length+'）</h3><button class="btn btn-gold btn-sm" onclick="qbSync();qbAddQ()">＋ 新增題目</button></div>';
   qb.questions.forEach((qq,i)=>{
     h+='<div class="course" style="margin-bottom:12px;"><div class="mini" style="margin-bottom:6px;">第 '+(i+1)+' 題</div>';
@@ -1034,9 +1034,6 @@ const STRINGS = {
   ' 門）': {en:' courses)', ja:' コース）'},
   '全部類別': {en:'All categories', ja:'すべてのカテゴリ'},
   '全部職系': {en:'All tracks', ja:'すべての職種'},
-  '核心': {en:'Core', ja:'コア'},
-  '專業': {en:'Professional', ja:'専門'},
-  '管理': {en:'Management', ja:'マネジメント'},
   ' 小時　⚡ +': {en:' h　⚡ +', ja:' 時間　⚡ +'},
   '✓ 已修畢': {en:'✓ Completed', ja:'✓ 修了済み'},
   /* 測驗 */
@@ -1047,7 +1044,6 @@ const STRINGS = {
   ' XP': {en:' XP', ja:' XP'},
   '我的測驗紀錄': {en:'My Quiz Records', ja:'テスト履歴'},
   '日期': {en:'Date', ja:'日付'},
-  '測驗': {en:'Quiz', ja:'テスト'},
   '分數': {en:'Score', ja:'点数'},
   '結果': {en:'Result', ja:'結果'},
   '通過': {en:'Pass', ja:'合格'},
@@ -1092,7 +1088,6 @@ const STRINGS = {
   '測驗：': {en:'Quiz: ', ja:'テスト：'},
   '編輯': {en:'Edit', ja:'編集'},
   '刪除': {en:'Delete', ja:'削除'},
-  '說明': {en:'Notes', ja:'説明'},
   '職級＝遊戲關卡。員工累積 XP（完成課程、通過測驗、晉升獎勵）達到門檻，並修畢該職級指定課程、通過指定測驗（≥80 分）後，即成為晉升候選人；由 HR 在「晉升評鑑」核准後升階。': {en:'Levels are game stages. Employees reach a threshold by earning XP (courses, quizzes, promotion bonus), completing required courses and passing required quizzes (≥80) — then HR approves the promotion.', ja:'等級はゲームのステージです。XP（コース・テスト・昇進ボーナス）を貯め、指定コースを修了し、指定テスト（80点以上）に合格すると昇進候補になります。HRが承認すると昇格します。'},
   /* 職能地圖 */
   '核心職能（全員）': {en:'Core Competencies (all staff)', ja:'コアコンピテンシー（全員）'},
@@ -1116,7 +1111,6 @@ const STRINGS = {
   '＋ 新增員工': {en:'＋ Add Employee', ja:'＋ 社員追加'},
   '姓名': {en:'Name', ja:'氏名'},
   '部門': {en:'Department', ja:'部署'},
-  '職系': {en:'Track', ja:'職種'},
   '狀態': {en:'Status', ja:'状態'},
   '在職': {en:'Active', ja:'在職'},
   '離職': {en:'Left', ja:'退職'},
@@ -1199,6 +1193,194 @@ Object.assign(STRINGS, {
   ' 晋升成功！': {en:' promoted!', ja:' 昇進しました！'},
   '繼續冒險': {en:'Continue the journey', ja:'冒険を続ける'}
 });
+Object.assign(STRINGS, {
+  '課程 ': {en:'Courses ', ja:'コース '},
+  '目前 ': {en:'Current ', ja:'現在 '},
+  ' 堂課程': {en:' courses', ja:'コース'},
+  '完成 ': {en:'Completed ', ja:'修了 '},
+  '未挑戰': {en:'Not attempted', ja:'未挑戦'},
+  '最高 ': {en:'Best ', ja:'最高 '},
+  ' 分': {en:' pts', ja:'点'},
+  '題 · 門檻 ': {en:' questions · pass ', ja:'問 ・ 合格 '},
+  '未打卡：': {en:'Not clocked in: ', ja:'未打刻：'},
+  '測驗拿到滿分': {en:'Scored 100 on a quiz', ja:'テストで満点獲得'},
+  '通過 3 類不同測驗': {en:'Passed 3 quiz categories', ja:'3種類のテスト合格'},
+  '首次晉升': {en:'First promotion', ja:'初昇進'},
+  '晉升 3 次': {en:'Promoted 3 times', ja:'3回昇進'},
+  '累積 XP 3000+': {en:'Earn 3,000+ XP', ja:'XP3,000以上'},
+  '完成管理類課程': {en:'Completed a management course', ja:'管理系コース修了'},
+  ' 的徽章（': {en:"'s badges (", ja:'のバッジ（'},
+  '全員徽章榜': {en:"Everyone's badges", ja:'全員バッジ'},
+  '核心職能': {en:'Core competencies', ja:'コアコンピテンシー'},
+  '專業職能': {en:'Professional competencies', ja:'専門コンピテンシー'},
+  '管理職能': {en:'Management competencies', ja:'マネジメントコンピテンシー'},
+  '培育職能': {en:'Competencies', ja:'育成コンピテンシー'},
+  '✓ XP 達標　✓ 課程完成　': {en:'✓ XP met　✓ Courses done　', ja:'✓ XP達成　✓ コース修了　'},
+  '題目（': {en:'Questions (', ja:'問題（'},
+  '＋ 新增題目': {en:'＋ Add question', ja:'＋ 問題追加'},
+  '第 ': {en:'Q', ja:'第'},
+  ' 題': {en:'', ja:' 問'},
+  '解析（答錯也要學到東西）': {en:'Explanation (learn even when wrong)', ja:'解説（間違っても学べる）'},
+  '刪除此題': {en:'Delete question', ja:'この問題を削除'},
+  '📤 匯出此卷 JSON': {en:'📤 Export this paper (JSON)', ja:'📤 この用紙を出力(JSON)'},
+  '💾 儲存測驗卷': {en:'💾 Save paper', ja:'💾 用紙を保存'},
+  '有題目或選項未填完整': {en:'Some questions or options are incomplete', ja:'問題または選択肢が未入力です'},
+  '測驗卷已儲存，立即生效於測驗中心': {en:'Paper saved — live in the Assessment Center', ja:'保存しました。テストセンターに即反映'},
+  '此測驗卷被「': {en:'This paper is a threshold for "', ja:'この用紙は「'},
+  '」職級設為門檻，請先於職級體系調整': {en:'" level requirements — adjust in Job Level System first', ja:'」等級の基準です。先に等級制度で調整してください'},
+  '編輯測驗卷': {en:'Edit quiz paper', ja:'用紙を編集'},
+  '返回列表': {en:'Back to list', ja:'一覧へ戻る'},
+  '測驗名稱': {en:'Paper name', ja:'用紙名'},
+  '通過門檻（分）': {en:'Pass score', ja:'合格点'},
+  '卷面 XP': {en:'Paper XP', ja:'用紙XP'},
+  '員工編號': {en:'Employee ID', ja:'社員番号'},
+  '到職日': {en:'Hire date', ja:'入社日'},
+  '頭像': {en:'Avatar', ja:'アバター'},
+  '起始職級': {en:'Starting level', ja:'初期等級'},
+  '取消': {en:'Cancel', ja:'キャンセル'},
+  '儲存': {en:'Save', ja:'保存'},
+  '確定刪除此員工？其課程與測驗紀錄將保留但不再顯示於名冊。': {en:'Delete this employee? Their records stay but leave the roster.', ja:'この社員を削除しますか？記録は残りますが名簿から消えます。'},
+  '至少保留一位員工': {en:'Keep at least one employee', ja:'少なくとも1名の社員が必要です'},
+  '✓ 已修畢': {en:'✓ Completed', ja:'✓ 修了済み'},
+  '💡 題庫設計建議：每卷 6-8 題、情境題優於背誦題、每題附解析（錯了也要學到東西）；晉升關鍵卷建議門檻 80 分以上。刪除測驗卷時，歷史成績會保留（顯示為已刪測驗），已核可的職級門檻請同步於「職級體系」調整。': {en:'💡 Quiz design tips: 6-8 questions per paper, scenario questions beat recall, add explanations to every question. Use 80+ pass scores for promotion-critical papers. Deleting a paper keeps historical scores; update the Job Level System accordingly.', ja:'💡 クイズ設計のヒント：1巻6〜8問、シナリオ問題優先、各問に解説。昇進に関わる巻は80点以上推奨。削除しても履歴は残ります。'},
+  '人才發展平台 · 職能升階': {en:'Talent Development · Skill Ladder', ja:'人材育成・スキル昇格'}
+});
+Object.assign(STRINGS, {
+  '課程 ': {en:'Courses ', ja:'コース '},
+  '通過測驗 ': {en:'Quizzes passed ', ja:'合格テスト '},
+  '徽章 ': {en:'Badges ', ja:'バッジ '},
+  '目前 ': {en:'Current ', ja:'現在 '},
+  ' 堂課程': {en:' courses', ja:'コース'},
+  '完成 ': {en:'Completed ', ja:'修了 '},
+  '未挑戰': {en:'Not attempted', ja:'未挑戦'},
+  '最高 ': {en:'Best ', ja:'最高 '},
+  ' 分': {en:' pts', ja:'点'},
+  '✓ 測驗 ': {en:'✓ Quiz ', ja:'✓ テスト '},
+  '待測 ': {en:'Quiz: ', ja:'未受験：'},
+  '測驗拿到滿分': {en:'Scored 100 on a quiz', ja:'テストで満点獲得'},
+  '通過 3 類不同測驗': {en:'Passed 3 quiz categories', ja:'3種類のテスト合格'},
+  '首次晉升': {en:'First promotion', ja:'初昇進'},
+  '晉升 3 次': {en:'Promoted 3 times', ja:'3回昇進'},
+  '累積 XP 3000+': {en:'Earn 3,000+ XP', ja:'XP3,000以上'},
+  '完成管理類課程': {en:'Completed a management course', ja:'管理系コース修了'},
+  ' 的徽章（': {en:"'s badges (", ja:'のバッジ（'},
+  '全員徽章榜': {en:"Everyone's badges", ja:'全員バッジ'},
+  '核心職能': {en:'Core competencies', ja:'コアコンピテンシー'},
+  '專業職能': {en:'Professional competencies', ja:'専門コンピテンシー'},
+  '管理職能': {en:'Management competencies', ja:'マネジメントコンピテンシー'},
+  '培育職能': {en:'Competencies', ja:'育成コンピテンシー'},
+  '✓ XP 達標　✓ 課程完成　': {en:'✓ XP met　✓ Courses done　', ja:'✓ XP達成　✓ コース修了　'},
+  '✓ 測驗 ': {en:'✓ Quiz ', ja:'✓ テスト '},
+  '編輯員工': {en:'Edit employee', ja:'社員を編集'},
+  '新增員工': {en:'Add employee', ja:'社員を追加'},
+  '員工編號': {en:'Employee ID', ja:'社員番号'},
+  '姓名': {en:'Name', ja:'氏名'},
+  '部門': {en:'Department', ja:'部署'},
+  '職稱': {en:'Job title', ja:'役職'},
+  '職系': {en:'Track', ja:'職種'},
+  '起始職級': {en:'Starting level', ja:'初期等級'},
+  '頭像': {en:'Avatar', ja:'アバター'},
+  '到職日': {en:'Hire date', ja:'入社日'},
+  '狀態': {en:'Status', ja:'状態'},
+  '在職': {en:'Active', ja:'在職'},
+  '離職': {en:'Left', ja:'退職'},
+  '選為玩家': {en:'Set as player', ja:'プレイヤーに設定'},
+  '取消': {en:'Cancel', ja:'キャンセル'},
+  '儲存': {en:'Save', ja:'保存'},
+  '確認後於承諾時間回覆': {en:'Confirm and reply by the promised time', ja:'約束した期限に返答する'},
+  '預覽': {en:'Preview', ja:'プレビュー'},
+  '匯出 JSON 備份': {en:'Export JSON backup', ja:'JSONバックアップ出力'},
+  '＋ 新增員工': {en:'＋ Add employee', ja:'＋ 社員追加'},
+  '說明': {en:'Notes', ja:'説明'},
+  '薪級對照（如：本薪 42,000-52,000 或對應薪級代號）': {en:'Salary band (e.g. Base 42,000-52,000 or grade code)', ja:'給与帯（例：基本給42,000-52,000）'},
+  '指定測驗（須 ≥80 分）': {en:'Required quiz (≥80)', ja:'指定テスト（80点以上）'},
+  '指定課程（須全部修畢）': {en:'Required courses (all)', ja:'指定コース（すべて修了）'},
+  '編輯職級': {en:'Edit level', ja:'等級を編集'},
+  '新增職級': {en:'Add level', ja:'等級を追加'},
+  '職級名稱': {en:'Level name', ja:'等級名'},
+  'XP 門檻': {en:'XP threshold', ja:'XP基準'},
+  '匯出職級薪級對照': {en:'Export level-salary map', ja:'等級・給与対応出力'},
+  '＋ 新增職級': {en:'＋ Add level', ja:'＋ 等級追加'},
+  '編輯測驗卷': {en:'Edit quiz paper', ja:'用紙を編集'},
+  '返回列表': {en:'Back to list', ja:'一覧へ戻る'},
+  '測驗名稱': {en:'Paper name', ja:'用紙名'},
+  '通過門檻（分）': {en:'Pass score', ja:'合格点'},
+  '卷面 XP': {en:'Paper XP', ja:'用紙XP'},
+  '類別': {en:'Category', ja:'カテゴリ'},
+  '題目（': {en:'Questions (', ja:'問題（'},
+  '＋ 新增題目': {en:'＋ Add question', ja:'＋ 問題追加'},
+  '解析（答錯也要學到東西）': {en:'Explanation (learn even when wrong)', ja:'解説（間違っても学べる）'},
+  '刪除此題': {en:'Delete question', ja:'この問題を削除'},
+  '📤 匯出此卷 JSON': {en:'📤 Export this paper (JSON)', ja:'📤 この用紙を出力(JSON)'},
+  '💾 儲存測驗卷': {en:'💾 Save paper', ja:'💾 用紙を保存'},
+  '有題目或選項未填完整': {en:'Some questions or options are incomplete', ja:'問題または選択肢が未入力です'},
+  '測驗卷已儲存，立即生效於測驗中心': {en:'Paper saved — live in the Assessment Center', ja:'保存しました。テストセンターに即反映'},
+  '此測驗卷被「': {en:'This paper is a threshold for "', ja:'この用紙は「'},
+  '」職級設為門檻，請先於職級體系調整': {en:'" level requirements — adjust in Job Level System first', ja:'」等級の基準です。先に等級制度で調整してください'},
+  '匯入題庫 JSON': {en:'Import quiz JSON', ja:'問題バンクJSON取込'},
+  '匯出全部題庫': {en:'Export all quizzes', ja:'全問題バンク出力'},
+  '＋ 新增測驗卷': {en:'＋ New quiz paper', ja:'＋ 新規用紙追加'},
+  '測驗卷': {en:'Paper', ja:'用紙'},
+  '預覽': {en:'Preview', ja:'プレビュー'},
+  '匯出晉升核定單': {en:'Export promotion list', ja:'昇進承認リスト出力'},
+  '目前沒有達標的候選人。員工達成「XP＋課程＋測驗」三項門檻後會出現在這裡。': {en:'No qualified candidates yet — employees appear here after meeting XP + courses + quiz thresholds.', ja:'まだ条件を満たす候補者はいません。'},
+  '核准晉升': {en:'Approve promotion', ja:'昇進を承認'},
+  '尚未達標（進度差異）': {en:'Not yet qualified (gap analysis)', ja:'未達成（ギャップ分析）'},
+  '晉升紀錄': {en:'Promotion records', ja:'昇進履歴'},
+  '尚無晉升紀錄。': {en:'No promotion records yet.', ja:'昇進履歴はまだありません。'},
+  '✓ XP 達標　✓ 課程完成　': {en:'✓ XP met　✓ Courses done　', ja:'✓ XP達成　✓ コース修了　'},
+  '✓ 測驗 ': {en:'✓ Quiz ', ja:'✓ テスト '},
+  '待測 ': {en:'Quiz: ', ja:'未受験：'},
+  '恭喜晉升': {en:'Promotion approved', ja:'昇進承認'},
+  '繼續冒險': {en:'Continue the journey', ja:'冒険を続ける'},
+  '晉升獎勵 +300 XP　新職級：': {en:'Promotion bonus +300 XP　New level: ', ja:'昇進ボーナス +300 XP　新しい等級：'},
+  '玩家': {en:'Player', ja:'プレイヤー'},
+  '排名': {en:'Rank', ja:'順位'},
+  '員工': {en:'Employee', ja:'社員'},
+  '目標職級': {en:'Target level', ja:'目標等級'},
+  '現職級': {en:'Current level', ja:'現在等級'},
+  '課程缺口': {en:'Course gaps', ja:'未修コース'},
+  '全員徽章榜': {en:"Everyone's badges", ja:'全員バッジ'},
+  '的徽章（': {en:' badges (', ja:'のバッジ（'},
+  '取消': {en:'Cancel', ja:'キャンセル'},
+  '儲存': {en:'Save', ja:'保存'},
+  '確認後於承諾時間回覆': {en:'Confirm and reply by the promised time', ja:'約束した期限に返答する'},
+  '預覽': {en:'Preview', ja:'プレビュー'},
+  '匯出 JSON 備份': {en:'Export JSON backup', ja:'JSONバックアップ出力'},
+  '＋ 新增員工': {en:'＋ Add employee', ja:'＋ 社員追加'},
+  '匯出職級薪級對照': {en:'Export level-salary map', ja:'等級・給与対応出力'},
+  '＋ 新增職級': {en:'＋ Add level', ja:'＋ 等級追加'},
+  '匯出晉升核定單': {en:'Export promotion list', ja:'昇進承認リスト出力'},
+  '📋 題庫設計建議': {en:'📋 Quiz design tips', ja:'📋 クイズ設計のヒント'},
+  '完成課程與測驗即可獲得徽章。': {en:'Complete courses and quizzes to earn badges.', ja:'コースとテストを完了するとバッジを獲得できます。'},
+  '≥80 分為通過；成績保留最高分': {en:'≥80 to pass · best score kept', ja:'80点以上で合格 ・ 最高得点を保持'},
+  '職能 × 課程 對照': {en:'Competency × Course mapping', ja:'コンピテンシー×コース対応'},
+  '核心職能': {en:'Core competencies', ja:'コアコンピテンシー'},
+  '專業職能': {en:'Professional competencies', ja:'専門コンピテンシー'},
+  '管理職能': {en:'Management competencies', ja:'マネジメントコンピテンシー'},
+  '關聯課程：': {en:'Related courses: ', ja:'関連コース：'},
+  ' 門　相關測驗可於測驗中心挑戰': {en:' courses · take the quiz in Assessment Center', ja:' コース　テストセンターで挑戦'},
+  '恭喜晉升': {en:'Promotion approved', ja:'昇進承認'}
+});
+Object.assign(STRINGS, {
+  '管理': {en:'Management', ja:'マネジメント'},
+  '核心': {en:'Core', ja:'コア'},
+  '專業': {en:'Professional', ja:'専門'},
+  '職系': {en:'Track', ja:'職種'},
+  '職級': {en:'Level', ja:'等級'},
+  '課程': {en:'Course', ja:'コース'},
+  '測驗': {en:'Quiz', ja:'テスト'},
+  '說明': {en:'Notes', ja:'説明'},
+  '類別': {en:'Category', ja:'カテゴリ'},
+  '70% 工作實戰＋20% 他人教練＋10% 課程；本平台記錄課程與認證，實戰由主管帶': {en:'70% field practice + 20% coaching + 10% courses; the platform logs courses and certifications, managers lead practice on the job', ja:'70% 実務＋20% コーチング＋10% 研修。本プラットフォームは研修と認定を記録し、実務は上司が伴走します'},
+  '人才發展平台 · 職能升階': {en:'Talent Development · Skill Ladder', ja:'人材育成・スキル昇格'}
+});
+Object.assign(STRINGS, {
+  '徽章數': {en:'Badges', ja:'バッジ数'},
+  '代表徽章': {en:'Top badge', ja:'代表バッジ'},
+  '題數': {en:'Questions', ja:'問題数'},
+  '門檻': {en:'Threshold', ja:'基準'}
+});
 function T(zh){
   if(LANG==='zh') return zh;
   const e = STRINGS[zh];
@@ -1238,6 +1420,8 @@ function applyShell(){
   if(ht){ if(!ht.dataset.zh) ht.dataset.zh = ht.textContent.trim(); ht.textContent = T(ht.dataset.zh); }
   const hs = document.getElementById('heroSelectLabel');
   if(hs){ if(!hs.dataset.zh) hs.dataset.zh = hs.textContent.trim(); hs.textContent = T(hs.dataset.zh); }
+  const bt2 = document.querySelector('.brand .t2');
+  if(bt2){ if(!bt2.dataset.zh) bt2.dataset.zh = bt2.textContent.trim(); bt2.textContent = T(bt2.dataset.zh); }
   const sf = document.querySelector('.sfoot');
   if(sf){ if(!sf.dataset.zh) sf.dataset.zh = 'TalentQuest v1.2.1 · 台灣中小企業適用'; sf.textContent = LANG==='en'?'TalentQuest v1.1 · for SMEs':(LANG==='ja'?'TalentQuest v1.1 ・ 中小企業向け':sf.dataset.zh); }
 }
@@ -1522,6 +1706,17 @@ function persistLangData(){
   localStorage.setItem('tq_data_' + LANG, JSON.stringify({tracks, ladder, comps, courses, quizzes}));
 }
 let ZH_MASTER = null;
+function localizedList(masterArr, defArr){
+  const byId = new Map(defArr.map(x=>[x.id,x]));
+  const out = []; const customs = [];
+  masterArr.forEach(m=>{
+    const l = byId.get(m.id);
+    if(l){ out.push(Object.assign(JSON.parse(JSON.stringify(m)), l)); }
+    else { customs.push(JSON.parse(JSON.stringify(m))); }
+  });
+  customs.forEach(c=>out.push(c));
+  return out;
+}
 function applyLangData(){
   if(LANG==='zh'){
     if(ZH_MASTER){ tracks=ZH_MASTER.tracks; ladder=ZH_MASTER.ladder; comps=ZH_MASTER.comps; courses=ZH_MASTER.courses; quizzes=ZH_MASTER.quizzes; }
@@ -1530,7 +1725,11 @@ function applyLangData(){
   if(!ZH_MASTER) ZH_MASTER = {tracks, ladder, comps, courses, quizzes};
   const a = activeDatasets();
   if(!a) return;
-  tracks = a.tracks; ladder = a.ladder; comps = a.comps; courses = a.courses; quizzes = a.quizzes;
+  tracks = localizedList(ZH_MASTER.tracks, a.tracks);
+  ladder = localizedList(ZH_MASTER.ladder, a.ladder);
+  comps = localizedList(ZH_MASTER.comps, a.comps);
+  courses = localizedList(ZH_MASTER.courses, a.courses);
+  quizzes = localizedList(ZH_MASTER.quizzes, a.quizzes);
 }
 function setLang(v){
   LANG = v; localStorage.setItem('tq_lang', v);
