@@ -1141,6 +1141,62 @@ const STRINGS = {
 STRINGS[' 卷）'] = {en:' papers)', ja:' 用紙）'};
 STRINGS[' 門）'] = {en:' courses)', ja:' コース）'};
 
+Object.assign(STRINGS, {
+  /* ── 遊戲說明頁 ── */
+  '🎮 遊戲玩法': {en:'🎮 How to Play', ja:'🎮 遊び方'},
+  '1. 建立你的角色': {en:'1. Create your character', ja:'1. キャラクターを作ろう'},
+  '每位員工就是一位冒險者：頭像、職系、職級。入職從「見習生」開始。': {en:'Every employee is an adventurer: avatar, track and level. Everyone starts as a Trainee.', ja:'従業員は冒険者です：アバター・職種・等級。入職は「見習い」から。'},
+  '2. 修課程＝解任務': {en:'2. Courses = Quests', ja:'2. 研修＝クエスト'},
+  '每門課程是一個任務，完成即獲得 XP 經驗值。課程對應職能，是升階的指定裝備。': {en:'Each course is a quest — earn XP on completion. Courses map to competencies, the required gear for promotion.', ja:'各コースはクエストです。修了でXPを獲得。コースはコンピテンシーに対応し、昇進の必須装備です。'},
+  '3. 考測驗＝打怪認證': {en:'3. Quizzes = Certification battles', ja:'3. テスト＝認定バトル'},
+  '每卷測驗是職能認證，80 分過關；分數越高獲得越多 XP，並留下解析讓你越來越強。': {en:'Each quiz certifies a competency — pass at 80. Higher scores earn more XP, with explanations that make you stronger.', ja:'各テストはコンピテンシー認定。80点で合格。高得点ほど多くのXPを獲得し、解説で強くなります。'},
+  '4. 晉升＝升階打王': {en:'4. Promotion = Boss stage', ja:'4. 昇進＝ボスステージ'},
+  'XP＋指定課程＋指定測驗三項門檻全達成，HR 核准後正式升階，獲得新稱號與 +300 XP。': {en:'Meet all three thresholds (XP + courses + quiz) and HR approves your promotion — new title plus 300 XP.', ja:'XP・指定コース・指定テストの3条件を達成し、HRが承認すると正式に昇格。新タイトルと+300 XP。'},
+  '5. 徽章與英雄榜': {en:'5. Badges & Leaderboard', ja:'5. バッジとランキング'},
+  '里程碑自動頒發徽章；英雄榜以 XP 排名，鼓勵「跟自己的過去比」。': {en:'Badges are awarded automatically at milestones; the leaderboard ranks by XP — compete with your past self.', ja:'マイルストーンでバッジを自動付与。ランキングはXP順。「過去の自分」と比べよう。'},
+  '遊戲機制': {en:'Game mechanic', ja:'ゲーム仕組み'},
+  '人力發展理論': {en:'HRD theory', ja:'人材育成理論'},
+  '職級階梯＋晉升門檻': {en:'Level ladder + promotion thresholds', ja:'等級ラダー＋昇進基準'},
+  '職能模型（Competency Model）': {en:'Competency Model', ja:'コンピテンシーモデル'},
+  '每個職級定義應具備的職能與行為指標，晉升＝職能被驗證': {en:'Each level defines required competencies with observable behaviors — promotion means verified competencies', ja:'各等級は必要なコンピテンシーと行動指標を定義。昇進＝実証された能力'},
+  '課程任務＋工作實戰': {en:'Course quests + field practice', ja:'研修クエスト＋実務'},
+  '70-20-10 學習法則': {en:'70-20-10 learning rule', ja:'70-20-10 ラーニング'},
+  '平台記錄 10% 正式訓練；70% 工作歷練與 20% 教練輔導由主管在職場執行（見第六節主管任務）': {en:'The platform logs the 10% formal training; the 70% field experience and 20% coaching happen on the job with your manager', ja:'プラットフォームは10%の正式研修を記録。70%の実務と20%のコーチングは職場で'},
+  '測驗＋逐題解析': {en:'Quizzes + explanations', ja:'テスト＋解説'},
+  'Kirkpatrick 四層評估（L2 學習層）': {en:'Kirkpatrick Level 2 (Learning)', ja:'Kirkpatrick レベル2（学習）'},
+  '測驗驗證「學到什麼」；反應層滿意度與行為層落地由主管觀察': {en:'Quizzes verify learning (L2); reaction and behavior layers are observed by managers', ja:'テストは学習を検証。反応層と行動層は管理職が観察'},
+  'XP 即時回饋': {en:'Instant XP feedback', ja:'XPの即時フィードバック'},
+  '行為強化（增強理論）': {en:'Reinforcement theory', ja:'強化理論'},
+  '立即回饋讓學習行為被看見、被強化': {en:'Instant feedback makes learning visible and reinforced', ja:'即時フィードバックで学習行動を可視化・強化'},
+  '晉升審核（HR 把關）': {en:'HR-gated promotion', ja:'HR承認の昇進'},
+  '晉升委員會／IDP 個人發展計畫': {en:'Promotion committee / IDP', ja:'昇進委員会／IDP'},
+  '門檻達成≠自動晉升，仍需組織核可職缺與意願，符合實務治理': {en:'Meeting thresholds ≠ automatic promotion — role availability and willingness still apply', ja:'条件達成＝自動昇進ではない。ポジションと意願の確認が必要'},
+  '推行建議（HR 顧問視角）': {en:'Rollout advice (HR consultant view)', ja:'導入のすすめ（HRコンサル視点）'},
+  '① 先與員工共擬「個人發展計畫（IDP）」，把職級需求轉成年度目標': {en:'1. Co-create an IDP with each employee, turning level requirements into yearly goals', ja:'①従業員とIDPを共同作成し、等級要件を年度目標に'},
+  '② 課程完成需主管在職場上給實戰任務（70%），平台只記錄正式訓練（10%）': {en:'2. Managers assign field tasks (70%); the platform logs formal training (10%)', ja:'②上司が実務任務を割り当て（70%）、プラットフォームは正式研修を記録（10%）'},
+  '③ 晉升門檻建議半年檢視一次，隨組織需求調整職能權重': {en:'3. Review promotion thresholds twice a year; adjust competency weights as the organization evolves', ja:'③昇進基準は半年ごとに見直し、組織に合わせて調整'},
+  '④ 排行榜以「自我成長」為訴求，避免過度內卷；建議搭配季度表揚': {en:'4. Frame the leaderboard around self-growth; add quarterly recognition', ja:'④ランキングは自己成長を訴求し、四半期ごとの表彰と併用'},
+  '⑤ 資料僅存本機，涉及個人發展隱私，請定期匯出 JSON 備份': {en:'5. Data stays on-device (privacy by design) — export JSON backups regularly', ja:'⑤データは端末内のみ。定期的にJSONバックアップを'},
+  /* ── 徽章名稱與條件 ── */
+  '初來乍到': {en:'First Steps', ja:'初の一歩'},
+  '學霸養成': {en:'Scholar in Training', ja:'学びの達人'},
+  '學富五車': {en:'Bookworm Master', ja:'学問の神様'},
+  '百分俱樂部': {en:'Perfect Score Club', ja:'満点クラブ'},
+  '全能選手': {en:'All-Rounder', ja:'オールラウンダー'},
+  '一飛沖天': {en:'First Promotion', ja:'初昇進'},
+  '平步青雲': {en:'Rising Star', ja:'昇進マスター'},
+  '經驗老道': {en:'Veteran', ja:'ベテラン'},
+  '管理入門': {en:'Management 101', ja:'管理入門'},
+  /* ── 漏翻補齊 ── */
+  '完成課程與測驗即可獲得徽章。': {en:'Complete courses and quizzes to earn badges.', ja:'コースとテストを完了するとバッジを獲得できます。'},
+  '≥80 分為通過；成績保留最高分': {en:'≥80 to pass · best score kept', ja:'80点以上で合格 ・ 最高得点を保持'},
+  '員工名冊': {en:'Employee roster', ja:'社員名簿'},
+  '✓ XP 達標　✓ 課程完成　': {en:'✓ XP met　✓ Courses done　', ja:'✓ XP達成　✓ コース修了　'},
+  '晉升獎勵 +300 XP　新職級：': {en:'Promotion bonus +300 XP　New level: ', ja:'昇進ボーナス +300 XP　新しい等級：'},
+  '🎉 晉升通過！': {en:'🎉 Promotion Approved!', ja:'🎉 昇進承認！'},
+  ' 晋升成功！': {en:' promoted!', ja:' 昇進しました！'},
+  '繼續冒險': {en:'Continue the journey', ja:'冒険を続ける'}
+});
 function T(zh){
   if(LANG==='zh') return zh;
   const e = STRINGS[zh];
