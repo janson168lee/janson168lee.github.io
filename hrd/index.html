@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>人才發展平台 TalentQuest — 職能升階遊戲 v1.1</title>
+<title>英雄升職記 TalentQuest — 職能升階遊戲 v1.2.4</title>
 <meta http-equiv="Cache-Control" content="no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <link rel="manifest" href="/hrd/manifest.json">
@@ -113,11 +113,40 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
 .mini{font-size:11px;color:var(--mute)}
 .hidden{display:none!important}
 .langb.on{background:var(--gold);color:#141a24;border-color:var(--gold)}
+
+/* ── 行動裝置響應式：直向 9:16 ／ 橫向 16:9 ── */
+.burger{display:none;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border2);border-radius:8px;background:var(--bg-card);color:var(--text);cursor:pointer;font-size:17px;flex-shrink:0}
+.scrim{position:fixed;inset:0;background:rgba(4,7,12,.62);z-index:55;display:none}
+.scrim.on{display:block}
+.probar{padding:9px 16px;border-top:1px solid #1a2230;font-size:11px;font-weight:700;color:var(--gold);cursor:pointer;letter-spacing:.3px}
+.probar.on{color:var(--green)}
+.probar:hover{background:rgba(240,169,60,.06)}
+.planbox{flex:1;border:1px solid var(--border2);border-radius:10px;padding:14px 12px;text-align:center}
+.planbox .pn{font-size:13px;font-weight:800;color:var(--gold)}
+.planbox .pp{font-size:22px;font-weight:800;margin:6px 0;color:var(--text)}
+.planbox .pp span{font-size:12px;color:var(--mute);font-weight:400}
+.planbox.feat{border-color:var(--gold);background:rgba(240,169,60,.06)}
+@media(max-width:700px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);transition:transform .22s ease;z-index:60}
+  .sidebar.open{transform:translateX(0)}
+  .burger{display:flex}
+  .header{height:auto;min-height:52px;flex-wrap:wrap;padding:8px 12px;gap:8px}
+  .content{padding:14px 12px;overflow:auto}
+  .hero-grid{grid-template-columns:1fr}
+  .dt{display:block;overflow-x:auto}
+  .modal{max-width:94vw;max-height:90vh}
+}
+@media(orientation:landscape) and (max-height:520px){
+  .sidebar{width:192px;min-width:192px}
+  .header{height:44px;min-height:44px;padding:0 12px}
+  .content{padding:10px 14px}
+  .modal{max-height:92vh}
+}
 </style>
 </head>
 <body>
 <aside class="sidebar">
-  <div class="brand"><div class="logo">🚀</div><div><div class="t1">TalentQuest</div><div class="t2">人才發展平台 · 職能升階</div></div></div>
+  <div class="brand"><div class="logo">🚀</div><div><div class="t1">TalentQuest</div><div class="t2">英雄升職記 · 職能升階</div></div></div>
   <nav class="snav" id="snav">
     <div class="sec-t">我的旅程</div>
     <div class="nitem active" data-page="hero"><span class="ni">🧭</span>英雄旅程</div>
@@ -135,15 +164,17 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
     <div class="nitem" data-page="board"><span class="ni">🏆</span>英雄榜</div>
     <div class="nitem" data-page="guide"><span class="ni">📖</span>遊戲說明</div>
   </nav>
-  <div class="sfoot">TalentQuest v1.2.3 · 台灣中小企業適用</div>
+  <div class="sfoot">英雄升職記 TalentQuest v1.2.4 · 台灣中小企業適用</div>
+  <div class="probar" id="proBar" onclick="openSubModal()">免費版 · 升級 Pro</div>
 </aside>
 <main class="main">
-  <header class="header">
+  <header class="header"><button class="burger" id="burgerBtn" onclick="toggleSide()" aria-label="menu">☰</button>
     <h1 id="pageTitle">英雄旅程</h1>
     <div style="display:flex;gap:4px;margin-right:12px;" id="langBar"><button class="btn btn-out btn-xs langb on" data-lang="zh">中</button><button class="btn btn-out btn-xs langb" data-lang="en">EN</button><button class="btn btn-out btn-xs langb" data-lang="ja">日</button></div><div class="heroSel"><span id="heroSelectLabel" style="font-size:12px;color:var(--mute);">目前玩家</span><select id="heroSelect" onchange="setHero(this.value)"></select></div>
   </header>
   <div class="content" id="mainContent"></div>
 </main>
+<div class="scrim" id="scrim" onclick="toggleSide()"></div>
 <div class="modal-ov hidden" id="modalOv"><div class="modal" id="modalBox"></div></div>
 <div class="toast" id="toastBox"></div>
 <script>
@@ -763,7 +794,7 @@ function renderEmployees(){
   h+='</tbody></table></div></div>';
   return h;
 }
-function editEmp(id){
+function editEmp(id){if(!id&&!empGateOK())return;
   const e=employees.find(x=>x.id===id)||{id:'',code:'T'+String(employees.length+1).padStart(3,'0'),name:'',dept:'',track:'t_staff',avatar:'🦊',title:'',level:ladder[0].id,hireDate:new Date().toISOString().split('T')[0],status:'在職',xp:0};
   let h='<div class="mh"><h3>'+(id?'編輯':'新增')+'員工</h3><button class="cbtn" onclick="closeModal()">✕</button></div><div class="mb">';
   h+='<div class="mrow"><div class="fg"><label>'+T('員工編號')+'</label><input id="eeCode" value="'+esc(e.code)+'"></div><div class="fg"><label>'+T('姓名')+'</label><input id="eeName" value="'+esc(e.name)+'"></div></div>';
@@ -793,7 +824,7 @@ function delEmp(id){
   if(STATE.heroId===id)STATE.heroId=employees[0].id;
   saveD('employees',employees);renderPage();
 }
-function exportTQ(){
+function exportTQ(){if(!requirePro('報表與資料匯出'))return;
   const data={employees,tracks,ladder,comps,courses,quizzes,completions,quizResults,promotions,exportedAt:new Date().toISOString()};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='TalentQuest_備份_'+new Date().toISOString().split('T')[0]+'.json';a.click();
@@ -853,13 +884,13 @@ function csvExport(rows,fn){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn+'.csv';a.click();
   toast('已匯出 '+fn+'.csv');
 }
-function exportPromotions(){
+function exportPromotions(){if(!requirePro('報表與資料匯出'))return;
   const done=promotions.filter(p=>p.status==='通過');
   if(done.length===0){toast('尚無核定紀錄');return;}
   const eff=new Date();eff.setDate(1);eff.setMonth(eff.getMonth()+1);
   csvExport(done.map(p=>{const e=employees.find(x=>x.id===p.empId)||{};const lv=ladder.find(x=>x.name===p.to)||{};return {員工編號:e.code||'',姓名:e.name||'',部門:e.dept||'',原職級:p.from,核定職級:p.to,薪級對照:lv.salaryBand||'',核定日:p.date,建議生效日:eff.getFullYear()+'/'+String(eff.getMonth()+1).padStart(2,'0')+'/01'};}),'晉升核定單');
 }
-function exportSalaryMap(){
+function exportSalaryMap(){if(!requirePro('報表與資料匯出'))return;
   csvExport(ladder.map(l=>({順序:ladder.indexOf(l)+1,職級名稱:l.name,XP門檻:l.xpNeed,薪級對照:l.salaryBand||'',升階需求課程:(l.reqCourses||[]).map(id=>{const c=courses.find(x=>x.id===id);return c?c.name:id;}).join('、'),指定測驗:l.reqQuiz?((quizzes.find(x=>x.id===l.reqQuiz)||{}).name||l.reqQuiz):'—'})),'職級薪級對照表');
 }
 
@@ -949,12 +980,12 @@ function qbExportOne(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(STATE.qb.name||'測驗卷')+'.json';a.click();
   toast('已匯出測驗卷 JSON');
 }
-function qbExportAll(){
+function qbExportAll(){if(!requirePro('報表與資料匯出'))return;
   const blob=new Blob([JSON.stringify(quizzes,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='TalentQuest_題庫.json';a.click();
   toast('已匯出全部題庫');
 }
-function qbImport(){
+function qbImport(){if(!requirePro('報表與資料匯出'))return;
   const i=document.createElement('input');i.type='file';i.accept='.json';
   i.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
     r.onload=ev=>{try{const d=JSON.parse(ev.target.result);const arr=Array.isArray(d)?d:[d];
@@ -983,7 +1014,7 @@ let LANG = localStorage.getItem('tq_lang') || 'zh';
 
 const STRINGS = {
   /* 側欄與頁面標題 */
-  'TalentQuest 人才發展平台 · 職能升階': {en:'TalentQuest Talent Development · Skill Ladder', ja:'TalentQuest 人材育成プラットフォーム・スキル昇格'},
+  'TalentQuest 英雄升職記 · 職能升階': {en:'TalentQuest Talent Development · Skill Ladder', ja:'TalentQuest 人材育成プラットフォーム・スキル昇格'},
   '我的旅程': {en:'MY JOURNEY', ja:'マイジャーニー'},
   '企業端': {en:'ENTERPRISE', ja:'企業向け'},
   '榮耀': {en:'GLORY', ja:'栄誉'},
@@ -1243,7 +1274,7 @@ Object.assign(STRINGS, {
   '至少保留一位員工': {en:'Keep at least one employee', ja:'少なくとも1名の社員が必要です'},
   '✓ 已修畢': {en:'✓ Completed', ja:'✓ 修了済み'},
   '💡 題庫設計建議：每卷 6-8 題、情境題優於背誦題、每題附解析（錯了也要學到東西）；晉升關鍵卷建議門檻 80 分以上。刪除測驗卷時，歷史成績會保留（顯示為已刪測驗），已核可的職級門檻請同步於「職級體系」調整。': {en:'💡 Quiz design tips: 6-8 questions per paper, scenario questions beat recall, add explanations to every question. Use 80+ pass scores for promotion-critical papers. Deleting a paper keeps historical scores; update the Job Level System accordingly.', ja:'💡 クイズ設計のヒント：1巻6〜8問、シナリオ問題優先、各問に解説。昇進に関わる巻は80点以上推奨。削除しても履歴は残ります。'},
-  '人才發展平台 · 職能升階': {en:'Talent Development · Skill Ladder', ja:'人材育成・スキル昇格'}
+  '英雄升職記 · 職能升階': {en:'Talent Development · Skill Ladder', ja:'人材育成・スキル昇格'}
 });
 Object.assign(STRINGS, {
   '課程 ': {en:'Courses ', ja:'コース '},
@@ -1373,7 +1404,7 @@ Object.assign(STRINGS, {
   '說明': {en:'Notes', ja:'説明'},
   '類別': {en:'Category', ja:'カテゴリ'},
   '70% 工作實戰＋20% 他人教練＋10% 課程；本平台記錄課程與認證，實戰由主管帶': {en:'70% field practice + 20% coaching + 10% courses; the platform logs courses and certifications, managers lead practice on the job', ja:'70% 実務＋20% コーチング＋10% 研修。本プラットフォームは研修と認定を記録し、実務は上司が伴走します'},
-  '人才發展平台 · 職能升階': {en:'Talent Development · Skill Ladder', ja:'人材育成・スキル昇格'}
+  '英雄升職記 · 職能升階': {en:'Talent Development · Skill Ladder', ja:'人材育成・スキル昇格'}
 });
 Object.assign(STRINGS, {
   '徽章數': {en:'Badges', ja:'バッジ数'},
@@ -1403,6 +1434,35 @@ Object.assign(STRINGS, {
   '王美華': {en:'Wang Mei-Hua', ja:'王美華'},
   '李建成': {en:'Li Chien-Cheng', ja:'李建成'},
   '黃小娟': {en:'Huang Hsiao-Chuan', ja:'黃小娟'}
+});
+Object.assign(STRINGS, {
+  /* ── 訂閱與行動版 UI ── */
+  '升級專業版': {en:'Upgrade to Pro', ja:'プロ版へアップグレード'},
+  '免費版 · 升級 Pro': {en:'Free · Upgrade to Pro', ja:'無料版 · Proへアップグレード'},
+  '專業版已啟用 ✓': {en:'Pro active ✓', ja:'プロ版有効 ✓'},
+  '專業版已啟用（Google Play 訂閱）': {en:'Pro active (Google Play subscription)', ja:'プロ版有効（Google Play 購読）'},
+  '專業版權益：員工無上限、報表與資料匯出、新功能優先體驗。': {en:'Pro benefits: unlimited employees, report & data export, priority access to new features.', ja:'プロ版特典：社員数無制限、レポート・データ出力、新機能優先。'},
+  '月訂閱': {en:'Monthly', ja:'月額'},
+  '年訂閱 · 最划算': {en:'Yearly · Best value', ja:'年額 · お得'},
+  '早鳥優惠 · 7 天免費試用': {en:'Launch offer · 7-day free trial', ja:'リリース特価 · 7日間無料トライアル'},
+  '平均每月約 NT$83，相當於 5 折': {en:'About NT$83/mo — 50% off', ja:'月額約NT$83、半額相当'},
+  '/月': {en:'/mo', ja:'/月'},
+  '/年': {en:'/yr', ja:'/年'},
+  '開始試用': {en:'Start free trial', ja:'トライ開始'},
+  '恢復購買': {en:'Restore purchases', ja:'購入を復元'},
+  '管理訂閱': {en:'Manage subscription', ja:'購読を管理'},
+  '訂閱透過 Google Play 結帳；7 天免費試用結束後自動續訂，可隨時在 Google Play 訂閱中心取消。換機或重裝後點「恢復購買」即可還原。': {en:'Billed via Google Play. Auto-renews after the 7-day trial; cancel anytime in Google Play subscriptions. Use "Restore purchases" after reinstall.', ja:'Google Play経由で課金。7日間トライアル後は自動更新、いつでも解約できます。再インストール後は「購入を復元」で復元。'},
+  '目前環境未偵測到 Google Play 服務（網頁版）——訂閱請於 Google Play 版 App 內進行。': {en:'Google Play services not detected (web version) — please subscribe inside the Google Play app.', ja:'Google Playサービス未検出（Web版）— 購読はGoogle Play版アプリ内でお願いします。'},
+  '報表與資料匯出': {en:'Report & data export (Pro)', ja:'レポート・データ出力（Pro）'},
+  '員工人數上限（免費版 6 人）': {en:'Employee limit reached (Free: 6)', ja:'社員数上限（無料版6名）'},
+  '訂閱成功，專業版已解鎖': {en:'Subscribed — Pro unlocked', ja:'購読完了、プロ版解除'},
+  '訂閱流程未完成': {en:'Subscription flow not completed', ja:'購読が完了しませんでした'},
+  '訂閱流程未完成或發生錯誤': {en:'Subscription not completed or error occurred', ja:'購読未完了またはエラー'},
+  '查無此訂閱方案，請確認 Play 商品已建立': {en:'Subscription product not found — check Play Console products', ja:'商品が見つかりません。Play商品をご確認ください'},
+  '已恢復訂閱，專業版啟用中': {en:'Purchases restored — Pro active', ja:'復元完了、プロ版有効'},
+  '查無有效訂閱': {en:'No active subscription found', ja:'有効な購読が見つかりません'},
+  '此環境不支援 Google Play 訂閱，請於 Google Play 版 App 內訂閱': {en:'Google Play billing not available here — subscribe in the Play app', ja:'ここではGoogle Play購読できません。Play版アプリでご購読ください'},
+  '此環境不支援 Google Play 訂閱': {en:'Google Play billing not available', ja:'Google Play購読不可'}
 });
 function T(zh){
   if(LANG==='zh') return zh;
@@ -1441,6 +1501,8 @@ function applyShell(){
   });
   const ht = document.getElementById('pageTitle');
   if(ht){ if(!ht.dataset.zh) ht.dataset.zh = ht.textContent.trim(); ht.textContent = T(ht.dataset.zh); }
+  const pb = document.getElementById('proBar');
+  if(pb){ pb.textContent = TQ_PRO ? T('專業版已啟用 ✓') : T('免費版 · 升級 Pro'); pb.className = 'probar' + (TQ_PRO ? ' on' : ''); }
   const hsel = document.getElementById('heroSelect');
   if(hsel){ [...hsel.options].forEach(o=>{ o.textContent = trHTML(o.textContent); }); }
   const hs = document.getElementById('heroSelectLabel');
@@ -1799,6 +1861,73 @@ document.getElementById('langBar').addEventListener('click', e=>{
   renderPage();
 })();
 
+
+/* ═══════════ 訂閱與行動版（Google Play Digital Goods） ═══════════ */
+var SKUS=['tq_pro_monthly','tq_pro_yearly'];
+var SUB_MGMT='https://play.google.com/store/account/subscriptions?sku=tq_pro_monthly&package=tw.erpfree.tq';
+var FREE_EMP_LIMIT=6;
+var billingService=null,TQ_PRO=false;
+try{TQ_PRO=localStorage.getItem('tq_pro')==='1';}catch(e){}
+function isPro(){return TQ_PRO;}
+function savePro(v){TQ_PRO=!!v;try{localStorage.setItem('tq_pro',TQ_PRO?'1':'0');}catch(e){}updateProBadge();}
+async function initBilling(){
+  if(!('getDigitalGoodsService' in window)){billingService=null;return;}
+  try{billingService=await window.getDigitalGoodsService('play');}catch(e){billingService=null;}
+}
+async function refreshPlaySub(){
+  if(!billingService)return;
+  try{
+    var ps=await billingService.listPurchases();
+    var act=ps.filter(function(p){return SKUS.indexOf(p.productId)>=0&&p.purchaseState==='PURCHASED';});
+    for(var i=0;i<act.length;i++){try{await billingService.acknowledge(act[i].purchaseToken,act[i].productId);}catch(e){}}
+    savePro(act.length>0);
+  }catch(e){}
+}
+async function subscribePlay(sku){
+  if(!billingService){toast('此環境不支援 Google Play 訂閱，請於 Google Play 版 App 內訂閱');return;}
+  try{
+    var details=await billingService.getDetails([sku]);
+    if(!details||!details.length){toast('查無此訂閱方案，請確認 Play 商品已建立');return;}
+    await billingService.launchPaymentFlow(details[0]);
+    await refreshPlaySub();
+    document.getElementById('modalOv').classList.add('hidden');
+    toast(TQ_PRO?'訂閱成功，專業版已解鎖':'訂閱流程未完成');
+  }catch(e){toast('訂閱流程未完成或發生錯誤');}
+}
+async function restorePurchases(){
+  if(!billingService){toast('此環境不支援 Google Play 訂閱');return;}
+  await refreshPlaySub();
+  toast(TQ_PRO?'已恢復訂閱，專業版啟用中':'查無有效訂閱');
+}
+function updateProBadge(){
+  var b=document.getElementById('proBar');if(!b)return;
+  b.textContent=TQ_PRO?T('專業版已啟用 ✓'):T('免費版 · 升級 Pro');
+  b.className='probar'+(TQ_PRO?' on':'');
+}
+function requirePro(feature){if(!billingService)return true;if(TQ_PRO)return true;openSubModal(feature);return false;}
+function empGateOK(){if(!billingService)return true;if(TQ_PRO)return true;if(employees.length<FREE_EMP_LIMIT)return true;openSubModal('員工人數上限（免費版 6 人）');return false;}
+function openSubModal(feature){
+  var h='<h2 style="margin-top:0;font-size:19px;">'+T('升級專業版')+'</h2>';
+  if(feature)h+='<div class="mini" style="margin-bottom:8px;">'+T(feature)+'</div>';
+  if(TQ_PRO){
+    h+='<div style="background:rgba(47,191,113,.12);color:var(--green);padding:14px;border-radius:10px;font-weight:700;text-align:center;margin-top:6px;">'+T('專業版已啟用（Google Play 訂閱）')+'</div>';
+  }else{
+    h+='<div class="mini">'+T('專業版權益：員工無上限、報表與資料匯出、新功能優先體驗。')+'</div>';
+    h+='<div style="display:flex;gap:12px;margin-top:14px;">';
+    h+='<div class="planbox"><div class="pn">'+T('月訂閱')+'</div><div class="pp">NT$149<span>'+T('/月')+'</span></div><div style="font-size:12px;color:var(--green);font-weight:700;">'+T('早鳥優惠 · 7 天免費試用')+'</div><button class="btn btn-gold btn-sm" style="width:100%;margin-top:10px;" onclick="subscribePlay(\'tq_pro_monthly\')">'+T('開始試用')+'</button></div>';
+    h+='<div class="planbox feat"><div class="pn">'+T('年訂閱 · 最划算')+'</div><div class="pp">NT$990<span>'+T('/年')+'</span></div><div style="font-size:12px;color:var(--mute);">'+T('平均每月約 NT$83，相當於 5 折')+'</div><button class="btn btn-gold btn-sm" style="width:100%;margin-top:10px;" onclick="subscribePlay(\'tq_pro_yearly\')">'+T('開始試用')+'</button></div>';
+    h+='</div>';
+    h+='<div class="mini" style="margin-top:14px;line-height:1.8;">'+T('訂閱透過 Google Play 結帳；7 天免費試用結束後自動續訂，可隨時在 Google Play 訂閱中心取消。換機或重裝後點「恢復購買」即可還原。')+'</div>';
+    h+='<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-out btn-sm" style="flex:1;" onclick="restorePurchases()">'+T('恢復購買')+'</button><button class="btn btn-out btn-sm" style="flex:1;" onclick="window.open(\''+SUB_MGMT+'\')">'+T('管理訂閱')+'</button></div>';
+    if(!billingService)h+='<div class="mini" style="color:var(--gold);margin-top:10px;">'+T('目前環境未偵測到 Google Play 服務（網頁版）——訂閱請於 Google Play 版 App 內進行。')+'</div>';
+  }
+  setModalHTML(h);
+  document.getElementById('modalOv').classList.remove('hidden');
+}
+/* ── 行動版抽屜側欄 ── */
+function toggleSide(){var sb=document.querySelector('.sidebar');var sc=document.getElementById('scrim');if(!sb)return;var on=sb.classList.toggle('open');if(sc)sc.classList.toggle('on',on);}
+document.addEventListener('click',function(e){var el=e.target;if(el&&el.closest&&el.closest('.nitem')&&window.innerWidth<=700){var sb=document.querySelector('.sidebar');if(sb)sb.classList.remove('open');var sc=document.getElementById('scrim');if(sc)sc.classList.remove('on');}});
+initBilling().then(refreshPlaySub).then(updateProBadge);
 </script>
 </body>
 </html>
