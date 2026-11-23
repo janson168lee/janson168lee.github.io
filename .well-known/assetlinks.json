@@ -32,7 +32,8 @@
       "namespace": "android_app",
       "package_name": "tw.erpfree.kaidan",
       "sha256_cert_fingerprints": [
-        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E"
+        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E",
+        "81:28:83:0E:B2:D2:50:AF:F9:AA:DD:D9:B8:45:0D:CE:8F:64:01:1D:2B:10:7C:8F:4B:EC:E9:BB:06:FB:9D:E6"
       ]
     }
   },
