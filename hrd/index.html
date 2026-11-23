@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>英雄升職記 TalentQuest — 職能升階遊戲 v1.2.4</title>
+<title>英雄升職記 TalentQuest — 職能升階遊戲 v1.2.5</title>
 <meta http-equiv="Cache-Control" content="no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <link rel="manifest" href="/hrd/manifest.json">
@@ -164,7 +164,7 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
     <div class="nitem" data-page="board"><span class="ni">🏆</span>英雄榜</div>
     <div class="nitem" data-page="guide"><span class="ni">📖</span>遊戲說明</div>
   </nav>
-  <div class="sfoot">英雄升職記 TalentQuest v1.2.4 · 台灣中小企業適用</div>
+  <div class="sfoot">英雄升職記 TalentQuest v1.2.5 · 台灣中小企業適用</div>
   <div class="probar" id="proBar" onclick="openSubModal()">免費版 · 升級 Pro</div>
 </aside>
 <main class="main">
@@ -1464,6 +1464,31 @@ Object.assign(STRINGS, {
   '此環境不支援 Google Play 訂閱，請於 Google Play 版 App 內訂閱': {en:'Google Play billing not available here — subscribe in the Play app', ja:'ここではGoogle Play購読できません。Play版アプリでご購読ください'},
   '此環境不支援 Google Play 訂閱': {en:'Google Play billing not available', ja:'Google Play購読不可'}
 });
+Object.assign(STRINGS, {
+  /* ── 單次買斷模式 ── */
+  '解鎖永久版': {en:'Unlock Lifetime', ja:'永久版を解錠'},
+  '個人版 · 單次買斷': {en:'Personal · One-time purchase', ja:'個人版 · 買切り'},
+  '/ 一次付清': {en:'/ one-time', ja:'/ 一括'},
+  'US$1.50 · 各國貨幣由 Google Play 自動換算': {en:'US$1.50 — local currency auto-converted by Google Play', ja:'US$1.50 · 通貨はGoogle Playが自動換算'},
+  '立即解鎖': {en:'Unlock now', ja:'今すぐ解錠'},
+  '一次付清，永久使用所有功能：員工無上限、報表與資料匯出、新功能優先。': {en:'One payment, all features forever: unlimited employees, report & data export, priority updates.', ja:'一度の支払いで全機能を永久利用：社員数無制限、出力、新機能優先。'},
+  '免費試用中 · 剩餘 ': {en:'Free trial: ', ja:'無料試用中 · 残り '},
+  ' 天': {en:' days left', ja:' 日'},
+  '試用期滿後，個人版只需單次買斷，永久使用。': {en:'After the trial, one payment unlocks everything forever.', ja:'試用期間後は買切りで永久利用できます。'},
+  '您的免費試用期已結束。': {en:'Your free trial has ended.', ja:'無料試用期間が終了しました。'},
+  '已購買永久版 ✓': {en:'Lifetime unlocked ✓', ja:'永久版購入済み ✓'},
+  '試用結束 · 解鎖永久版': {en:'Trial ended · Unlock lifetime', ja:'試用終了 · 永久版を解錠'},
+  '企業版（多人授權／進階客製）請洽 erp-free.com 另議。': {en:'Enterprise licensing: contact erp-free.com for a quote.', ja:'企業版（複数ライセンス）はerp-free.comまでご相談ください。'},
+  '購買成功，永久版已解鎖': {en:'Purchased — lifetime unlocked', ja:'購入完了、永久版解除'},
+  '購買流程未完成': {en:'Purchase not completed', ja:'購入が完了しませんでした'},
+  '購買流程未完成或發生錯誤': {en:'Purchase not completed or error occurred', ja:'購入未完了またはエラー'},
+  '查無商品，請確認 Play 商品已建立': {en:'Product not found — check Play Console in-app product', ja:'商品が見つかりません。Play商品をご確認ください'},
+  '已恢復購買，永久版啟用中': {en:'Purchases restored — lifetime active', ja:'復元完了、永久版有効'},
+  '查無有效購買紀錄': {en:'No purchase record found', ja:'有効な購入記録がありません'},
+  '此環境不支援 Google Play 購買': {en:'Google Play billing not available', ja:'Google Play購入不可'},
+  '目前環境未偵測到 Google Play 服務（網頁版）——請於 Google Play 下載 App 後購買。': {en:'Google Play services not detected (web) — download the app on Google Play to purchase.', ja:'Google Playサービス未検出（Web版）— Play版アプリでご購入ください。'},
+  '員工人數上限（免費試用版 6 人）': {en:'Employee limit reached (free trial: 6)', ja:'社員数上限（試用版6名）'}
+});
 function T(zh){
   if(LANG==='zh') return zh;
   const e = STRINGS[zh];
@@ -1502,7 +1527,7 @@ function applyShell(){
   const ht = document.getElementById('pageTitle');
   if(ht){ if(!ht.dataset.zh) ht.dataset.zh = ht.textContent.trim(); ht.textContent = T(ht.dataset.zh); }
   const pb = document.getElementById('proBar');
-  if(pb){ pb.textContent = TQ_PRO ? T('專業版已啟用 ✓') : T('免費版 · 升級 Pro'); pb.className = 'probar' + (TQ_PRO ? ' on' : ''); }
+  if(pb)updateProBadge();
   const hsel = document.getElementById('heroSelect');
   if(hsel){ [...hsel.options].forEach(o=>{ o.textContent = trHTML(o.textContent); }); }
   const hs = document.getElementById('heroSelectLabel');
@@ -1862,14 +1887,19 @@ document.getElementById('langBar').addEventListener('click', e=>{
 })();
 
 
-/* ═══════════ 訂閱與行動版（Google Play Digital Goods） ═══════════ */
-var SKUS=['tq_pro_monthly','tq_pro_yearly'];
-var SUB_MGMT='https://play.google.com/store/account/subscriptions?sku=tq_pro_monthly&package=tw.erpfree.tq';
+/* ═══════════ 商業模式：半年免費＋單次買斷（Google Play Digital Goods） ═══════════ */
+var IAP_ID='tq_pro_lifetime';
 var FREE_EMP_LIMIT=6;
+var FREE_DAYS=180;
 var billingService=null,TQ_PRO=false;
 try{TQ_PRO=localStorage.getItem('tq_pro')==='1';}catch(e){}
+var TQ_FIRST=0;
+try{var _tqf=localStorage.getItem('tq_first');if(_tqf)TQ_FIRST=parseInt(_tqf,10)||0;}catch(e){}
+if(!TQ_FIRST){TQ_FIRST=Date.now();try{localStorage.setItem('tq_first',String(TQ_FIRST));}catch(e){}}
 function isPro(){return TQ_PRO;}
 function savePro(v){TQ_PRO=!!v;try{localStorage.setItem('tq_pro',TQ_PRO?'1':'0');}catch(e){}updateProBadge();}
+function freeDaysLeft(){var d=Math.ceil((TQ_FIRST+FREE_DAYS*86400000-Date.now())/86400000);return d>0?d:0;}
+function inFreeWindow(){return freeDaysLeft()>0;}
 async function initBilling(){
   if(!('getDigitalGoodsService' in window)){billingService=null;return;}
   try{billingService=await window.getDigitalGoodsService('play');}catch(e){billingService=null;}
@@ -1878,49 +1908,55 @@ async function refreshPlaySub(){
   if(!billingService)return;
   try{
     var ps=await billingService.listPurchases();
-    var act=ps.filter(function(p){return SKUS.indexOf(p.productId)>=0&&p.purchaseState==='PURCHASED';});
+    var act=ps.filter(function(p){return p.productId===IAP_ID&&p.purchaseState==='PURCHASED';});
     for(var i=0;i<act.length;i++){try{await billingService.acknowledge(act[i].purchaseToken,act[i].productId);}catch(e){}}
     savePro(act.length>0);
   }catch(e){}
 }
-async function subscribePlay(sku){
-  if(!billingService){toast('此環境不支援 Google Play 訂閱，請於 Google Play 版 App 內訂閱');return;}
+async function buyLifetime(){
+  if(!billingService){toast('目前環境未偵測到 Google Play 服務（網頁版）——請於 Google Play 下載 App 後購買。');return;}
   try{
-    var details=await billingService.getDetails([sku]);
-    if(!details||!details.length){toast('查無此訂閱方案，請確認 Play 商品已建立');return;}
+    var details=await billingService.getDetails([IAP_ID]);
+    if(!details||!details.length){toast('查無商品，請確認 Play 商品已建立');return;}
     await billingService.launchPaymentFlow(details[0]);
     await refreshPlaySub();
     document.getElementById('modalOv').classList.add('hidden');
-    toast(TQ_PRO?'訂閱成功，專業版已解鎖':'訂閱流程未完成');
-  }catch(e){toast('訂閱流程未完成或發生錯誤');}
+    toast(TQ_PRO?'購買成功，永久版已解鎖':'購買流程未完成');
+  }catch(e){toast('購買流程未完成或發生錯誤');}
 }
 async function restorePurchases(){
-  if(!billingService){toast('此環境不支援 Google Play 訂閱');return;}
+  if(!billingService){toast('此環境不支援 Google Play 購買');return;}
   await refreshPlaySub();
-  toast(TQ_PRO?'已恢復訂閱，專業版啟用中':'查無有效訂閱');
+  toast(TQ_PRO?'已恢復購買，永久版啟用中':'查無有效購買紀錄');
 }
 function updateProBadge(){
   var b=document.getElementById('proBar');if(!b)return;
-  b.textContent=TQ_PRO?T('專業版已啟用 ✓'):T('免費版 · 升級 Pro');
-  b.className='probar'+(TQ_PRO?' on':'');
+  if(TQ_PRO){b.textContent=T('已購買永久版 ✓');b.className='probar on';}
+  else if(inFreeWindow()){b.textContent=T('免費試用中 · 剩餘 ')+freeDaysLeft()+T(' 天');}
+  else{b.textContent=T('試用結束 · 解鎖永久版');}
 }
-function requirePro(feature){if(!billingService)return true;if(TQ_PRO)return true;openSubModal(feature);return false;}
-function empGateOK(){if(!billingService)return true;if(TQ_PRO)return true;if(employees.length<FREE_EMP_LIMIT)return true;openSubModal('員工人數上限（免費版 6 人）');return false;}
+function requirePro(feature){if(!billingService)return true;if(TQ_PRO)return true;if(inFreeWindow())return true;openSubModal(feature);return false;}
+function empGateOK(){if(!billingService)return true;if(TQ_PRO)return true;if(inFreeWindow())return true;if(employees.length<FREE_EMP_LIMIT)return true;openSubModal('員工人數上限（免費試用版 6 人）');return false;}
 function openSubModal(feature){
-  var h='<h2 style="margin-top:0;font-size:19px;">'+T('升級專業版')+'</h2>';
+  var h='<h2 style="margin-top:0;font-size:19px;">'+T('解鎖永久版')+'</h2>';
   if(feature)h+='<div class="mini" style="margin-bottom:8px;">'+T(feature)+'</div>';
   if(TQ_PRO){
-    h+='<div style="background:rgba(47,191,113,.12);color:var(--green);padding:14px;border-radius:10px;font-weight:700;text-align:center;margin-top:6px;">'+T('專業版已啟用（Google Play 訂閱）')+'</div>';
+    h+='<div style="background:rgba(47,191,113,.12);color:var(--green);padding:14px;border-radius:10px;font-weight:700;text-align:center;margin-top:6px;">'+T('已購買永久版 ✓')+'</div>';
   }else{
-    h+='<div class="mini">'+T('專業版權益：員工無上限、報表與資料匯出、新功能優先體驗。')+'</div>';
+    if(inFreeWindow()){
+      h+='<div style="background:rgba(240,169,60,.08);border:1px solid var(--border2);padding:12px;border-radius:10px;font-weight:700;text-align:center;">'+T('免費試用中 · 剩餘 ')+freeDaysLeft()+T(' 天')+'</div>';
+      h+='<div class="mini" style="margin-top:10px;">'+T('試用期滿後，個人版只需單次買斷，永久使用。')+'</div>';
+    }else{
+      h+='<div style="background:rgba(226,88,91,.08);border:1px solid var(--border2);padding:12px;border-radius:10px;font-weight:700;text-align:center;">'+T('您的免費試用期已結束。')+'</div>';
+    }
     h+='<div style="display:flex;gap:12px;margin-top:14px;">';
-    h+='<div class="planbox"><div class="pn">'+T('月訂閱')+'</div><div class="pp">NT$149<span>'+T('/月')+'</span></div><div style="font-size:12px;color:var(--green);font-weight:700;">'+T('早鳥優惠 · 7 天免費試用')+'</div><button class="btn btn-gold btn-sm" style="width:100%;margin-top:10px;" onclick="subscribePlay(\'tq_pro_monthly\')">'+T('開始試用')+'</button></div>';
-    h+='<div class="planbox feat"><div class="pn">'+T('年訂閱 · 最划算')+'</div><div class="pp">NT$990<span>'+T('/年')+'</span></div><div style="font-size:12px;color:var(--mute);">'+T('平均每月約 NT$83，相當於 5 折')+'</div><button class="btn btn-gold btn-sm" style="width:100%;margin-top:10px;" onclick="subscribePlay(\'tq_pro_yearly\')">'+T('開始試用')+'</button></div>';
+    h+='<div class="planbox feat"><div class="pn">'+T('個人版 · 單次買斷')+'</div><div class="pp">NT$50<span>'+T('/ 一次付清')+'</span></div><div style="font-size:12px;color:var(--green);font-weight:700;">'+T('US$1.50 · 各國貨幣由 Google Play 自動換算')+'</div><button class="btn btn-gold btn-sm" style="width:100%;margin-top:10px;" onclick="buyLifetime()">'+T('立即解鎖')+'</button></div>';
     h+='</div>';
-    h+='<div class="mini" style="margin-top:14px;line-height:1.8;">'+T('訂閱透過 Google Play 結帳；7 天免費試用結束後自動續訂，可隨時在 Google Play 訂閱中心取消。換機或重裝後點「恢復購買」即可還原。')+'</div>';
-    h+='<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-out btn-sm" style="flex:1;" onclick="restorePurchases()">'+T('恢復購買')+'</button><button class="btn btn-out btn-sm" style="flex:1;" onclick="window.open(\''+SUB_MGMT+'\')">'+T('管理訂閱')+'</button></div>';
-    if(!billingService)h+='<div class="mini" style="color:var(--gold);margin-top:10px;">'+T('目前環境未偵測到 Google Play 服務（網頁版）——訂閱請於 Google Play 版 App 內進行。')+'</div>';
+    h+='<div class="mini" style="margin-top:14px;">'+T('一次付清，永久使用所有功能：員工無上限、報表與資料匯出、新功能優先。')+'</div>';
+    h+='<div style="display:flex;gap:8px;margin-top:12px;"><button class="btn btn-out btn-sm" style="flex:1;" onclick="restorePurchases()">'+T('恢復購買')+'</button></div>';
+    if(!billingService)h+='<div class="mini" style="color:var(--gold);margin-top:10px;">'+T('目前環境未偵測到 Google Play 服務（網頁版）——請於 Google Play 下載 App 後購買。')+'</div>';
   }
+  h+='<div class="mini" style="margin-top:14px;line-height:1.8;">'+T('企業版（多人授權／進階客製）請洽 erp-free.com 另議。')+'</div>';
   setModalHTML(h);
   document.getElementById('modalOv').classList.remove('hidden');
 }
