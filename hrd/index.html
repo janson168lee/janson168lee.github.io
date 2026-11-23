@@ -1381,6 +1381,29 @@ Object.assign(STRINGS, {
   '題數': {en:'Questions', ja:'問題数'},
   '門檻': {en:'Threshold', ja:'基準'}
 });
+Object.assign(STRINGS, {
+  /* ── 示範資料：部門 ── */
+  '管理部': {en:'Management', ja:'管理部'},
+  '人資部': {en:'HR', ja:'人事部'},
+  '業務部': {en:'Sales', ja:'営業部'},
+  '生產部': {en:'Production', ja:'製造部'},
+  '研發部': {en:'R&D', ja:'研究開発部'},
+  '財務部': {en:'Finance', ja:'財務部'},
+  /* ── 示範資料：職稱 ── */
+  '總經理': {en:'General Manager', ja:'総経理'},
+  '人資經理': {en:'HR Manager', ja:'人事マネージャー'},
+  '業務主任': {en:'Sales Supervisor', ja:'営業主任'},
+  '資深技術員': {en:'Senior Technician', ja:'シニア技術員'},
+  '工程師': {en:'Engineer', ja:'エンジニア'},
+  '初階專員': {en:'Associate', ja:'アソシエイト'},
+  /* ── 示範資料：員工姓名（EN 羅馬拼音）── */
+  '林志明': {en:'Lin Chih-Ming', ja:'林志明'},
+  '陳雅玲': {en:'Chen Ya-Ling', ja:'陳雅玲'},
+  '張大為': {en:'Chang Ta-Wei', ja:'張大為'},
+  '王美華': {en:'Wang Mei-Hua', ja:'王美華'},
+  '李建成': {en:'Li Chien-Cheng', ja:'李建成'},
+  '黃小娟': {en:'Huang Hsiao-Chuan', ja:'黃小娟'}
+});
 function T(zh){
   if(LANG==='zh') return zh;
   const e = STRINGS[zh];
@@ -1418,6 +1441,8 @@ function applyShell(){
   });
   const ht = document.getElementById('pageTitle');
   if(ht){ if(!ht.dataset.zh) ht.dataset.zh = ht.textContent.trim(); ht.textContent = T(ht.dataset.zh); }
+  const hsel = document.getElementById('heroSelect');
+  if(hsel){ [...hsel.options].forEach(o=>{ o.textContent = trHTML(o.textContent); }); }
   const hs = document.getElementById('heroSelectLabel');
   if(hs){ if(!hs.dataset.zh) hs.dataset.zh = hs.textContent.trim(); hs.textContent = T(hs.dataset.zh); }
   const bt2 = document.querySelector('.brand .t2');
