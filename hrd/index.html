@@ -110,6 +110,7 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
 .explain{background:var(--bg-card2);border-left:3px solid var(--cyan);padding:10px 14px;font-size:12.5px;color:var(--text2);border-radius:4px;margin-top:8px;line-height:1.7}
 .mini{font-size:11px;color:var(--mute)}
 .hidden{display:none!important}
+.langb.on{background:var(--gold);color:#141a24;border-color:var(--gold)}
 </style>
 </head>
 <body>
@@ -137,7 +138,7 @@ table.dt{width:100%;border-collapse:collapse;font-size:13px}
 <main class="main">
   <header class="header">
     <h1 id="pageTitle">英雄旅程</h1>
-    <div class="heroSel"><span style="font-size:12px;color:var(--mute);">目前玩家</span><select id="heroSelect" onchange="setHero(this.value)"></select></div>
+    <div style="display:flex;gap:4px;margin-right:12px;" id="langBar"><button class="btn btn-out btn-xs langb on" data-lang="zh">中</button><button class="btn btn-out btn-xs langb" data-lang="en">EN</button><button class="btn btn-out btn-xs langb" data-lang="ja">日</button></div><div class="heroSel"><span id="heroSelectLabel" style="font-size:12px;color:var(--mute);">目前玩家</span><select id="heroSelect" onchange="setHero(this.value)"></select></div>
   </header>
   <div class="content" id="mainContent"></div>
 </main>
@@ -333,7 +334,7 @@ function $(s){return document.querySelector(s);}
 function $$s(s){return document.querySelectorAll(s);}
 function genId(){return 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);}
 function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function toast(msg){const t=document.getElementById('toastBox');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400);}
+function toast(msg){msg=T(msg);const t=document.getElementById('toastBox');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2400);}
 function hero(){return employees.find(x=>x.id===STATE.heroId)||employees[0]||null;}
 function lvlOf(emp){let idx=0;for(let i=0;i<ladder.length;i++){if((emp.xp||0)>=ladder[i].xpNeed)idx=i;}return idx;}
 function lvlName(emp){return ladder[lvlOf(emp)]?ladder[lvlOf(emp)].name:'—';}
@@ -392,6 +393,9 @@ function renderPage(){
   const map={hero:renderHero,courses:renderCourses,quiz:renderQuiz,badges:renderBadges,team:renderTeam,promotion:renderPromotion,ladder:renderLadder,comps:renderComps,qbank:renderQbank,qbankedit:renderQbankEdit,employees:renderEmployees,board:renderBoard,guide:renderGuide};
   c.innerHTML=(map[p]||renderHero)();
   if(p==='quiz'&&STATE.quiz&&STATE.quiz.live)renderQuizRun();
+  captureMain();
+  applyMain();
+  applyShell();
   if(p==='quiz'&&STATE.quiz&&STATE.quiz.live)renderQuizRun();
 }
 
@@ -674,7 +678,7 @@ function approvePromotion(empId){
    +'<div class="mini" style="margin-top:10px;">晉升獎勵 +300 XP　新職級：'+esc(nl.name)+'</div>'
    +'<div class="mini" style="margin-top:6px;">'+esc(nl.desc||'')+'</div>'
    +'<div style="margin-top:16px;"><button class="btn btn-gold" onclick="closeModal();renderPage()">繼續冒險</button></div></div>';
-  document.getElementById('modalBox').innerHTML=h;
+  setModalHTML(h);
   document.getElementById('modalOv').classList.remove('hidden');
   renderPage();
 }
@@ -701,7 +705,7 @@ function editLadder(id){
   h+='<div class="fg"><label>指定測驗（須 ≥80 分）</label><select id="lvQuiz"><option value="">（無）</option>'+quizzes.map(qz=>'<option value="'+qz.id+'" '+(lv.reqQuiz===qz.id?'selected':'')+'>'+esc(qz.name)+'</option>').join('')+'</select></div>';
   h+='<div class="fg"><label>指定課程（須全部修畢）</label><div style="max-height:220px;overflow-y:auto;background:var(--bg-input);border:1px solid var(--border);border-radius:6px;padding:10px;">'+courses.map(c=>'<label style="display:block;font-size:13px;font-weight:400;text-transform:none;letter-spacing:0;"><input type="checkbox" class="lvC" value="'+c.id+'" '+(lv.reqCourses.includes(c.id)?'checked':'')+'> '+esc(c.name)+'（+'+c.xp+' XP）</label>').join('')+'</div></div>';
   h+='</div><div class="mf"><button class="btn btn-out" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="saveLadder(\''+(id||'')+'\')">儲存</button></div>';
-  document.getElementById('modalBox').innerHTML=h;
+  setModalHTML(h);
   document.getElementById('modalOv').classList.remove('hidden');
 }
 function saveLadder(id){
@@ -715,7 +719,7 @@ function saveLadder(id){
   if(id){const lv=ladder.find(x=>x.id===id);Object.assign(lv,{name,xpNeed,desc,reqQuiz,reqCourses,salaryBand});}
   else ladder.push({id:genId(),name,xpNeed,desc,reqQuiz,reqCourses,salaryBand});
   ladder.sort((a,b)=>a.xpNeed-b.xpNeed);
-  saveD('ladder',ladder);closeModal();renderPage();
+  saveActive('ladder',ladder);closeModal();renderPage();
 }
 function delLadder(id){
   if(ladder.length<=2){toast('至少保留兩個職級');return;}
@@ -767,7 +771,7 @@ function editEmp(id){
   h+='<div class="fg"><label>頭像</label><div>'+AVATARS.map(a=>'<label style="display:inline-block;font-size:22px;margin:4px 8px;cursor:pointer;text-transform:none;font-weight:400;"><input type="radio" name="av" value="'+a+'" '+(e.avatar===a?'checked':'')+' style="display:none;" onchange="document.getElementById(\'avPrev\').textContent=this.value">'+(a)+'</label>').join('')+'<span id="avPrev" style="font-size:26px;margin-left:10px;">'+e.avatar+'</span></div></div>';
   h+='<div class="mrow"><div class="fg"><label>到職日</label><input type="date" id="eeHire" value="'+esc(e.hireDate)+'"></div><div class="fg"><label>狀態</label><select id="eeStatus"><option '+(e.status==='在職'?'selected':'')+'>在職</option><option '+(e.status==='離職'?'selected':'')+'>離職</option></select></div></div>';
   h+='</div><div class="mf"><button class="btn btn-out" onclick="closeModal()">取消</button><button class="btn btn-gold" onclick="saveEmp(\''+(id||'')+'\')">儲存</button></div>';
-  document.getElementById('modalBox').innerHTML=h;
+  setModalHTML(h);
   document.getElementById('modalOv').classList.remove('hidden');
 }
 function saveEmp(id){
@@ -925,7 +929,7 @@ function qbSave(){
   if(qb.questions.some(qq=>!qq.q.trim()||qq.o.some(o=>!String(o).trim()))){toast('有題目或選項未填完整');return;}
   const idx=quizzes.findIndex(x=>x.id===qb.id);
   if(idx>=0)quizzes[idx]=qb;else{qb.id=genId();quizzes.push(qb);}
-  saveD('quizzes',quizzes);
+  saveActive('quizzes',quizzes);
   STATE.qb=null;STATE.page='qbank';renderPage();
   toast('測驗卷已儲存，立即生效於測驗中心');
 }
@@ -935,7 +939,7 @@ function delQuiz(id){
   if(used){toast('此測驗卷被「'+used.name+'」職級設為門檻，請先於職級體系調整');return;}
   if(!confirm('確定刪除「'+(qz?qz.name:'')+'」？歷史成績將保留。'))return;
   quizzes=quizzes.filter(x=>x.id!==id);
-  saveD('quizzes',quizzes);renderPage();
+  saveActive('quizzes',quizzes);renderPage();
 }
 function qbExportOne(){
   qbSync();
@@ -957,7 +961,7 @@ function qbImport(){
         qz.id=genId();qz.pass=qz.pass||80;qz.xp=qz.xp||150;qz.cat=qz.cat||'core';
         qz.questions=qz.questions.map(qq=>({q:qq.q||'',o:[qq.o?qq.o[0]||'':'',qq.o?qq.o[1]||'':'',qq.o?qq.o[2]||'':'',qq.o?qq.o[3]||'':''],a:Number(qq.a)||0,e:qq.e||''}));
         quizzes.push(qz);added++;}});
-      saveD('quizzes',quizzes);renderPage();toast('已匯入 '+added+' 卷測驗');
+      saveActive('quizzes',quizzes);renderPage();toast('已匯入 '+added+' 卷測驗');
     }catch(err){toast('匯入失敗：'+err.message);}};
     r.readAsText(f);};
   i.click();
@@ -969,6 +973,527 @@ document.getElementById('modalOv').addEventListener('click',e=>{if(e.target===do
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 /* ── 13. Boot ── */
+/* LANG-BOOT */
+
+/* ═══════════ 多語言層 ═══════════ */
+/* ═══════════ TALENTQUEST — 多語言層（UI 字典） ═══════════ */
+let LANG = localStorage.getItem('tq_lang') || 'zh';
+
+const STRINGS = {
+  /* 側欄與頁面標題 */
+  'TalentQuest 人才發展平台 · 職能升階': {en:'TalentQuest Talent Development · Skill Ladder', ja:'TalentQuest 人材育成プラットフォーム・スキル昇格'},
+  '我的旅程': {en:'MY JOURNEY', ja:'マイジャーニー'},
+  '企業端': {en:'ENTERPRISE', ja:'企業向け'},
+  '榮耀': {en:'GLORY', ja:'栄誉'},
+  '帳戶': {en:'ACCOUNT', ja:'アカウント'},
+  '英雄旅程': {en:'Hero Journey', ja:'ヒーロージャーニー'},
+  '訓練課程': {en:'Training Courses', ja:'研修コース'},
+  '測驗中心': {en:'Assessment Center', ja:'テストセンター'},
+  '徽章牆': {en:'Badge Wall', ja:'バッジウォール'},
+  '團隊總覽': {en:'Team Overview', ja:'チーム概況'},
+  '晉升評鑑': {en:'Promotion Review', ja:'昇進審査'},
+  '職級體系': {en:'Job Level System', ja:'等級制度'},
+  '職能地圖': {en:'Competency Map', ja:'コンピテンシーマップ'},
+  '題庫編輯': {en:'Quiz Bank Editor', ja:'問題バンク編集'},
+  '員工管理': {en:'Employee Management', ja:'社員管理'},
+  '英雄榜': {en:'Leaderboard', ja:'ランキング'},
+  '遊戲說明': {en:'How It Works', ja:'使い方'},
+  '訂閱方案': {en:'Subscription', ja:'サブスクリプション'},
+  '目前玩家': {en:'Current player', ja:'現在のプレイヤー'},
+  /* 通用 */
+  '完成課程': {en:'Complete', ja:'修了する'},
+  '開始挑戰': {en:'Start', ja:'挑戦する'},
+  '重新挑戰': {en:'Retry', ja:'再挑戦'},
+  '上一題': {en:'◀ Prev', ja:'◀ 前へ'},
+  '下一題': {en:'Next ▶', ja:'次へ ▶'},
+  '交卷': {en:'Submit', ja:'提出する'},
+  '返回測驗中心': {en:'Back to Assessment Center', ja:'テストセンターへ戻る'},
+  '再挑戰一次': {en:'Try Again', ja:'もう一度挑戦'},
+  '返回': {en:'Back', ja:'戻る'},
+  '已修畢此課程': {en:'Already completed', ja:'すでに修了済みです'},
+  '尚未挑戰': {en:'Not attempted', ja:'未挑戦'},
+  '尚未挑戰的專案管理測驗': {en:'Project Management quiz not attempted', ja:'プロジェクト管理テスト未挑戦'},
+  '通過測驗：': {en:'Pass quiz: ', ja:'テスト合格：'},
+  '修畢課程：': {en:'Complete course: ', ja:'コース修了：'},
+  '累積經驗值 ': {en:'Earn ', ja:'経験値 '},
+  ' XP': {en:' XP', ja:' XP'},
+  '距離晉升還有 ': {en:'To promotion: ', ja:'昇進まで '},
+  '已達最高職級，傳奇！': {en:'Top level reached — legendary!', ja:'最高等級に到達しました！'},
+  '已是最高職級': {en:'Already at top level', ja:'すでに最高等級です'},
+  '👑 晉升資格達成 — 由 HR 於「晉升評鑑」核准': {en:'👑 Promotion criteria met — HR approves in Promotion Review', ja:'👑 昇進条件達成 — HRが「昇進審査」で承認'},
+  '晉升資格達成 — 由 HR 於「晉升評鑑」核准': {en:'Promotion criteria met — HR approves in Promotion Review', ja:'昇進条件達成 — HRが「昇進審査」で承認'},
+  '前往 ': {en:'To ', ja:'次の目標：'},
+  ' — 任務清單': {en:' — Quest List', ja:' — クエストリスト'},
+  '我的徽章（': {en:'My Badges (', ja:'マイバッジ（'},
+  '）': {en:')', ja:'）'},
+  '完成第一堂課': {en:'Complete your first course', ja:'最初のコースを修了'},
+  /* 課程頁 */
+  '課程目錄（': {en:'Course Catalog (', ja:'コースカタログ（'},
+  ' 門）': {en:' courses)', ja:' コース）'},
+  '全部類別': {en:'All categories', ja:'すべてのカテゴリ'},
+  '全部職系': {en:'All tracks', ja:'すべての職種'},
+  '核心': {en:'Core', ja:'コア'},
+  '專業': {en:'Professional', ja:'専門'},
+  '管理': {en:'Management', ja:'マネジメント'},
+  ' 小時　⚡ +': {en:' h　⚡ +', ja:' 時間　⚡ +'},
+  '✓ 已修畢': {en:'✓ Completed', ja:'✓ 修了済み'},
+  /* 測驗 */
+  '測驗列表（': {en:'Quiz List (', ja:'テスト一覧（'},
+  ' 卷）': {en:' quizzes)', ja:' 卷）'},
+  '題 · 門檻 ': {en:' questions · pass ', ja:'問 ・ 合格 '},
+  ' 分 · 最高 ': {en:' · max ', ja:' 点 ・ 最高 '},
+  ' XP': {en:' XP', ja:' XP'},
+  '我的測驗紀錄': {en:'My Quiz Records', ja:'テスト履歴'},
+  '日期': {en:'Date', ja:'日付'},
+  '測驗': {en:'Quiz', ja:'テスト'},
+  '分數': {en:'Score', ja:'点数'},
+  '結果': {en:'Result', ja:'結果'},
+  '通過': {en:'Pass', ja:'合格'},
+  '未通過': {en:'Fail', ja:'不合格'},
+  '尚無紀錄。': {en:'No records yet.', ja:'履歴はまだありません。'},
+  '分 — ': {en:' — ', ja:'点 — '},
+  '測驗通過！': {en:'Quiz passed!', ja:'テスト合格！'},
+  '未達門檻，再接再厲': {en:'Below threshold — keep going', ja:'基準点未達、もう一息'},
+  '答對 ': {en:'Correct ', ja:'正解 '},
+  ' / ': {en:' / ', ja:' / '},
+  ' 題 · 獲得 ': {en:' questions · earned ', ja:' 問 ・ 獲得 '},
+  '逐題解析': {en:'Question Review', ja:'問題解説'},
+  /* 團隊 */
+  '團隊人數': {en:'Team size', ja:'チーム人数'},
+  '團隊總 XP': {en:'Total XP', ja:'チーム総XP'},
+  '平均 XP': {en:'Average XP', ja:'平均XP'},
+  '課程完成數': {en:'Courses completed', ja:'修了コース数'},
+  '測驗通過數': {en:'Quizzes passed', ja:'合格テスト数'},
+  /* 晉升 */
+  '👑 晉升候選人（符合下一職級全部門檻）': {en:'👑 Promotion Candidates (all thresholds met)', ja:'👑 昇進候補者（条件達成）'},
+  '匯出晉升核定單': {en:'Export Promotion List', ja:'昇進承認リスト出力'},
+  '目前沒有達標的候選人。員工達成「XP＋課程＋測驗」三項門檻後會出現在這裡。': {en:'No qualified candidates yet. Employees appear here after meeting XP + courses + quiz thresholds.', ja:'まだ条件を満たした候補者はいません。'},
+  '核准晉升': {en:'Approve Promotion', ja:'昇進を承認'},
+  '尚未達標（進度差異）': {en:'Not Yet Qualified (gap analysis)', ja:'未達成（ギャップ分析）'},
+  '員工': {en:'Employee', ja:'社員'},
+  '現職級': {en:'Current level', ja:'現在等級'},
+  '目標職級': {en:'Target level', ja:'目標等級'},
+  '課程缺口': {en:'Course gaps', ja:'未修コース'},
+  '待測 ': {en:'Quiz: ', ja:'未受験 '},
+  '晉升紀錄': {en:'Promotion Records', ja:'昇進履歴'},
+  '尚無晉升紀錄。': {en:'No promotion records yet.', ja:'昇進履歴はまだありません。'},
+  /* 階梯 */
+  '職級階梯（由低到高）': {en:'Job Level Ladder (low to high)', ja:'等級ラダー（下位→上位）'},
+  '匯出職級薪級對照': {en:'Export Level-Salary Map', ja:'等級・給与対応出力'},
+  '＋ 新增職級': {en:'＋ Add Level', ja:'＋ 等級追加'},
+  '級': {en:'Lv', ja:'級'},
+  '職級名稱': {en:'Level name', ja:'等級名'},
+  'XP 門檻': {en:'XP threshold', ja:'XP基準'},
+  '薪級對照（可編輯）': {en:'Salary band (editable)', ja:'給与帯（編集可）'},
+  '升階需求': {en:'Promotion requirements', ja:'昇進要件'},
+  '課程：': {en:'Courses: ', ja:'コース：'},
+  '測驗：': {en:'Quiz: ', ja:'テスト：'},
+  '編輯': {en:'Edit', ja:'編集'},
+  '刪除': {en:'Delete', ja:'削除'},
+  '說明': {en:'Notes', ja:'説明'},
+  '職級＝遊戲關卡。員工累積 XP（完成課程、通過測驗、晉升獎勵）達到門檻，並修畢該職級指定課程、通過指定測驗（≥80 分）後，即成為晉升候選人；由 HR 在「晉升評鑑」核准後升階。': {en:'Levels are game stages. Employees reach a threshold by earning XP (courses, quizzes, promotion bonus), completing required courses and passing required quizzes (≥80) — then HR approves the promotion.', ja:'等級はゲームのステージです。XP（コース・テスト・昇進ボーナス）を貯め、指定コースを修了し、指定テスト（80点以上）に合格すると昇進候補になります。HRが承認すると昇格します。'},
+  /* 職能地圖 */
+  '核心職能（全員）': {en:'Core Competencies (all staff)', ja:'コアコンピテンシー（全員）'},
+  '專業職能（職務相關）': {en:'Professional Competencies (role-based)', ja:'専門コンピテンシー（職務別）'},
+  '管理職能（主管進階）': {en:'Management Competencies (managers)', ja:'マネジメントコンピテンシー（管理職）'},
+  '關聯課程：': {en:'Related courses: ', ja:'関連コース：'},
+  ' 門　相關測驗可於測驗中心挑戰': {en:' quizzes · take the quiz in Assessment Center', ja:' コース　テストセンターで挑戦できます'},
+  '職能 × 課程 對照': {en:'Competency × Course Mapping', ja:'コンピテンシー×コース対応'},
+  /* 題庫 */
+  '測驗卷列表（': {en:'Quiz Papers (', ja:'テスト用紙一覧（'},
+  '可編輯內建卷與自訂卷：名稱、門檻分數、XP、題目、選項、答案與解析。編輯後立即生效於「測驗中心」。': {en:'Edit built-in and custom papers: name, pass score, XP, questions, options, answers and explanations. Changes apply to the Assessment Center immediately.', ja:'内蔵・カスタム用紙を編集できます。変更はすぐにテストセンターに反映されます。'},
+  '📥 匯入題庫 JSON': {en:'📥 Import Quiz JSON', ja:'📥 問題バンクJSON取り込み'},
+  '📤 匯出全部題庫': {en:'📤 Export All Quizzes', ja:'📤 全問題バンク出力'},
+  '＋ 新增測驗卷': {en:'＋ New Quiz Paper', ja:'＋ 新規テスト用紙'},
+  '題庫設計建議：每卷 6-8 題、情境題優於背誦題、每題附解析（錯了也要學到東西）；晉升關鍵卷建議門檻 80 分以上。刪除測驗卷時，歷史成績會保留（顯示為已刪測驗），已核可的職級門檻請同步於「職級體系」調整。': {en:'Quiz design tips: 6-8 questions per paper, scenario questions beat recall questions, add an explanation to every question. Use a pass score of 80+ for promotion-critical papers. Deleting a paper keeps historical scores; update the Job Level System accordingly.', ja:'クイズ設計のヒント：1巻6〜8問、暗記よりシナリオ問題、各問に解説を付ける。昇進に関わる巻は80点以上を推奨。削除しても履歴は残ります。'},
+  '測驗卷': {en:'Paper', ja:'用紙'},
+  '預覽': {en:'Preview', ja:'プレビュー'},
+  /* 員工管理 */
+  '員工名冊（': {en:'Employee Roster (', ja:'社員名簿（'},
+  '匯出 JSON 備份': {en:'Export JSON Backup', ja:'JSONバックアップ出力'},
+  '＋ 新增員工': {en:'＋ Add Employee', ja:'＋ 社員追加'},
+  '姓名': {en:'Name', ja:'氏名'},
+  '部門': {en:'Department', ja:'部署'},
+  '職系': {en:'Track', ja:'職種'},
+  '狀態': {en:'Status', ja:'状態'},
+  '在職': {en:'Active', ja:'在職'},
+  '離職': {en:'Left', ja:'退職'},
+  '選為玩家': {en:'Set as player', ja:'プレイヤーに設定'},
+  /* 英雄榜 */
+  '🏆 英雄榜（依 XP 排名）': {en:'🏆 Leaderboard (by XP)', ja:'🏆 ランキング（XP順）'},
+  '排名': {en:'Rank', ja:'順位'},
+  '玩家': {en:'Player', ja:'プレイヤー'},
+  '徽章': {en:'Badges', ja:'バッジ'},
+  '排行榜以累積 XP 排序；XP 來源＝完成課程＋通過測驗（依分數比例）＋晉升獎勵。排名僅供激勵，不與薪資連動——鼓勵比較「自己的成長」而非同事之間的競爭。': {en:'Ranked by total XP: courses + quizzes (score-based) + promotion bonus. For motivation only — not linked to salary. Compare with your past self, not your colleagues.', ja:'累計XPでランキング。激励用であり給与とは連動しません。'},
+  /* 說明 */
+  '🎮 遊戲玩法': {en:'🎮 How to Play', ja:'🎮 遊び方'},
+  '🎓 制度設計依據（HRD 理論）': {en:'🎓 System Design Basis (HRD theory)', ja:'🎓 制度設計の根拠（HRD理論）'},
+  '推行建議（HR 顧問視角）': {en:'Rollout Advice (HR consultant view)', ja:'導入のすすめ（HRコンサル視点）'},
+  /* toast */
+  '請先選擇員工': {en:'Please select an employee first', ja:'先に社員を選択してください'},
+  '還有未作答的題目': {en:'There are unanswered questions', ja:'未回答の問題があります'},
+  '無資料可匯出': {en:'No data to export', ja:'出力データがありません'},
+  '已匯出備份 JSON': {en:'JSON backup exported', ja:'JSONバックアップを出力しました'},
+  '請先選擇員工': {en:'Please select an employee', ja:'社員を選択してください'}
+};
+
+/* 例外鍵修正 */
+STRINGS[' 卷）'] = {en:' papers)', ja:' 用紙）'};
+STRINGS[' 門）'] = {en:' courses)', ja:' コース）'};
+
+function T(zh){
+  if(LANG==='zh') return zh;
+  const e = STRINGS[zh];
+  return (e && e[LANG]) || zh;
+}
+let LANG_SNAP = {main:'', modal:''};
+function captureMain(){ const mc=document.getElementById('mainContent'); if(mc) LANG_SNAP.main = mc.innerHTML; }
+function captureModal(){ const mb=document.getElementById('modalBox'); if(mb) LANG_SNAP.modal = mb.innerHTML; }
+function trHTML(html){
+  if(LANG==='zh') return html;
+  let out = html;
+  const keys = Object.keys(STRINGS).sort((a,b)=>b.length-a.length);
+  for(const k of keys){
+    const e = STRINGS[k];
+    const t = e[LANG];
+    if(t && out.indexOf(k)>=0) out = out.split(k).join(t);
+  }
+  return out;
+}
+function applyMain(){ const mc=document.getElementById('mainContent'); if(mc&&LANG_SNAP.main){ mc.innerHTML = trHTML(LANG_SNAP.main); } }
+function applyShell(){
+  // 以 dataset.zh 為原文錨點（無狀態、可雙向切換）
+  $$s('.nitem').forEach(el=>{
+    const key = el.dataset.page;
+    if(!key || !PAGE_TITLES[key]) return;
+    const zh = PAGE_TITLES[key];
+    if(!el.dataset.zh) el.dataset.zh = zh;
+    const t = T(el.dataset.zh);
+    const tn = el.lastChild;
+    if(tn && tn.nodeType===3){ tn.nodeValue = t; }
+  });
+  $$s('.sec-t').forEach(el=>{
+    if(!el.dataset.zh) el.dataset.zh = el.textContent.trim();
+    el.textContent = T(el.dataset.zh);
+  });
+  const ht = document.getElementById('pageTitle');
+  if(ht){ if(!ht.dataset.zh) ht.dataset.zh = ht.textContent.trim(); ht.textContent = T(ht.dataset.zh); }
+  const hs = document.getElementById('heroSelectLabel');
+  if(hs){ if(!hs.dataset.zh) hs.dataset.zh = hs.textContent.trim(); hs.textContent = T(hs.dataset.zh); }
+  const sf = document.querySelector('.sfoot');
+  if(sf){ if(!sf.dataset.zh) sf.dataset.zh = 'TalentQuest v1.1 · 台灣中小企業適用'; sf.textContent = LANG==='en'?'TalentQuest v1.1 · for SMEs':(LANG==='ja'?'TalentQuest v1.1 ・ 中小企業向け':sf.dataset.zh); }
+}
+function setModalHTML(h){ const mb=document.getElementById('modalBox'); mb.innerHTML = trHTML(h); LANG_SNAP.modal = mb.innerHTML; }
+
+/* ═══════════ TALENTQUEST — English dataset ═══════════ */
+const L10N_EN = {
+  tracks: [
+    {id:'t_mgr', name:'Management Track'},
+    {id:'t_tech', name:'Technical Track'},
+    {id:'t_sales', name:'Sales Track'},
+    {id:'t_staff', name:'Staff Track'}
+  ],
+  ladder: [
+    {id:'L1', name:'Trainee', desc:'Onboarding stage — learn the company and core basics', salaryBand:'Base 30,000-35,000'},
+    {id:'L2', name:'Associate', desc:'Handles standard tasks independently, solid fundamentals', salaryBand:'Base 35,000-42,000'},
+    {id:'L3', name:'Senior Specialist', desc:'Works independently on complex day-to-day tasks', salaryBand:'Base 42,000-52,000'},
+    {id:'L4', name:'Expert', desc:'Domain expert — mentors juniors and solves hard problems', salaryBand:'Base 52,000-65,000'},
+    {id:'L5', name:'Supervisor Candidate', desc:'Begins managing people with leadership readiness', salaryBand:'Base 60,000-75,000'},
+    {id:'L6', name:'Team Lead', desc:'Leads a team to hit targets and runs performance management', salaryBand:'Base 70,000-90,000'},
+    {id:'L7', name:'Department Manager', desc:'Business perspective — orchestrates resources and strategy', salaryBand:'Base 90,000-130,000'}
+  ],
+  comps: [
+    {id:'cp_comm', name:'Communication', desc:'Conveys ideas clearly, listens well, communicates up and down effectively'},
+    {id:'cp_team', name:'Teamwork', desc:'Collaborates toward shared goals; willing to cover for others and share'},
+    {id:'cp_learn', name:'Learning Agility', desc:'Learns proactively and turns feedback into improvement'},
+    {id:'cp_cust', name:'Customer Focus', desc:'Thinks from the customer perspective and meets expectations'},
+    {id:'cp_solve', name:'Problem Solving', desc:'Breaks down problems, finds root causes, proposes workable solutions'},
+    {id:'cp_exec', name:'Execution', desc:'Delivers on time, on quality, on volume'},
+    {id:'cp_prof', name:'Professional Knowledge', desc:'Role-specific skills and industry knowledge'},
+    {id:'cp_digi', name:'Digital Literacy', desc:'Uses digital tools and data to boost efficiency'},
+    {id:'cp_pm', name:'Project Management', desc:'Plans schedules, allocates resources, manages risk and delivery'},
+    {id:'cp_data', name:'Data Analysis', desc:'Uses data to describe reality, spot issues and support decisions'},
+    {id:'cp_inno', name:'Innovation', desc:'Continuously improves processes and services; tries new approaches'},
+    {id:'cp_goal', name:'Goal Management', desc:'Sets clear goals and breaks them into actions'},
+    {id:'cp_lead', name:'Leadership', desc:'Builds team cohesion, sets direction, delivers results'},
+    {id:'cp_perf', name:'Performance Management', desc:'Evaluates fairly and gives concrete feedback'},
+    {id:'cp_talent', name:'Talent Development', desc:'Spots potential and grows people with coaching'},
+    {id:'cp_biz', name:'Business Acumen', desc:'Understands cost, revenue and market to make trade-offs'}
+  ],
+  courses: [
+    {id:'c_newbie', name:'Onboarding: Company Culture & Ethics', desc:'Company values, workplace conduct and career rules'},
+    {id:'c_comm', name:'Communication & Collaboration Basics', desc:'Listening, expressing, feedback — the three arrows'},
+    {id:'c_time', name:'Time Management & Priorities', desc:'First things first: quadrants and time blocking'},
+    {id:'c_cust', name:'Customer Service Mindset', desc:'Design service from the customer perspective'},
+    {id:'c_problem', name:'Problem Analysis & Solving', desc:'Root-cause analysis with fishbone and 5 Why'},
+    {id:'c_excel', name:'Excel in Practice', desc:'Pivot tables, functions and charts that speak'},
+    {id:'c_write', name:'Business Report Writing', desc:'Pyramid principle: conclusion first'},
+    {id:'c_meeting', name:'Meeting Minutes & Briefing', desc:'Structured minutes and focused briefings'},
+    {id:'c_pm', name:'Project Management Basics', desc:'Scope, schedule, risk — small projects done right'},
+    {id:'c_data', name:'Data Literacy & Charts', desc:'Read charts and avoid being misled by numbers'},
+    {id:'c_service', name:'Service Recovery Skills', desc:'From complaint to trust: the LAST method'},
+    {id:'c_cross', name:'Cross-team Collaboration', desc:'Getting things done without authority'},
+    {id:'c_leader', name:'Leadership Fundamentals', desc:'Mindset shift from contributor to manager'},
+    {id:'c_okr', name:'Goal Setting & OKR', desc:'Write measurable goals aligned with the team'},
+    {id:'c_perf', name:'Performance Reviews in Practice', desc:'SBI feedback that works, without hurting feelings'},
+    {id:'c_coach', name:'Talent Development & Coaching', desc:'GROW model: ask out their answers'},
+    {id:'c_decision', name:'Decision Making & Risk', desc:'Decision trees, assumptions and worst cases'},
+    {id:'c_biz', name:'Reading Business Numbers', desc:'P&L, cash flow and operating metrics in practice'},
+    {id:'c_resil', name:'Resilience & Stress Management', desc:'Self-regulation and recovery under pressure'},
+    {id:'c_present', name:'Persuasive Presenting', desc:'Story structure that moves audiences to act'},
+    {id:'c_law', name:'Labor Law Essentials', desc:'Hours, overtime, leave: lines managers must not cross'},
+    {id:'c_safety', name:'Occupational Safety & Health', desc:'OSH basics and reporting procedures'},
+    {id:'c_kaizen', name:'Innovation & Continuous Improvement', desc:'PDCA and small experiments as a daily habit'},
+    {id:'c_interview', name:'Recruiting & Interviewing', desc:'Behavioral interviews: ask right, hire right'}
+  ],
+  quizzes: [
+    {id:'q_comm', name:'Communication Certification', questions:[
+      {q:'A colleague complains that another department "never cooperates". What should you do FIRST?', o:['Complain along with them','Listen and clarify what actually happened','Go lecture the other department directly','Report them to your boss'], a:1, e:'Listen and clarify first — separate communication, process or perception issues before acting.'},
+      {q:'The core of an "I-Message" is…', o:['Pointing out personality flaws','Describing facts and your feelings instead of blaming','Silent treatment','Being as intense as possible'], a:1, e:'I-Message = fact + impact + feeling. It lowers defensiveness.'},
+      {q:'The most productive prep before a cross-team meeting is…', o:['A long slide deck','Clarify what you need and what you can offer','Memorize every detail','Blame them in an email'], a:1, e:'Meetings trade resources and build consensus — define your ask and offer first.'},
+      {q:'When receiving vague work instructions, the best response is…', o:['Guess and start','Confirm goal, deadline and deliverable format','Wait for colleagues','Ask about every micro-detail'], a:1, e:'Confirming goal/deadline/format removes ambiguity at minimum cost.'},
+      {q:'Which is "effective praise"?', o:['You are great!','You are hardworking!','The data cross-check in your report was complete — the client confirmed cooperation on the spot','You are better than everyone'], a:2, e:'Specific behavior + impact makes praise repeatable.'},
+      {q:'The biggest source of misunderstanding in written messages is…', o:['Emojis','Missing tone and facial expressions, easily over-read','Line breaks','Punctuation'], a:1, e:'Text carries no tone; handle sensitive topics by voice, keep text for confirmation.'}
+    ]},
+    {id:'q_problem', name:'Problem Solving Certification', questions:[
+      {q:'The FIRST step of problem solving is…', o:['Propose a solution immediately','Define the problem precisely (when, where, how severe)','Assign blame','Hold a review meeting'], a:1, e:'An undefined problem cannot be solved — describe symptoms and impact first.'},
+      {q:'The purpose of 5 Why analysis is…', o:['Ask five people who is responsible','Drill down to the root cause','Keep the meeting short','Avoid responsibility'], a:1, e:'5 Why digs from symptoms to systemic causes.'},
+      {q:'A fishbone (Ishikawa) diagram is best for…', o:['Prioritizing tasks','Organizing possible causes systematically','Costing','Tracking schedules'], a:1, e:'It expands causes across categories so nothing is missed.'},
+      {q:'The most complete set of dimensions for evaluating solutions is…', o:['Lowest cost only','Feasibility, cost, risk, expected effect','The boss preference','Fastest'], a:1, e:'Four dimensions avoid one-sided decisions.'},
+      {q:'After implementing a countermeasure, the next step is…', o:['Close the case','Track metrics to verify effect and standardize','Move to the next problem','Wait for the boss'], a:1, e:'PDCA C/A: verify with metrics, then standardize — or problems recur.'},
+      {q:'Recurring vs. one-off problems should be handled…', o:['The same way — a review meeting','Recurring: fix the process; one-off: handle the case','One-offs deserve projects','Neither needs action'], a:1, e:'Recurring problems mean a systemic hole; one-offs get exception handling.'}
+    ]},
+    {id:'q_pm', name:'Project Management Certification', questions:[
+      {q:'The three confirmations when kicking off a project are…', o:['Budget, venue, catering','Scope, milestones, resources and roles','Headcount, weather, dress code','Tools, software, placements'], a:1, e:'Scope, schedule and resources/roles are the three pillars.'},
+      {q:'Mid-project the client asks for "more features, same time and budget". The best response is…', o:['Accept silently and work overtime','Explain the trade-off and let them prioritize','Refuse and end the deal','Agree and not deliver'], a:1, e:'Scope-time-cost triangle: show the trade-off and get sign-off.'},
+      {q:'A Gantt chart mainly shows…', o:['Org structure','Task sequences and dependencies','Cost details','Risk lists'], a:1, e:'Gantt charts map scheduling and dependencies over time.'},
+      {q:'A "milestone" means…', o:['Daily chores','A key delivery checkpoint to verify project health','Only at project end','Team dinner time'], a:1, e:'Milestones expose deviations early instead of at the end.'},
+      {q:'The basic practice of project risk management is…', o:['Assume nothing happens','Identify, assess, plan responses','Deal with it when it happens','Outsource everything'], a:1, e:'A risk register (identify→assess→respond→track) gives the team a shared script.'},
+      {q:'The most valuable action after a project ends is…', o:['Disband immediately','Run a retrospective and turn experience into assets','Delete all files','Avoid criticism'], a:1, e:'Retrospectives turn wins and misses into processes and templates.'}
+    ]},
+    {id:'q_leader', name:'Leadership Certification', questions:[
+      {q:'The biggest mindset shift from contributor to manager is…', o:['Doing things faster yourself','Getting results through others and owning team outcomes','Less contact with people','Keeping all work to yourself'], a:1, e:'Manager output = team output; invest in delegation and development.'},
+      {q:'The most common delegation failure is…', o:['No follow-up, or handing over work without information and authority','Delegating to too many people','Choosing someone too senior','Using formal documents'], a:1, e:'Delegation = goal + resources/authority + check-in points.'},
+      {q:'When team morale drops, the manager should first…', o:['Hand out bonuses','Observe and hold 1-on-1s to find the real cause','Run a team-building event','Replace people'], a:1, e:'Morale issues often come from unclear goals, missing feedback or unfairness — diagnose first.'},
+      {q:'"Situational Leadership" says the manager should…', o:['Manage everyone the same way','Adapt directing and supporting to each member','Always vote','Fully let go'], a:1, e:'Newcomers need direction; veterans get autonomy.'},
+      {q:'Which is an "effective team goal"?', o:['Let us do our best!','Cut average complaint handling time from 48h to 24h by Q2','Be the best in the industry','Full sprint'], a:1, e:'Measurable + deadline + meaningful baseline.'},
+      {q:'The best way to confirm understanding when assigning a task is…', o:['Ask "Got it?"','Have them restate the goal and deliverable standard','Just send an email','Read their face'], a:1, e:'Restating exposes gaps; "Got it?" only earns polite nods.'}
+    ]},
+    {id:'q_perf', name:'Performance Management Certification', questions:[
+      {q:'The three elements of SBI feedback are…', o:['Situation, Behavior, Impact','Style, Balance, Initiative','Salary, Bonus, Promotion','Score, Band, Index'], a:0, e:'Situation + observed behavior + impact: concrete and discussable.'},
+      {q:'What should be avoided in a performance review?', o:['Concrete examples','Vague comparisons, digging up old issues, recency bias','Preparing data','Listening to the employee'], a:1, e:'Old issues and fuzzy comparisons trigger defensiveness.'},
+      {q:'The main risk of "forced ranking" is…', o:['Too costly','Distortion in small teams and damage to collaboration','Too easy','It is illegal'], a:1, e:'Forcing 271 onto small teams distorts; focus on dialogue quality and transparent standards.'},
+      {q:'In SMART goals, M stands for…', o:['Motivation','Measurable','Mission','Management'], a:1, e:'Unmeasurable goals cannot be managed.'},
+      {q:'For an excellent employee, the feedback that reinforces behavior best is…', o:['A quick "thanks"','Pointing out what they did and the value created, recognized publicly','Say nothing to avoid arrogance','Cash only'], a:1, e:'Specific + timely + sees the process builds meaning.'},
+      {q:'For an underperformer, the first step is…', o:['Immediate termination','1-on-1 diagnosis: ability, willingness or environment','Public shaming','Double the workload'], a:1, e:'Diagnose the root cause first; punishment alone often misses.'}
+    ]},
+    {id:'q_data', name:'Data Literacy Certification', questions:[
+      {q:'Bar charts are best for…', o:['Time trends','Comparing categories','Proportions','Correlations'], a:1, e:'Category comparison = bar; trend = line; composition = stacked/pie (≤5 items).'},
+      {q:'Averages are easily distorted by…', o:['Outliers','Sample color','Report length','Chart color'], a:0, e:'Extreme values pull the mean; check the median too.'},
+      {q:'"Correlation is not causation" means…', o:['All data is fake','Two numbers moving together does not prove one causes the other','Causality cannot be studied','Charts lie'], a:1, e:'Third variables or coincidence may explain it — control variables or experiment.'},
+      {q:'"Complaints fell for three quarters" needs what to be complete?', o:['Nothing','Absolute volume, baseline, complaint types and handling time','Just the picture','A smaller chart'], a:1, e:'Relative change alone misjudges scale; type distribution shows coverage.'},
+      {q:'Excel pivot tables are best for…', o:['Writing reports','Summarizing and cross-viewing large detail data','Designing logos','Editing photos'], a:1, e:'Pivots are the fastest way to aggregate and cross-check details.'},
+      {q:'Before making data-driven decisions, first confirm…', o:['Chart colors','Data sources and consistent definitions','Report length','Slide animations'], a:1, e:'Inconsistent definitions and periods are the most common trap.'}
+    ]},
+    {id:'q_service', name:'Customer Service Certification', questions:[
+      {q:'When a customer complains, the first reaction should be…', o:['Explain company policy','Listen sincerely and show understanding','Point them to the website','Transfer the call'], a:1, e:'No explanation lands before emotions are heard.'},
+      {q:'The LAST service recovery steps are…', o:['Listen, Apologize, Solve, Thank','Listen, Argue, Solve, Transfer','Leave, Avoid, Silence, Tell','Log, Assign, Send, Track'], a:0, e:'Listen → Apologize → Solve → Thank (complaints are improvement signals).'},
+      {q:'The best way to "exceed expectations" is…', o:['Promise everything','Certainty within your promise, plus one thoughtful extra','Lots of freebies','Price cuts'], a:1, e:'Reliability + a small thoughtful extra builds trust better than endless concessions.'},
+      {q:'After resolving a complaint, the most valuable action is…', o:['Archive and forget','Feed it back into process improvement','Wait for the next one','Blame someone','—'], a:1, e:'Complaints are free health checks; fix the system.'},
+      {q:'When a customer asks beyond your authority, you should…', o:['Just say yes','Comfort them, commit to a reply time and escalate internally','Refuse and end the talk','Pretend not to hear'], a:1, e:'A clear reply time + internal escalation preserves trust.'},
+      {q:'"Customer-centric" thinking means…', o:['Whatever is easiest for the company','Design the journey around the customer, reducing their effort','Push costs to customers','Scripts only'], a:1, e:'Customer-centric = reduce customer effort, not company effort.'}
+    ]},
+    {id:'q_boss', name:'Manager Promotion Assessment', questions:[
+      {q:'Budget cut 20% with unchanged targets — your first move as a manager?', o:['Cut headcount across the board','Re-rank work by value: stop low-yield projects, focus high-yield, then talk resources','Demand unpaid overtime','Raise prices for customers'], a:1, e:'With fewer resources, make value trade-offs first (stop, cut, focus).'},
+      {q:'Two senior members clash publicly. The right sequence is…', o:['Rule on it publicly at once','1-on-1 with each to hear facts, then mediate a consensus','Ignore it','Transfer both'], a:1, e:'Hear facts separately first; public confrontation escalates.'},
+      {q:'The key question when reviewing a proposal with business acumen is…', o:['Is the deck pretty','ROI: cost, benefit, risk and opportunity cost','Page count','The presenter seniority'], a:1, e:'Limited resources mean every proposal must answer "is it worth it, and now?"'},
+      {q:'A high-potential new hire wants to leave. The most effective retention move is…', o:['Counter-offer with salary','1-on-1 on motives, then challenging tasks and a visible growth path','More workload','Ask them to stay for the team'], a:1, e:'High potentials leave over growth; paths and challenges beat quick raises.'},
+      {q:'When company strategy shifts, the manager should communicate…', o:['Orders only','Why it changes, what changes, the impact, and the next steps — and address anxiety','Just an email','Wait until it settles'], a:1, e:'Change communication is about meaning and safety; silence breeds rumors.'},
+      {q:'Aligning department KPIs with company goals means…', o:['Each team sets its own','Department KPIs must trace up to company goals','Copy competitors','More KPIs is better'], a:1, e:'KPIs decompose strategy; untraceable KPIs are local optimization.'},
+      {q:'You discover your own decision caused a loss. The professional handling is…', o:['Hide it and wait to quit','Report promptly, propose remedies and review','Blame the team','Deny it'], a:1, e:'Integrity and remediation speed are a manager trust capital.'},
+      {q:'The core of building a talent bench is…', o:['Only external hires','Succession plans for key roles (challenges + coaching + assessment)','Wait for assignment','Rotate everyone'], a:1, e:'Succession planning keeps key roles staffed: 70-20-10.'}
+    ]}
+  ]
+};
+
+/* ═══════════ TALENTQUEST — 日本語データセット ═══════════ */
+const L10N_JA = {
+  tracks: [
+    {id:'t_mgr', name:'管理職コース'},
+    {id:'t_tech', name:'技術職コース'},
+    {id:'t_sales', name:'営業職コース'},
+    {id:'t_staff', name:'スタッフ職コース'}
+  ],
+  ladder: [
+    {id:'L1', name:'見習い', desc:'入職ステージ：企業と基礎を学ぶ', salaryBand:'基本給 30,000-35,000'},
+    {id:'L2', name:'アソシエイト', desc:'標準業務を独力でこなし、基礎を固める', salaryBand:'基本給 35,000-42,000'},
+    {id:'L3', name:'中堅メンバー', desc:'複雑な日常業務を独力で処理できる', salaryBand:'基本給 42,000-52,000'},
+    {id:'L4', name:'エキスパート', desc:'分野の専門家：後輩を育て、難問を解く', salaryBand:'基本給 52,000-65,000'},
+    {id:'L5', name:'管理職候補', desc:'人のマネジメントを始める準備段階', salaryBand:'基本給 60,000-75,000'},
+    {id:'L6', name:'チームリーダー', desc:'チームを率いて目標を達成し、人事評価を運営', salaryBand:'基本給 70,000-90,000'},
+    {id:'L7', name:'部門マネージャー', desc:'経営視点で部門の資源と戦略を統括', salaryBand:'基本給 90,000-130,000'}
+  ],
+  comps: [
+    {id:'cp_comm', name:'コミュニケーション', desc:'明確に伝え、よく聴き、上下内外と効果的に意思疎通する'},
+    {id:'cp_team', name:'チームワーク', desc:'共通目標に向けて協力し、補位と共有を厭わない'},
+    {id:'cp_learn', name:'学習成長', desc:'自ら学び、フィードバックを改善に変える'},
+    {id:'cp_cust', name:'顧客志向', desc:'顧客の視点で考え、期待に応える成果を届ける'},
+    {id:'cp_solve', name:'課題解決', desc:'問題を分解し、根本原因を見つけ、実行可能な案を出す'},
+    {id:'cp_exec', name:'実行力', desc:'約束したことを期限・品質・数量どおりにやり遂げる'},
+    {id:'cp_prof', name:'専門知識', desc:'職務に必要な専門スキルと業界知識'},
+    {id:'cp_digi', name:'デジタルリテラシー', desc:'デジタルツールとデータを活用して効率を高める'},
+    {id:'cp_pm', name:'プロジェクト管理', desc:'スケジュールを計画し、資源を配分し、リスクと納期を管理する'},
+    {id:'cp_data', name:'データ分析', desc:'データで現状を把握し、問題を発見し、意思決定を支える'},
+    {id:'cp_inno', name:'イノベーション', desc:'流程とサービスを継続的に改善し、新しい手法に挑戦する'},
+    {id:'cp_goal', name:'目標管理', desc:'明確な目標を設定し、実行可能な行動に分解する'},
+    {id:'cp_lead', name:'リーダーシップ', desc:'チームをまとめ、方向を示し、成果を出す'},
+    {id:'cp_perf', name:'人事評価', desc:'公正に評価し、具体的なフィードバックを行う'},
+    {id:'cp_talent', name:'人材育成', desc:'メンバーの可能性を見出し、挑戦とコーチングで育てる'},
+    {id:'cp_biz', name:'経営思考', desc:'コスト・収益・市場を理解し、優先順位を判断する'}
+  ],
+  courses: [
+    {id:'c_newbie', name:'新入社員必修：企業文化と職場倫理', desc:'企業の価値観、職場の規範、キャリアのルールを学ぶ'},
+    {id:'c_comm', name:'コミュニケーション基礎', desc:'聴く・伝える・フィードバックの3つの箭'},
+    {id:'c_time', name:'時間管理と優先順位', desc:'重要なことから：四象限とタイムブロッキング'},
+    {id:'c_cust', name:'カスタマーサービスの心構え', desc:'顧客視点でのサービス設計'},
+    {id:'c_problem', name:'問題分析と解決', desc:'フィッシュボーンと5 Whyによる根本原因分析'},
+    {id:'c_excel', name:'Excel 実践', desc:'ピボットテーブル・関数・グラフで数字を語る'},
+    {id:'c_write', name:'ビジネスレポート作成', desc:'結論ファーストのピラミッド構造'},
+    {id:'c_meeting', name:'議事録とプレゼン', desc:'会議を無駄にしない：構造化された議事録'},
+    {id:'c_pm', name:'プロジェクト管理入門', desc:'範囲・スケジュール・リスク：小規模プロジェクトもきれいに管理'},
+    {id:'c_data', name:'データリテラシーとグラフ', desc:'グラフを読み、数字に惑わされない'},
+    {id:'c_service', name:'サービスリカバリー', desc:'クレームを信頼に変える：LAST 4ステップ'},
+    {id:'c_cross', name:'部門横断連携', desc:'権限がなくても物事を推進する方法'},
+    {id:'c_leader', name:'チームリーダー入門', desc:'個人貢献者からマネージャーへの転換'},
+    {id:'c_okr', name:'目標設定と OKR', desc:'測定可能な目標を書き、チームの方向を合わせる'},
+    {id:'c_perf', name:'人事評価面談の実務', desc:'SBI フィードバックで感情を害さず成果を出す'},
+    {id:'c_coach', name:'人材育成とコーチング', desc:'GROW モデル：部下から答えを引き出す'},
+    {id:'c_decision', name:'意思決定とリスク管理', desc:'ディシジョンツリー・前提条件・最悪シナリオ'},
+    {id:'c_biz', name:'経営数字の読み方', desc:'損益計算書・キャッシュフロー・経営指標の実務解読'},
+    {id:'c_resil', name:'メンタルヘルスとレジリエンス', desc:'プレッシャー下の自己調整と回復力'},
+    {id:'c_present', name:'説得力あるプレゼン', desc:'聴衆を行動させるストーリー構造'},
+    {id:'c_law', name:'労働基準法の基礎', desc:'労働時間・残業・有給：管理職が踏んではいけない線'},
+    {id:'c_safety', name:'労働安全衛生', desc:'職場安全の基本観念と報告フロー'},
+    {id:'c_kaizen', name:'イノベーションと継続的改善', desc:'PDCA＋小さな実験：改善を日常に'},
+    {id:'c_interview', name:'採用面接テクニック', desc:'行動面接法：正しい質問で正しい人を採用'}
+  ],
+  quizzes: [
+    {id:'q_comm', name:'コミュニケーション認定', questions:[
+      {q:'同僚が「他部門が全く協力してくれない」と不満を言ったら、まず何をすべきか？', o:['一緒に不満を言う','まず聴いて、何が起きたかを確認する','直接相手部門の管理職に説教する','上司に告発する'], a:1, e:'まず聴いて事実を確認する。コミュニケーション・流程・認知のどの問題かを見極める。'},
+      {q:'「Iメッセージ」の核心は何か？', o:['相手の性格の欠点を指摘する','事実と自分の気持ちを述べ、相手を責めない','沈黙で相手に気づかせる','強く出るほど効果的'], a:1, e:'Iメッセージ＝事実＋影響＋気持ち。相手の防御反応を下げる。'},
+      {q:'部門横断会議の前に最も生産的な準備は？', o:['大量のスライドを作る','「相手に何をしてほしいか・何を提供できるか」を明確にする','すべての詳細を暗記する','メールで先に非難する'], a:1, e:'会議は資源の交換と合意形成が本質。要求と交換条件を先に整理する。'},
+      {q:'曖昧な仕事の指示を受けたとき、最善の対応は？', o:['自分の推測で進める','目標・期限・成果物の形式の3点を確認する','同僚の指示を待って比較','細部を次々に質問する'], a:1, e:'目標/期限/形式の確認で最小コストで曖昧さを排除できる。'},
+      {q:'「効果的な褒め方」はどれか？', o:['すごいね！','頑張っているね！','レポートのデータ照合が完全で、顧客がその場で協力を確定した','誰よりも優秀だ'], a:2, e:'具体的な行動＋その影響こそが、再現可能な効果的な褒め方。'},
+      {q:'文章コミュニケーションで誤解を生みやすいのは？', o:['絵文字を使うこと','文字には語気や表情がなく、過度に解釈されやすいこと','改行が多すぎること','句読点を使うこと'], a:1, e:'文字には語気がない。重要・敏感な内容は口頭やビデオで、文字は確認と記録に。'}
+    ]},
+    {id:'q_problem', name:'課題解決認定', questions:[
+      {q:'問題解決の最初のステップは？', o:['すぐ解決策を出す','問題と現象を明確に定義する（いつ・どこで・どの程度）','まず責任者を探す','振り返り会を開く'], a:1, e:'定義されていない問題は解決できない。まず現象と影響範囲を記述する。'},
+      {q:'5 Why 分析の目的は？', o:['5人に責任を尋ねる','なぜを繰り返し根本原因に迫る','会議を5分に収める','責任回避'], a:1, e:'5 Whyで表面現象から系統的な根本原因まで掘り下げる。'},
+      {q:'特性要因図（フィッシュボーン）が最も適する用途は？', o:['タスクの優先順位付け','問題の原因候補を体系的に整理','コスト計算','進捗追跡'], a:1, e:'人・機械・材料・方法・環境などの軸で原因を展開し、漏れを防ぐ。'},
+      {q:'「解決策」評価で最も完全な評価軸は？', o:['コストが安ければよい','実現可能性・コスト・リスク・期待効果','上司の好み','最速'], a:1, e:'4軸評価で片面だけの判断（安いが無効など）を避ける。'},
+      {q:'対策実施後、次にすべきことは？', o:['そのまま結案','追跡指標で効果を検証し、標準化する','次の問題へ移る','上司の確認を待つ'], a:1, e:'PDCA の C/A：指標で効果を検証し、做法を標準化しないと問題が再発する。'},
+      {q:'「繰り返し発生する問題」と「散発的な問題」の対応の違いは？', o:['どちらも振り返り会を開く','繰り返し問題は流程を根治；散発問題は個別対応','散発問題こそプロジェクト化すべき','どちらも対応不要'], a:1, e:'繰り返し問題はシステムの穴（流程改善）。散発問題は例外処理で対応。'}
+    ]},
+    {id:'q_pm', name:'プロジェクト管理認定', questions:[
+      {q:'プロジェクト立ち上げ時の3つの確認は？', o:['予算・場所・ケータリング','範囲・マイルストーン・資源と役割','人数・天気・服装','ツール・ソフト・配置'], a:1, e:'範囲（何をやる/やらない）・スケジュール（いつ何を）・資源と役割（誰が）の3本柱。'},
+      {q:'プロジェクト途中で顧客が「機能追加、期間と予算はそのまま」を求めたら？', o:['黙って受けて残業する','トレードオフを説明し、顧客に優先順位を決めてもらう','拒否して契約を終える','受けても実行しない'], a:1, e:'範囲・時間・コストのトライアングルは連動。取舍を見せて署名確認するのがプロ。'},
+      {q:'ガントチャートが主に示すものは？', o:['組織図','各作業の時間順序と依存関係','コスト明細','リスクリスト'], a:1, e:'ガントチャートは時間軸上の作業スケジュールと依存関係を示す。'},
+      {q:'「マイルストーン」の意味は？', o:['毎日の作業','検証可能な重要節点で、プロジェクトの健全性を確認する','プロジェクト終了時だけのもの','チームの食事会'], a:1, e:'マイルストーンで早期に逸脱を発見し、最後の爆発を防ぐ。'},
+      {q:'プロジェクトリスク管理の基本動作は？', o:['問題は起きないと仮定する','リスクを識別し、確率と影響を評価し、対応策を用意する','起きてから考える','全部外注する'], a:1, e:'リスク登録表（識別→評価→対応→追跡）でチームに共通のシナリオを。'},
+      {q:'プロジェクト終了後の最も価値ある行動は？', o:['すぐ解散','振り返り（Retrospective）で経験を組織資産にする','全ファイルを削除','缺点を話さない'], a:1, e:'振り返りで「良かった点」「改善点」を流程とテンプレートに変える。'}
+    ]},
+    {id:'q_leader', name:'リーダーシップ認定', questions:[
+      {q:'個人貢献者からマネージャーへの最大のマインドシフトは？', o:['自分がより速く強くなること','他人を通じて成果を出し、チームの結果に責任を持つこと','人と接する時間を減らすこと','仕事を全部自分で抱えること'], a:1, e:'マネージャーの産出＝チームの産出。「自分が最速」の達成感を捨て、育成と委譲に投資する。'},
+      {q:'委譲の最も一般的な失敗原因は？', o:['委譲後に全く追跡しない、または仕事だけ渡して情報と権限を渡さない','人が多すぎる','経験豊富な人を選ぶ','正式な文書を使う'], a:1, e:'委譲＝目標＋資源と権限＋報告節点。仕事だけ渡すのは責任の押し付け。'},
+      {q:'チームの士気が下がったとき、管理職はまず何をすべきか？', o:['すぐ賞与を出す','観察と1on1で傾聴し、真の原因を探る','懇親会を開く','人を替える'], a:1, e:'士気問題の背景は目標の不明確さ・フィードバック不足・公平感。まず診断。'},
+      {q:'「状況対応型リーダーシップ」の主張は？', o:['全員に同じ管理方式','部下の意欲と能力に応じて指導と支援の度合いを調整','常に民主的投票','完全な放置'], a:1, e:'新人には多く指導、熟練者には権限委譲。スタイルは部下の状態に合わせる。'},
+      {q:'「効果的なチーム目標」はどれか？', o:['みんな頑張ろう！','Q2までにクレーム対応の平均時間を48時間から24時間に短縮','業界一になる','全力で走る'], a:1, e:'測定可能＋期限＋意味のある比較基準があること。'},
+      {q:'仕事を任せたとき、理解を確認する最善の方法は？', o:['「わかった？」と聞く','部下に目標と成果基準を自分の言葉で復唱してもらう','メールだけ送る','表情を見る'], a:1, e:'復唱で認知のズレを即座に発見できる。「わかった？」は礼儀上のうなずきしか返らない。'}
+    ]},
+    {id:'q_perf', name:'人事評価認定', questions:[
+      {q:'SBI フィードバックの3要素は？', o:['Situation（状況）、Behavior（行動）、Impact（影響）','Style、Balance、Initiative','Salary、Bonus、Promotion','Score、Band、Index'], a:0, e:'状況と観察した行動を述べ、その影響を説明する。具体的で議論可能、人格評価にならない。'},
+      {q:'人事評価面談で避けるべき做法は？', o:['具体的な事例で説明','「誰も彼も」式の比較、昔のことを持ち出す、直近の印象だけを見る','事前準備','部下の話を最後まで聴く'], a:1, e:'昔の持ち出しと曖昧な比較は防御反応を招く。本期の行動と今後の改善に焦点を。'},
+      {q:'「強制分布（271ルール）」の主なリスクは？', o:['コストが高い','小規模チームでは歪み、協力文化を損なう','簡単すぎる','法律で禁止されている'], a:1, e:'少人数に強制分布を当てはめると歪む。重要なのは対話の質と基準の透明性。'},
+      {q:'SMART 目標の M は？', o:['Motivation','Measurable（測定可能）','Mission','Management'], a:1, e:'測定できない目標は管理できない。Mは「達成したか」の客観的根拠を保証する。'},
+      {q:'優秀な部下に最も行動を強化するフィードバックは？', o:['口頭でお疲れ様と言う','何をしてどんな価値を生んだかを具体的に指摘し、適切な場で公開的に認める','何も言わない（自慢させないため）','賞与だけ'], a:1, e:'具体＋即時＋過程を見る肯定が、行動と意味の結びつきを作る。'},
+      {q:'業績不振の部下への最初のステップは？', o:['すぐ解雇','1on1で診断：能力か、意欲か、環境・資源か','公の場で指名','業務量を倍増'], a:1, e:'まず根本原因を診断（能力は訓練可、意欲は動機付け可、環境は調整可）。処罰だけでは外れる。'}
+    ]},
+    {id:'q_data', name:'データリテラシー認定', questions:[
+      {q:'棒グラフが最も適する表現は？', o:['時間の推移','カテゴリ間の比較','構成比','相関関係'], a:1, e:'カテゴリ比較＝棒グラフ、推移＝折れ線、構成＝積み上げ/円（5項目以下）。'},
+      {q:'「平均値」を歪めるものは？', o:['外れ値','サンプルの色','報告のページ数','グラフの色'], a:0, e:'少数の極端値が平均を引っ張る。中央値と併せて分布を判断する。'},
+      {q:'「相関は因果にあらず」の意味は？', o:['データはすべて偽','2つの数値が連動しても、一方が他方の原因とは限らない','因果は研究できない','グラフが不正確'], a:1, e:'第三の変数や偶然の可能性がある。因果の結論には変数制御や実験が必要。'},
+      {q:'「クレーム件数が3四半期連続で減少」の報告に補うべきものは？', o:['補足不要','絶対量と基準期、クレームの種類分布と対応時間','画像だけ','図を小さくする'], a:1, e:'相対変化だけでは規模を誤判する。種類分布で改善の網羅性を確認。'},
+      {q:'Excel ピボットテーブルの最適用途は？', o:['レポート文章の作成','大量明細データのカテゴリ集計とクロス集計','ロゴデザイン','写真編集'], a:1, e:'ピボットテーブルは明細データの集計＋クロスビューの最速ツール。'},
+      {q:'データに基づく意思決定で最初に確認すべきは？', o:['グラフの配色','データの出所と統計基準の一致','報告の長さ','スライドのアニメーション'], a:1, e:'集計期間・定義・母集団の不一致がデータ意思決定の最大の落とし穴。'}
+    ]},
+    {id:'q_service', name:'カスタマーサービス認定', questions:[
+      {q:'顧客がクレームを言ったときの最初の反応は？', o:['会社の規定を説明する','誠意を持って聴き、問題の全体像を確認し、理解を示す','ウェブサイトの説明を見せる','他部門に転送する'], a:1, e:'感情が受け止められる前に、どんな説明も届かない。まず聴く。'},
+      {q:'LAST サービスリカバリーの4ステップは？', o:['Listen、Apologize、Solve、Thank','Listen、Argue、Solve、Transfer','Leave、Avoid、Silence、Tell','Log、Assign、Send、Track'], a:0, e:'聴く→謝る（気持ちを引き受ける）→解決する→感謝する（クレームは改善シグナル）。'},
+      {q:'「顧客の期待を超える」最善の做法は？', o:['無条件にすべての要求に応じる','約束の範囲内で確実性を提供し、要所で一歩先回りする','大量の景品','値下げ'], a:1, e:'確実性（言ったことはやる）＋要所でのさりげない気配りが、際限ない譲歩より信頼を築く。'},
+      {q:'クレーム処理完了後、最も価値ある行動は？', o:['結案して封印','流程改善にフィードバックし、同問題の再発を防ぐ','次回発生を待つ','個人に責任を負わせる'], a:1, e:'クレームは無料の健康診断書。個票をシステム改善に変えるこそがサービス升级。'},
+      {q:'権限を超える要求をされたときは？', o:['その場で受諾','まず安撫し、確認後約束した時間に返答すると伝え、内部で資源を調整','拒否して会話を終える','聞こえないふり'], a:1, e:'明確な返答時間＋内部での資源調整が、その場での安請け合いや拒絶より信頼を保つ。'},
+      {q:'「顧客中心」の思考とは？', o:['会社の流程が楽ならそれでよい','顧客がタスクを完了する経路に沿ってサービスを設計し、手間を減らす','コストを顧客に転嫁','マニュアル通読のみ'], a:1, e:'顧客志向＝顧客の努力コストを下げることであり、会社のコストを下げることではない。'}
+    ]},
+    {id:'q_boss', name:'管理職昇進総合評価', questions:[
+      {q:'来年度の予算が20%削減だが目標は据え置き。管理職として最初にすべきことは？', o:['全面的に人員削減','業務の価値を再棚卸し：低効率案件を停止し、高産出アクションに集中してから資源を話す','無給残業を要求','顧客に値上げ'], a:1, e:'資源縮減時はまず価値の取舍（止める・切る・集中）を行い、次に効率化と資源獲得。'},
+      {q:'二人のベテラン社員が公の場で衝突し、チームの雰囲気に影響。対応の順序は？', o:['即座に公の場で善悪を裁く','それぞれ1on1で立場と事実を聴き、中立的に合意を仲介','見て見ぬふり','二人を異動させる'], a:1, e:'まず個別に事実を聴く（公の場での対決は激化する）。協力の交集と共通目標を見つける。'},
+      {q:'「経営視点」で提案書を見るとき、最も重要な問いは？', o:['スライドの美しさ','費用対効果：コスト・効果・リスクと機会損失','ページ数','提案者の年次'], a:1, e:'資源は有限。すべての提案は「価値があるか・今最もやるべきか」に答えなければならない。'},
+      {q:'高い潜在力を持つ新人が離職を希望している。最も効果的な引き留め策は？', o:['給与で引き留める','1on1で離職動機を聞き、挑戦的な任務と見える成長パスを用意','業務量を増やす','チームのために残ってほしいと頼む'], a:1, e:'ハイポテンシャル人材は「成長が見えない」ことで去る。成長パスと挑戦が一時的な昇給より効果的。'},
+      {q:'会社の戦略転換時、管理職のチームへの伝達重点は？', o:['命令のみ','なぜ変わるか・何が変わるか・チームへの影響・次のステップを説明し、不安に応える','メール配信だけでよい','落着いてから話す'], a:1, e:'変革コミュニケーションの鍵は意義と安心感。放置は噂を増幅する。'},
+      {q:'部門 KPI と会社目標の整合の正しい做法は？', o:['各部門が自分で自分の KPI を決める','部門 KPI は会社目標の分解として遡及可能でなければならない','競合他社の KPI を写す','KPI は多いほどよい'], a:1, e:'KPI は戦略の分解。会社目標に遡及できない指標は、局所最適化にすぎない。'},
+      {q:'自分の決定が損失を生んだと気づいたら、プロフェッショナルな対応は？', o:['情報を隠して退職を待つ','速やかに上層へ報告し、是正案を提出して振り返る','実行チームに責任転嫁','最後まで否認'], a:1, e:'誠実さと是正の速度は管理職の信頼資本。隠蔽は小さな損失を信頼危機に変える。'},
+      {q:'部門の人材梯隊構築の核心的な行動は？', o:['外部からの空降採用のみ','重要ポジションに後継者育成計画（挑戦任務＋コーチング＋評価）を用意','上司の指名を待つ','全員ローテーション'], a:1, e:'後継者計画で重要ポジションに「使える人」を確保。70-20-10：挑戦任務が主、コーチングが補、講座は従。'}
+    ]}
+  ]
+};
+
+/* ═══════════ TALENTQUEST — 語言控制器 ═══════════ */
+const L10N_DATA = {en: L10N_EN, ja: L10N_JA};
+
+function activeDatasets(){
+  if(LANG==='zh') return null;
+  const key = 'tq_data_' + LANG;
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch(e){ saved = null; }
+  if(saved && saved.tracks && saved.quizzes) return saved;
+  const D = L10N_DATA[LANG];
+  return JSON.parse(JSON.stringify({tracks:D.tracks, ladder:D.ladder, comps:D.comps, courses:D.courses, quizzes:D.quizzes}));
+}
+function persistLangData(){
+  if(LANG==='zh') return;
+  localStorage.setItem('tq_data_' + LANG, JSON.stringify({tracks, ladder, comps, courses, quizzes}));
+}
+let ZH_MASTER = null;
+function applyLangData(){
+  if(LANG==='zh'){
+    if(ZH_MASTER){ tracks=ZH_MASTER.tracks; ladder=ZH_MASTER.ladder; comps=ZH_MASTER.comps; courses=ZH_MASTER.courses; quizzes=ZH_MASTER.quizzes; }
+    return;
+  }
+  if(!ZH_MASTER) ZH_MASTER = {tracks, ladder, comps, courses, quizzes};
+  const a = activeDatasets();
+  if(!a) return;
+  tracks = a.tracks; ladder = a.ladder; comps = a.comps; courses = a.courses; quizzes = a.quizzes;
+}
+function setLang(v){
+  LANG = v; localStorage.setItem('tq_lang', v);
+  applyLangData();
+  renderPage();
+  syncLangBar();
+  toast(v==='zh'?'已切換為繁體中文':(v==='en'?'Switched to English':'日本語に切り替えました'));
+}
+function syncLangBar(){
+  $$s('.langb').forEach(b=>b.classList.toggle('on', b.dataset.lang===LANG));
+}
+function saveActive(store, arr){
+  if(LANG==='zh'){ saveD(store, arr); }
+  else { persistLangData(); }
+}
+document.getElementById('langBar').addEventListener('click', e=>{
+  const b = e.target.closest('.langb');
+  if(b) setLang(b.dataset.lang);
+});
+
+
 (async function boot(){
   await openDB();
   ladder=await loadD('ladder',DEFAULT_LADDER);
@@ -985,6 +1510,9 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
   if(completions!==DEFAULT_COMPLETIONS)await saveD('completions',completions);
   if(quizResults!==DEFAULT_RESULTS)await saveD('quizResults',quizResults);
   employees.forEach(e=>recalcXp(e.id));
+  ZH_MASTER = {tracks, ladder, comps, courses, quizzes};
+  applyLangData();
+  syncLangBar();
   STATE.heroId=employees[0]?employees[0].id:null;
   renderPage();
 })();
