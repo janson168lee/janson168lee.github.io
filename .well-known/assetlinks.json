@@ -82,7 +82,8 @@
       "namespace": "android_app",
       "package_name": "com.erpfree.twstock",
       "sha256_cert_fingerprints": [
-        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E"
+        "7C:2C:69:81:90:98:BD:A8:DA:12:3D:51:DB:42:89:6E:30:8F:E2:33:43:20:DD:E7:C6:F6:C1:19:09:F5:9B:3E",
+        "B2:EF:CF:C3:CA:28:C7:78:2F:58:A5:FD:EE:7C:E1:C7:33:1C:2C:EF:2A:BE:B2:58:3E:8C:A6:4A:3E:46:A6:F0"
       ]
     }
   }
