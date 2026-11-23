@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>制度設計指南 | TalentQuest 人才發展平台</title>
+<style>
+:root{--ink:#1f2937;--brand:#b45309;--brand2:#92400e;--paper:#fffdf8;--line:#e7e0d2}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","PingFang TC",sans-serif;color:var(--ink);background:#f6f2e9;line-height:1.75}
+.top{background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;padding:26px 20px}
+.top .wrap{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{margin:0;font-size:21px}
+.top .back{color:#fbbf24;text-decoration:none;font-size:14px;border:1px solid rgba(251,191,36,.5);padding:6px 14px;border-radius:8px}
+.top .back:hover{background:rgba(251,191,36,.12)}
+.paper{max-width:960px;margin:24px auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:38px 44px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+h1.doc{font-size:24px;color:var(--brand2);border-bottom:3px solid var(--brand);padding-bottom:12px;margin-top:0}
+h2{font-size:19px;color:var(--brand2);margin-top:34px;border-left:4px solid var(--brand);padding-left:12px}
+h3{font-size:16px;color:#374151;margin-top:24px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th{background:#1e293b;color:#fff;padding:9px 10px;text-align:left;font-weight:600}
+td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}
+tr:nth-child(even) td{background:#faf6ec}
+blockquote{margin:14px 0;padding:10px 16px;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;font-size:14px}
+code{background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:13px}
+li{margin:4px 0}
+hr{border:none;border-top:1px dashed var(--line);margin:26px 0}
+.foot{max-width:960px;margin:0 auto 30px;color:#9ca3af;font-size:12px;text-align:center}
+@media print{.top,.foot{display:none}.paper{border:none;box-shadow:none;margin:0;max-width:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap"><h1>🏅 TalentQuest 文件中心 — 制度設計指南</h1><a class="back" href="./">回文件總覽</a></div></div>
+<div class="paper">
+<h1 class="doc">制度設計指南 — 遊戲化人才發展平台（給經營者與 HR 的導入手冊）</h1>
+<p><strong>撰寫</strong>：2026-11-23 ｜ <strong>定位</strong>：以人力資源發展（HRD）理論為骨架、遊戲化（Gamification）為外衣的企業人才發展制度設計指南</p>
+<hr>
+<h2>一、這個平台解決什麼管理問題</h2>
+<p>中小企業的人才發展普遍存在四個痛點：</p>
+<table>
+<thead><tr><th>痛點</th><th>傳統做法</th><th>本平台的解法</th></tr></thead>
+<tbody>
+<tr><td>晉升標準不透明</td><td>「老闆說了算」，員工不知道要努力什麼</td><td>職級階梯公開：XP 門檻＋指定課程＋指定測驗，三項條件清楚可見</td></tr>
+<tr><td>訓練完就忘、與工作脫節</td><td>上完課沒有後續</td><td>課程綁定職能、職能綁定職級：訓練直接連結升遷</td></tr>
+<tr><td>培育資源投入無法追蹤</td><td>Excel 紀錄零散</td><td>IndexedDB 結構化紀錄：誰修了什麼、誰通過什麼，一目瞭然</td></tr>
+<tr><td>員工看不見自己在組織裡的未來</td><td>無</td><td>英雄旅程頁：角色卡＋下階任務清單＋進度條，發展路徑視覺化</td></tr>
+</tbody>
+</table>
+<h2>二、理論骨架（平台機制 ↔ 學理依據）</h2>
+<table>
+<thead><tr><th>遊戲機制</th><th>理論依據</th><th>導入要點</th></tr></thead>
+<tbody>
+<tr><td>職級階梯＋晉升門檻</td><td><strong>職能模型（Competency Model）</strong>：McClelland 職能冰山模型</td><td>每個職級定義「應具備職能＋可驗證行為」；職能字典 16 項分核心／專業／管理三類</td></tr>
+<tr><td>課程＋測驗＋工作實戰</td><td><strong>70-20-10 學習法則</strong>（Lombardo &amp; Eichinger, CCL）</td><td>平台記錄 10% 正式訓練；70% 工作歷練與 20% 教練輔導由主管在職場執行（見第六節主管任務）</td></tr>
+<tr><td>測驗＋逐題解析</td><td><strong>Kirkpatrick 四層評估</strong>：L2 學習層</td><td>測驗驗證「學到了什麼」；L1 反應層（滿意度）、L3 行為層（主管觀察）、L4 結果層（績效）需組織另行設計</td></tr>
+<tr><td>XP 即時回饋</td><td><strong>增強理論（Skinner）／遊戲化八角框架</strong>（Chou）</td><td>即時回饋強化學習行為；成就體系對應「發展與成就」核心驅力</td></tr>
+<tr><td>晉升需 HR 核准</td><td><strong>晉升委員會／IDP 個人發展計畫</strong></td><td>門檻達成 ≠ 自動晉升：仍需組織核可（職缺、意願、面談），避免「分數至上」</td></tr>
+<tr><td>英雄榜</td><td>社會比較與同儕激勵</td><td>建議以「與自己的過去比」為主訴求，排行榜為輔，避免過度內卷</td></tr>
+</tbody>
+</table>
+<h2>三、職能體系設計（16 職能 × 3 類 × 7 職級）</h2>
+<p><strong>三類職能</strong>（對應公司人才結構）：</p>
+<ul>
+<li><strong>核心職能</strong>（6 項）：全員必備——溝通表達、團隊合作、學習成長、客戶導向、問題解決、執行力</li>
+<li><strong>專業職能</strong>（5 項）：職務深耕——專業知識、數位素養、專案管理、資料分析、創新改善</li>
+<li><strong>管理職能</strong>（5 項）：主管進階——目標管理、領導統御、績效管理、人才培育、經營思維</li>
+</ul>
+<p><strong>七級職業階梯</strong>（預設，可全數自訂）：</p>
+<table>
+<thead><tr><th>級</th><th>職級</th><th>XP 門檻</th><th>升階需求（預設）</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>見習生</td><td>0</td><td>入職起步</td></tr>
+<tr><td>2</td><td>初階夥伴</td><td>300</td><td>課程：企業文化＋溝通協作；測驗：溝通協作認證</td></tr>
+<tr><td>3</td><td>中堅幹部</td><td>800</td><td>課程：時間管理＋問題解決＋Excel；測驗：問題解決認證</td></tr>
+<tr><td>4</td><td>資深骨幹</td><td>1,600</td><td>課程：專案管理＋資料素養＋跨部門協作；測驗：專案管理認證</td></tr>
+<tr><td>5</td><td>儲備主管</td><td>2,800</td><td>課程：團隊領導＋OKR；測驗：團隊領導認證</td></tr>
+<tr><td>6</td><td>基層主管</td><td>4,200</td><td>課程：績效面談＋人才培育＋勞基法；測驗：績效管理認證</td></tr>
+<tr><td>7</td><td>部門經理</td><td>6,000</td><td>課程：經營數字＋決策風險；測驗：主管綜合評鑑</td></tr>
+</tbody>
+</table>
+<p><strong>XP 來源</strong>：完成課程（80–260 XP）＋通過測驗（分數比例 × 卷面 XP）＋晉升獎勵（+300）。</p>
+<h2>四、導入五步驟（顧問實務建議）</h2>
+<ul>
+<li><strong>盤點現況（1 週）</strong>：列出公司現有職級與薪級對照；決定職系（預設管理／技術／業務／幕僚四系可增減）。</li>
+<li><strong>定義職能門檻（2 週）</strong>：與各部門主管共創——每一級「該會什麼」；把既有內訓課程對應到職能。平台內直接編輯職級階梯。</li>
+<li><strong>試行（3 個月）</strong>：選 1–2 個部門先跑，課程完成由主管在職場搭配實戰任務（70%）。</li>
+<li><strong>第一次晉升評鑑（試行後）</strong>：達標者由 HR 核准晉升，公開表揚——這是制度公信力的關鍵時刻。</li>
+<li><strong>制度化（6 個月後）</strong>：與薪級連動（各職級薪幅）、納入年度 IDP 討論、調整職能權重。</li>
+</ul>
+<h2>五、遊戲化的三個邊界（避免反效果）</h2>
+<ul>
+<li><strong>排行榜</strong>：以自我成長為主訴求；團隊規模小時避免公開羞辱式排名。</li>
+<li><strong>XP 不等於績效</strong>：XP 衡量「學習投入」，績效衡量「工作成果」——兩者相輔相成但不可互換，避免員工只刷分不產出。</li>
+<li><strong>晉升仍需組織判斷</strong>：門檻是「必要條件」而非「充分條件」；主管面談與職缺空位是現實限制，請坦誠溝通。</li>
+</ul>
+<h2>六、主管的配套任務（平台之外的 70/20）</h2>
+<table>
+<thead><tr><th>平台記錄</th><th>主管配套</th></tr></thead>
+<tbody>
+<tr><td>完成課程（10%）</td><td>指派實戰任務應用所學（70%）</td></tr>
+<tr><td>通過測驗</td><td>一對一教練對話（20%），每月 30 分鐘</td></tr>
+<tr><td>XP 達標</td><td>在晉升面談中確認「行為是否真的改變」（Kirkpatrick L3）</td></tr>
+<tr><td>晉升核准</td><td>公開場合頒發，賦予新職級的第一次挑戰任務</td></tr>
+</tbody>
+</table>
+<h2>七、隱私與治理</h2>
+<ul>
+<li>所有資料僅存於員工/HR 的裝置本機（IndexedDB），不上傳任何伺服器。</li>
+<li>涉及個人發展資料，建議：定期匯出 JSON 備份、離職員工資料依個資法處理、排行榜公開範圍由公司決定。</li>
+<li>若需多人協作／雲端版本，可基於本平台升級（聯絡 erp-free.com）。</li>
+</ul>
+<h2>八、參考文獻與資料蒐集（制度設計依據）</h2>
+<table>
+<thead><tr><th>#</th><th>文獻／框架</th><th>內容</th><th>在本平台的映射</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>McClelland（1973）〈Testing for Competence Rather Than for Intelligence〉</td><td>職能（Competency）概念起源：以行為特徵預測績效，而非僅看智力</td><td>職能字典 16 項，以可觀察行為定義</td></tr>
+<tr><td>2</td><td>Boyatzis（1982）《The Competent Manager》</td><td>管理職能模型實證化</td><td>管理職能 5 項（目標/領導/績效/培育/經營）</td></tr>
+<tr><td>3</td><td>Lombardo &amp; Eichinger, Center for Creative Leadership</td><td>70-20-10 學習法則：工作歷練/他人教練/正式課程</td><td>課程僅佔 10%；主管配套任務表（制度設計指南第六節）</td></tr>
+<tr><td>4</td><td>Kirkpatrick《Evaluating Training Programs》四層評估</td><td>反應/學習/行為/結果</td><td>測驗＝L2 學習層；L3 行為層由主管觀察，L4 由績效驗證</td></tr>
+<tr><td>5</td><td>Dooney &amp; O'Neil（SHRM）《Essentials of HR Analytics》</td><td>人力資料分析基礎</td><td>團隊總覽的 XP/完成率統計</td></tr>
+<tr><td>6</td><td>Google re:Work《Set goals with OKRs》</td><td>目標管理實務</td><td>OKR 課程與職級目標設計</td></tr>
+<tr><td>7</td><td>Center for Creative Leadership《SBI Feedback Model》</td><td>情境-行為-影響回饋法</td><td>績效管理課程與面談實務</td></tr>
+<tr><td>8</td><td>Whitmore《Coaching for Performance》GROW 模型</td><td>教練式對話四步驟</td><td>人才培育課程</td></tr>
+<tr><td>9</td><td>Chou（2015）《Octalysis: Complete Gamification Framework》八大核心驅力</td><td>遊戲化設計框架</td><td>XP/徽章/排行榜對應成就感、社會影響、發展賦能驅力</td></tr>
+<tr><td>10</td><td>勞動部勞動力發展署【iCap 職能基準】</td><td>台灣官方職能基準資料庫</td><td>自訂職能時可對照官方基準（職業別能力單元）</td></tr>
+</tbody>
+</table>
+<blockquote>以上文獻為制度設計之理論依據；平台內建的課程/題庫為通用預設內容，企業應依自身產業調整（可對照 iCap 職能基準增修職能項目）。</blockquote>
+</div>
+<div class="foot">TalentQuest 人才發展平台 · 配套文件 · <a href="https://www.erp-free.com/hrd/" style="color:inherit">開啟平台</a></div>
+</body>
+</html>

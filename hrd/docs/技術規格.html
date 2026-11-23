@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>技術規格 | TalentQuest 人才發展平台</title>
+<style>
+:root{--ink:#1f2937;--brand:#b45309;--brand2:#92400e;--paper:#fffdf8;--line:#e7e0d2}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","PingFang TC",sans-serif;color:var(--ink);background:#f6f2e9;line-height:1.75}
+.top{background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;padding:26px 20px}
+.top .wrap{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{margin:0;font-size:21px}
+.top .back{color:#fbbf24;text-decoration:none;font-size:14px;border:1px solid rgba(251,191,36,.5);padding:6px 14px;border-radius:8px}
+.top .back:hover{background:rgba(251,191,36,.12)}
+.paper{max-width:960px;margin:24px auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:38px 44px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+h1.doc{font-size:24px;color:var(--brand2);border-bottom:3px solid var(--brand);padding-bottom:12px;margin-top:0}
+h2{font-size:19px;color:var(--brand2);margin-top:34px;border-left:4px solid var(--brand);padding-left:12px}
+h3{font-size:16px;color:#374151;margin-top:24px}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th{background:#1e293b;color:#fff;padding:9px 10px;text-align:left;font-weight:600}
+td{border:1px solid var(--line);padding:8px 10px;vertical-align:top}
+tr:nth-child(even) td{background:#faf6ec}
+blockquote{margin:14px 0;padding:10px 16px;background:#fef3c7;border-left:4px solid #f59e0b;border-radius:0 8px 8px 0;font-size:14px}
+code{background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:13px}
+li{margin:4px 0}
+hr{border:none;border-top:1px dashed var(--line);margin:26px 0}
+.foot{max-width:960px;margin:0 auto 30px;color:#9ca3af;font-size:12px;text-align:center}
+@media print{.top,.foot{display:none}.paper{border:none;box-shadow:none;margin:0;max-width:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap"><h1>🏅 TalentQuest 文件中心 — 技術規格</h1><a class="back" href="./">回文件總覽</a></div></div>
+<div class="paper">
+<h1 class="doc">技術規格 — TalentQuest 人才發展平台 v1.0</h1>
+<h2>一、架構</h2>
+<table>
+<thead><tr><th>項目</th><th>規格</th></tr></thead>
+<tbody>
+<tr><td>型態</td><td>單檔離線 HTML（零外部依賴：無 CDN、無字體外連、無 API）</td></tr>
+<tr><td>檔案</td><td><code>APP\人才發展平台TalentQuest.html</code>（約 82KB）</td></tr>
+<tr><td>部署</td><td>官網 <code>https://www.erp-free.com/hrd/</code>（GitHub Pages，commit 05920b3）</td></tr>
+<tr><td>資料</td><td>IndexedDB <code>TQ_DB</code>（10 個 store：employees／courses／quizzes／completions／quizResults／promotions／ladder／comps／tracks／settings）</td></tr>
+<tr><td>相容性</td><td>Chrome／Edge／Safari／Firefox 桌面與手機（支援 IndexedDB 之環境）</td></tr>
+</tbody>
+</table>
+<h2>二、資料模型</h2>
+<table>
+<thead><tr><th>Store</th><th>內容</th></tr></thead>
+<tbody>
+<tr><td>employees</td><td>員工角色卡（avatar／track／level 顯示／XP 由紀錄重算）</td></tr>
+<tr><td>tracks</td><td>職系 4 種（管理／技術／業務／幕僚）</td></tr>
+<tr><td>ladder</td><td>職級階梯 7 級（xpNeed／reqCourses／reqQuiz／desc）</td></tr>
+<tr><td>comps</td><td>職能字典 16 項（core／pro／mgmt）</td></tr>
+<tr><td>courses</td><td>訓練課程 24 門（comps 關聯／xp／hours／track）</td></tr>
+<tr><td>quizzes</td><td>測驗 8 卷 50 題（pass 80／xp／questions[q,o,a,e]）</td></tr>
+<tr><td>completions</td><td>課程修畢紀錄</td></tr>
+<tr><td>quizResults</td><td>測驗成績（保留，取最高分計 XP）</td></tr>
+<tr><td>promotions</td><td>晉升紀錄（from/to/status）</td></tr>
+</tbody>
+</table>
+<h2>三、核心邏輯</h2>
+<ul>
+<li><strong>XP 重算</strong>：<code>recalcXp(empId)</code>＝Σ課程 XP＋Σ(通過測驗分數% × 卷面 XP)＋Σ晉升 300</li>
+<li><strong>職級判定</strong>：<code>lvlOf(emp)</code>＝XP 落點（由低到高掃描 xpNeed）——職級由 XP 推導，非獨立欄位</li>
+<li><strong>晉升三門檻</strong>：<code>reqStatus(emp)</code>＝XP 達標 ∧ 指定課程全修畢 ∧ 指定測驗 ≥80 → HR 核准 → +300 XP</li>
+<li><strong>徽章</strong>：<code>badgesOf(empId)</code> 由紀錄即時計算（9 種），不需儲存</li>
+</ul>
+<h2>四、驗證紀錄（2026-11-23）</h2>
+<ul>
+<li>puppeteer（Edge headless）11 個頁面逐頁渲染驗證：全數通過</li>
+<li>測驗互動流程：作答 → 交卷 → 逐題解析：通過</li>
+<li>啟動 JS 錯誤：0</li>
+<li>截圖：英雄旅程／英雄榜（1280×800@1.5x）存於 商店素材\截圖\</li>
+</ul>
+<h2>五、擴充路徑</h2>
+<table>
+<thead><tr><th>需求</th><th>做法</th></tr></thead>
+<tbody>
+<tr><td>Android APP</td><td>bubblewrap TWA 打包（沿用 talentfit／hr 產線），或 Capacitor 全離線包</td></tr>
+<tr><td>多公司／雲端</td><td>加入後端 API（資料結構已就緒），或 Supabase/Firebase</td></tr>
+<tr><td>自訂題庫 UI</td><td>測驗編輯器（題目 JSON 匯入匯出已可由員工管理 JSON 備份達成）</td></tr>
+<tr><td>職能雷達圖</td><td>員工職能評等（HR 評分 0-5）+ 雷達渲染</td></tr>
+<tr><td>與 HR 薪資系統打通</td><td>兩者皆為 erp-free.com 生態，職級對接薪級</td></tr>
+</tbody>
+</table>
+</div>
+<div class="foot">TalentQuest 人才發展平台 · 配套文件 · <a href="https://www.erp-free.com/hrd/" style="color:inherit">開啟平台</a></div>
+</body>
+</html>
